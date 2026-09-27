@@ -4,8 +4,8 @@ struct ConverterView: View {
     let dependencies: DependencyContainer
     let coordinator: AppCoordinator
     
-    @State private var baseAmountText = "-0"
-    @State private var quoteAmountText = "+0"
+    @State private var baseAmountText = ""
+    @State private var quoteAmountText = ""
     
     var body: some View {
         VStack(alignment: .leading, spacing: .zero) {
@@ -17,7 +17,8 @@ struct ConverterView: View {
                 
                 CurrencyInputField(
                     currencyCode: "USDC",
-                    sign: "-",
+                    sign: "−",
+                    currencySymbol: "$",
                     subtitle: "Digital dollars",
                     showsChevron: false,
                     amountText: $baseAmountText,
@@ -45,6 +46,7 @@ struct ConverterView: View {
             CurrencyInputField(
                 currencyCode: "MXN",
                 sign: "+",
+                currencySymbol: "$",
                 subtitle: "Mexican pesos",
                 showsChevron: true,
                 amountText: $quoteAmountText,

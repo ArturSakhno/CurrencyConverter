@@ -9,7 +9,8 @@ import SwiftUI
 
 struct CurrencyInputField: View {
     let currencyCode: String
-    let sign: String
+    let sign: String?
+    let currencySymbol: String?
     let subtitle: String
     let showsChevron: Bool
     @Binding var amountText: String
@@ -30,16 +31,19 @@ struct CurrencyInputField: View {
                                 .frame(width: 24, height: 24)
                         }
                     }
+                    .fixedSize()
                 }
                 .disabled(!showsChevron)
                 .foregroundStyle(.primary)
 
                 Spacer(minLength: 0)
 
-                TextField("", text: $amountText)
-                    .multilineTextAlignment(.trailing)
-                    .keyboardType(.decimalPad)
-                    .font(.system(size: 32))
+                AmountTextField(
+                    text: $amountText,
+                    sign: sign,
+                    currencySymbol: currencySymbol,
+                    accessibilityLabel: "Amount in \(currencyCode)"
+                )
             }
 
             HStack(spacing: 4) {
@@ -57,10 +61,11 @@ struct CurrencyInputField: View {
 }
 
 #Preview {
-    @Previewable @State var text = "-0"
+    @Previewable @State var text = ""
     CurrencyInputField(
         currencyCode: "USDC",
-        sign: "-",
+        sign: "−",
+        currencySymbol: "$",
         subtitle: "Digital dollars",
         showsChevron: true,
         amountText: $text,
