@@ -13,11 +13,12 @@ struct ExchangeRateView: View {
         Text(text)
             .padding(.horizontal, 12)
             .padding(.vertical, 11)
-            .cornerRadius(20) /// make the background rounded
-            .overlay( /// apply a rounded border
+            .cornerRadius(20)
+            .overlay(
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color(hex: "#F5F5F4"), lineWidth: 1.5)
             )
+            .backgroundStyle(.white)
     }
 }
 

@@ -4,49 +4,57 @@ struct ConverterView: View {
     let dependencies: DependencyContainer
     let coordinator: AppCoordinator
     
-    @State var textField = "- $"
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("Exchange calculator")
-                .padding(.horizontal, 16)
-                .font(.system(size: 32))
-                .fontWeight(.medium)
-                
-            buildTop
-            
-            HStack {
-                SwapButton {}
-                
-                ExchangeRateView()
-            }
-        }
-        
-        .padding(.top, 126)
-        .ignoresSafeArea(edges: .top)
-        .background(.red)
-        Spacer()
-    }
+    @State private var baseAmountText = "-0"
+    @State private var quoteAmountText = "+0"
     
-    var buildTop: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
-                Text("USDC")
-                    .frame(alignment: .leading)
-                    
-                Spacer(minLength: 0)
-                TextField("", text: $textField)
-                    .multilineTextAlignment(.trailing)
-                    .keyboardType(.decimalPad)
+    var body: some View {
+        VStack(alignment: .leading, spacing: .zero) {
+            VStack(alignment: .leading, spacing: .zero) {
+                Text("Exchange calculator")
+                    .padding(.horizontal, 16)
+                    .font(.system(size: 32))
+                    .fontWeight(.medium)
+                
+                CurrencyInputField(
+                    currencyCode: "USDC",
+                    sign: "-",
+                    subtitle: "Digital dollars",
+                    showsChevron: false,
+                    amountText: $baseAmountText,
+                    onSelectCurrency: {}
+                )
+                .padding(.top, 20)
+                .padding(.horizontal, 16)
             }
+            .padding(.top, 126)
+            .overlay(alignment: .bottom) {
+                ExchangeRateView()
+                    .frame(maxWidth: .infinity)
+                    .alignmentGuide(.bottom) { $0[VerticalAlignment.top]
+                    }
+                    .overlay(alignment: .leading) {
+                        SwapButton { }
+                            .padding(.leading, 16)
+                    }
+            }
+            .zIndex(1)
             
-            HStack(spacing: 4) {
-                Image(systemName: "0.circle")
-                    .resizable()
-                    .frame(width: 11, height: 11)
-                Text("Digital dollars")
-            }
+            .padding(.bottom, 20)
+            .background(Color(hex: "#F9F9F9"))
+            
+            CurrencyInputField(
+                currencyCode: "MXN",
+                sign: "+",
+                subtitle: "Mexican pesos",
+                showsChevron: true,
+                amountText: $quoteAmountText,
+                onSelectCurrency: { coordinator.presentCurrencyPicker() }
+            )
+            .padding(.horizontal, 16)
+            .padding(.top, 20)
         }
+        .ignoresSafeArea()
+        Spacer()
     }
 }
 
