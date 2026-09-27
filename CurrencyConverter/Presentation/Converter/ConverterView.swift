@@ -6,24 +6,26 @@ struct ConverterView: View {
     
     @State var textField = "- $"
 
-    @State private var status = "Loading…"
-
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             Text("Exchange calculator")
-            
+                .padding(.horizontal, 16)
+                .font(.system(size: 32))
+                .fontWeight(.medium)
+                
             buildTop
             
-            
-            
-            exchangeRate
-            
             HStack {
-                convertButton
+                SwapButton {}
                 
-                exchangeRate
+                ExchangeRateView()
             }
         }
+        
+        .padding(.top, 126)
+        .ignoresSafeArea(edges: .top)
+        .background(.red)
+        Spacer()
     }
     
     var buildTop: some View {
@@ -45,28 +47,6 @@ struct ConverterView: View {
                 Text("Digital dollars")
             }
         }
-    }
-    
-    var convertButton: some View {
-        ZStack {
-            Circle()
-                .fill(.green)
-            Image("arrow.down")
-                .resizable()
-                .frame(width: 24, height: 24)
-        }
-        .frame(width: 40, height: 40)
-    }
-    
-    var exchangeRate: some View {
-        Text("1 USDc = 18.4097 MXN")
-            .padding(.horizontal, 12)
-            .padding(.vertical, 11)
-            .cornerRadius(20) /// make the background rounded
-            .overlay( /// apply a rounded border
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color(hex: "#F5F5F4"), lineWidth: 1.5)
-            )
     }
 }
 
