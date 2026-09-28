@@ -35,8 +35,31 @@ struct AmountInputSanitizerTests {
         #expect(sut.sanitize("1,234.5") == "1,234.5")
     }
 
-    @Test func capsIntegerDigits() {
-        #expect(sut.sanitize("1234567890123456") == "123,456,789,012")
+    @Test func sanitizeKeepsIntegerDigitsBeyondEntryCap() {
+        #expect(sut.sanitize("1234567890123456") == "1234567890123456")
+        #expect(sut.decimal(from: "3,999,999,999,996,000.00") == Decimal(string: "3999999999996000"))
+    }
+
+    @Test func editWithinCapIsAccepted() {
+        #expect(sut.sanitizeEdit(from: "12345678901", to: "123456789012") == "123456789012")
+    }
+
+    @Test func editGrowingIntegerPastCapIsRejected() {
+        #expect(sut.sanitizeEdit(from: "123456789012", to: "1234567890123") == "123456789012")
+    }
+
+    @Test func pastingPastCapIntoEmptyFieldIsRejected() {
+        #expect(sut.sanitizeEdit(from: "", to: "1234567890123456") == "")
+    }
+
+    @Test func editShrinkingValueAlreadyOverCapIsAccepted() {
+        // A converted amount the user focuses and deletes from.
+        #expect(sut.sanitizeEdit(from: "3,999,999,999,996,000.00", to: "3,999,999,999,996,00.00")
+            == "399999999999600.00")
+    }
+
+    @Test func fractionEditBeyondCapIsNotRejectedByIntegerRule() {
+        #expect(sut.sanitizeEdit(from: "123456789012.1", to: "123456789012.12") == "123456789012.12")
     }
 
     @Test(arguments: [

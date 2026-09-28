@@ -88,6 +88,26 @@ struct ConverterViewModelTests {
         #expect(result == "100.00")
     }
 
+    @Test func convertedAmountKeepsEveryDigitBeyondEntryCap() async {
+        let cop = Currency(code: "COP")
+        let snapshot = ExchangeRatesSnapshot(
+            rates: [ExchangeRate(quoteCurrencyCode: "COP", ask: 4000, bid: 4000)],
+            fetchedAt: Date(timeIntervalSince1970: 0)
+        )
+        let sut = makeSUT(result: .loaded(snapshot, isFresh: true))
+        await sut.loadRates()
+
+        let result = sut.convertedAmount(
+            sourceText: "999999999999",
+            sourceField: .base,
+            quoteCurrency: cop,
+            isBaseOnTop: true
+        )
+
+        let parser = AmountInputSanitizer(locale: Locale(identifier: "en_US"))
+        #expect(result.flatMap(parser.decimal(from:)) == Decimal(string: "3999999999996000"))
+    }
+
     @Test func convertedAmountReturnsNilForUnparsableInput() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
         await sut.loadRates()

@@ -102,8 +102,11 @@ struct AmountTextField: View {
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
             availableWidth = width
         }
-        .onChange(of: text) { _, newValue in
-            let sanitized = sanitizer.sanitize(newValue)
+        .onChange(of: text) { oldValue, newValue in
+            // Only the user's own typing is sanitized. The unfocused field receives an
+            // already-formatted converted amount, which may legitimately exceed the entry cap.
+            guard focusedField.wrappedValue == field else { return }
+            let sanitized = sanitizer.sanitizeEdit(from: oldValue, to: newValue)
             if sanitized != newValue {
                 text = sanitized
             }
