@@ -4,6 +4,7 @@ struct ConverterView: View {
     let dependencies: DependencyContainer
     let coordinator: AppCoordinator
     let quoteCurrency: Currency
+    private let baseCurrency: Currency
 
     @State private var viewModel: ConverterViewModel
     @State private var baseAmountText = ""
@@ -22,19 +23,20 @@ struct ConverterView: View {
         self.dependencies = dependencies
         self.coordinator = coordinator
         self.quoteCurrency = quoteCurrency
+        self.baseCurrency = dependencies.currencyCatalogUseCase.baseCurrency()
         _viewModel = State(wrappedValue: ConverterViewModel(
             convertUseCase: dependencies.convertUseCase,
             loadRatesUseCase: dependencies.loadRatesUseCase
         ))
     }
 
-    private var baseInfo: CurrencyDisplayInfo { .info(for: CurrencyCatalog.base) }
+    private var baseInfo: CurrencyDisplayInfo { .info(for: baseCurrency) }
     private var quoteInfo: CurrencyDisplayInfo { .info(for: quoteCurrency) }
 
     // MARK: - Row identity follows currency, not screen slot
 
-    private var topCurrency: Currency { isBaseOnTop ? CurrencyCatalog.base : quoteCurrency }
-    private var bottomCurrency: Currency { isBaseOnTop ? quoteCurrency : CurrencyCatalog.base }
+    private var topCurrency: Currency { isBaseOnTop ? baseCurrency : quoteCurrency }
+    private var bottomCurrency: Currency { isBaseOnTop ? quoteCurrency : baseCurrency }
     private var topInfo: CurrencyDisplayInfo { .info(for: topCurrency) }
     private var bottomInfo: CurrencyDisplayInfo { .info(for: bottomCurrency) }
     private var topField: AmountField { isBaseOnTop ? .base : .quote }
