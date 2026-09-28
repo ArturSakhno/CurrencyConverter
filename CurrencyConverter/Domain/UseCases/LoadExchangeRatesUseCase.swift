@@ -7,11 +7,11 @@ protocol LoadExchangeRatesUseCase: Sendable {
     nonisolated func load() async -> RatesLoadResult
 }
 
-nonisolated struct DefaultLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
+struct DefaultLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
     let repository: ExchangeRateRepository
     let quoteCurrencyCodes: [String]
 
-    nonisolated func load() async -> RatesLoadResult {
+    func load() async -> RatesLoadResult {
         do {
             let snapshot = try await repository.fetchLatestRates(for: quoteCurrencyCodes)
             return .loaded(snapshot, isFresh: true)
