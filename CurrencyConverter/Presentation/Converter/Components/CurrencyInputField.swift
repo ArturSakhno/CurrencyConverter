@@ -15,6 +15,8 @@ struct CurrencyInputField: View {
     let subtitle: String
     let showsChevron: Bool
     let imageName: String?
+    let field: FocusSlot
+    var focusedField: FocusState<FocusSlot?>.Binding
     let onSelectCurrency: EmptyClosure
 
     var body: some View {
@@ -43,7 +45,9 @@ struct CurrencyInputField: View {
                     text: $amountText,
                     sign: sign,
                     currencySymbol: currencySymbol,
-                    accessibilityLabel: "Amount in \(currencyCode)"
+                    accessibilityLabel: "Amount in \(currencyCode)",
+                    field: field,
+                    focusedField: focusedField
                 )
             }
 
@@ -65,6 +69,7 @@ struct CurrencyInputField: View {
 
 #Preview {
     @Previewable @State var text = ""
+    @Previewable @FocusState var focusedField: FocusSlot?
     CurrencyInputField(
         amountText: $text,
         currencyCode: "USDC",
@@ -73,6 +78,8 @@ struct CurrencyInputField: View {
         subtitle: "Digital dollars",
         showsChevron: true,
         imageName: "us",
+        field: .top,
+        focusedField: $focusedField,
         onSelectCurrency: {}
     )
 }
