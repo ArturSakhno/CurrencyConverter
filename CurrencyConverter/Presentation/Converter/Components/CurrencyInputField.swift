@@ -51,17 +51,18 @@ struct CurrencyInputField: View {
                 } label: {
                     HStack(spacing: .zero) {
                         Text(currencyCode)
-                            .font(.system(size: 32, weight: .medium))
+                            .textStyle(\.h3)
+                            .foregroundStyle(.textPrimary)
                         if showsChevron {
                             Image(.chevronDown)
                                 .resizable()
-                                .frame(width: 24, height: 24)
+                                .foregroundStyle(.iconPrimary)
+                                .frame(width: DS.Size.icon, height: DS.Size.icon)
                         }
                     }
                     .fixedSize()
                 }
                 .disabled(!showsChevron)
-                .foregroundStyle(.primary)
                 .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
                     currencyButtonWidth = width
                 }
@@ -84,9 +85,8 @@ struct CurrencyInputField: View {
                         .frame(width: 11, height: 11)
                 }
                 Text(subtitle)
-                    .foregroundStyle(Color(hex: "#A8A29F"))
-                    .font(.system(size: 14,
-                                  weight: .regular))
+                    .textStyle(\.bodySmall)
+                    .foregroundStyle(.textSecondary)
             }
         }
         .padding(.vertical, 9.5)

@@ -41,7 +41,6 @@ struct AmountTextField: View {
     /// this view is given - so a caller can pick its layout from it without feedback.
     var onNaturalWidthChange: (CGFloat) -> Void = { _ in }
 
-    @ScaledMetric(relativeTo: .largeTitle) private var fontSize: CGFloat = 32
     @State private var availableWidth: CGFloat?
     @State private var naturalWidth: CGFloat = 0
 
@@ -54,14 +53,14 @@ struct AmountTextField: View {
         HStack(spacing: 4) {
             if let sign {
                 Text(sign)
-                    .foregroundStyle(text.isEmpty ? .secondary : .primary)
+                    .foregroundStyle(text.isEmpty ? .textSecondary : .textPrimary)
                     .accessibilityHidden(true)
             }
 
             HStack(spacing: .zero) {
                 if let currencySymbol {
                     Text(currencySymbol)
-                        .foregroundStyle(text.isEmpty ? .secondary : .primary)
+                        .foregroundStyle(text.isEmpty ? .textSecondary : .textPrimary)
                         .accessibilityHidden(true)
                 }
 
@@ -74,9 +73,10 @@ struct AmountTextField: View {
                     .padding(.trailing, 2) // room for the caret
                     .hidden()
                     .overlay {
-                        TextField(text: $text, prompt: Text("0").foregroundStyle(.secondary)) {
+                        TextField(text: $text, prompt: Text("0").foregroundStyle(.textSecondary)) {
                             Text(accessibilityLabel)
                         }
+                        .foregroundStyle(.textPrimary)
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .lineLimit(2)
@@ -85,7 +85,7 @@ struct AmountTextField: View {
                     }
             }
         }
-        .font(.system(size: fontSize))
+        .textStyle(\.amountInput)
         .monospacedDigit()
         .fixedSize()
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in

@@ -13,6 +13,8 @@ struct RootView: View {
     var body: some View {
         NavigationStack {
             ConverterView(dependencies: dependencies, coordinator: coordinator, quoteCurrency: selectedQuoteCurrency)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(.bgPrimary)
                 .sheet(item: $coordinator.presentedSheet) { route in
                     switch route {
                     case .currencyPicker:
@@ -24,5 +26,6 @@ struct RootView: View {
                     }
                 }
         }
+        .theme(.standard)
     }
 }

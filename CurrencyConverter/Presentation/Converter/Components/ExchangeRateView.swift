@@ -11,18 +11,28 @@ struct ExchangeRateView: View {
     let text: String
     var body: some View {
         Text(text)
-            .foregroundStyle(.black)
-            .padding(.horizontal, 12)
+            .textStyle(\.body)
+            .foregroundStyle(.interactivePrimary)
+            .padding(.horizontal, DS.Spacing.s)
             .padding(.vertical, 11)
-            .background(.white)
-            .cornerRadius(20)
+            .background(.surfaceOverlay, in: .rect(cornerRadius: DS.Radius.pill))
             .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color(hex: "#F5F5F4"), lineWidth: 1.5)
+                RoundedRectangle(cornerRadius: DS.Radius.pill)
+                    .stroke(.borderDefault, lineWidth: DS.borderWidth)
             )
     }
 }
 
 #Preview {
     ExchangeRateView(text: "1 USDc = 18.4097 MXN")
+}
+
+#Preview("Dark Mode") {
+    ExchangeRateView(text: "1 USDc = 18.4097 MXN")
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Sample theme") {
+    ExchangeRateView(text: "1 USDc = 18.4097 MXN")
+        .theme(.sample)
 }

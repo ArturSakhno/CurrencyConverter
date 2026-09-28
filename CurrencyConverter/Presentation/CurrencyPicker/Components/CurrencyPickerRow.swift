@@ -14,20 +14,19 @@ struct CurrencyPickerRow: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(verbatim: info.displayCode)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
+                        .textStyle(\.body)
+                        .foregroundStyle(.textPrimary)
                 }
 
                 Spacer(minLength: 0)
 
                 if isSelected {
                     Image(systemName: "checkmark")
-                        .foregroundStyle(.tint)
+                        .foregroundStyle(.interactivePrimary)
                         .accessibilityHidden(true)
                 }
             }
             .contentShape(Rectangle())
-            .listRowBackground(Color.clear)
         }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
@@ -43,7 +42,7 @@ struct CurrencyPickerRow: View {
                 .accessibilityHidden(true)
         } else {
             Circle()
-                .fill(.quaternary)
+                .fill(.surfaceDefault)
                 .frame(width: flagSize, height: flagSize)
         }
     }

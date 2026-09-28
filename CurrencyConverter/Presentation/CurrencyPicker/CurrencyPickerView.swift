@@ -15,6 +15,7 @@ struct CurrencyPickerView: View {
                 )
 
                 .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             }
             .listStyle(.plain)
             .navigationTitle("Choose currency")
@@ -35,7 +36,7 @@ struct CurrencyPickerView: View {
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .frame(maxHeight: .infinity)
-        .presentationBackground(Color(.systemBackground))
+        .presentationBackground(.bgPrimary)
     }
 
     private func select(_ currency: Currency) {

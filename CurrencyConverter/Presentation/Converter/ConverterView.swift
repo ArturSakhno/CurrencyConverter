@@ -67,15 +67,15 @@ struct ConverterView: View {
         VStack(alignment: .leading, spacing: .zero) {
             VStack(alignment: .leading, spacing: .zero) {
                 Text("Exchange calculator")
-                    .padding(.horizontal, 16)
-                    .font(.system(size: 32))
-                    .fontWeight(.medium)
+                    .padding(.horizontal, DS.Spacing.m)
+                    .textStyle(\.h3)
+                    .foregroundStyle(.textPrimary)
 
                 if let ratesAsOfText = viewModel.ratesAsOfText {
                     Text("Rates as of \(ratesAsOfText)")
-                        .padding(.horizontal, 16)
-                        .font(.system(size: 13))
-                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, DS.Spacing.m)
+                        .textStyle(\.bodySmall)
+                        .foregroundStyle(.textSecondary)
                 }
 
                 ZStack {
@@ -85,16 +85,14 @@ struct ConverterView: View {
 
                         bottomView
                             .padding(.top, 30)
-                            .background(Color(.systemBackground))
-
+                            .background(.bgPrimary)
                     }
 
                     exchange
                 }
-
             }
             .padding(.top, 54)
-            .background(Color(hex: "#F9F9F9").ignoresSafeArea())
+            .background(.bgSelected)
             .task {
                 await viewModel.loadRates()
             }

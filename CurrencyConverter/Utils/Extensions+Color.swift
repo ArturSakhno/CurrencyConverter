@@ -13,7 +13,7 @@ import SwiftUI
 // Retrieved 2026-09-27, License - CC BY-SA 4.0
 
 extension Color {
-    init(hex: String) {
+    nonisolated init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0
         Scanner(string: hex).scanHexInt64(&int)

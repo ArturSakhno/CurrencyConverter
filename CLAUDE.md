@@ -56,6 +56,7 @@ Other project settings that matter:
   - On first launch with no cache and no network, show a blocking full-screen "No connection" state with a Retry button. The amount fields must not be in the view hierarchy at all, not just hidden.
   - If a later load fails while a cache exists, stay non-blocking and keep showing cached numbers.
   - Rates refresh on launch and when the app returns to the foreground; there's no polling. A "rates as of" timestamp is always visible, using client capture time rather than the API's `date`.
+- **Design tokens** live in `Presentation/DesignSystem/` and are named after the Figma variables. Views use `.foregroundStyle(.textPrimary)`-style `ThemeColor` tokens, `.textStyle(\.h3)`, and `DS.Spacing`/`DS.Radius`, never raw `Color(hex:)` or `.system(size:)`. The theme follows the system Light/Dark; add a theme as another `Theme` `static let` and inject it with `.theme(_:)`. The `theme` environment key is hand-written and `nonisolated`, not `@Entry`, because `ThemeColor.resolve` is nonisolated.
 - **Scope**: Dark Mode is in scope (Figma is light-only, so it's self-designed). i18n uses a String Catalog and ships English and Spanish.
 
 ## Live API quirks the code must respect
