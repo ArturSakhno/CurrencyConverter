@@ -1,0 +1,138 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Amount in %@" : {
+      "comment" : "Accessibility label for an amount entry field; %@ is the currency code shown in that row",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monto en %@"
+          }
+        }
+      }
+    },
+    "Argentine pesos" : {
+      "comment" : "Subtitle for ARS",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesos argentinos"
+          }
+        }
+      }
+    },
+    "Brazilian reais" : {
+      "comment" : "Subtitle for BRL",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reales brasileños"
+          }
+        }
+      }
+    },
+    "Choose currency" : {
+      "comment" : "Navigation title for the currency picker sheet",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir moneda"
+          }
+        }
+      }
+    },
+    "Close" : {
+      "comment" : "Accessibility label for the currency picker's close button",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
+          }
+        }
+      }
+    },
+    "Colombian pesos" : {
+      "comment" : "Subtitle for COP",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesos colombianos"
+          }
+        }
+      }
+    },
+    "Digital dollars" : {
+      "comment" : "Subtitle for USDC",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dólares digitales"
+          }
+        }
+      }
+    },
+    "Digital euros" : {
+      "comment" : "Subtitle for EURC",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Euros digitales"
+          }
+        }
+      }
+    },
+    "Exchange calculator" : {
+      "comment" : "Main screen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculadora de cambio"
+          }
+        }
+      }
+    },
+    "Mexican pesos" : {
+      "comment" : "Subtitle for MXN",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesos mexicanos"
+          }
+        }
+      }
+    },
+    "Rate unavailable" : {
+      "comment" : "Shown in place of the rate pill when no exchange rate could be loaded",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasa no disponible"
+          }
+        }
+      }
+    },
+    "Rates as of %@" : {
+      "comment" : "Caption under the screen title; %@ is the local time the rates were fetched",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasas actualizadas: %@"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

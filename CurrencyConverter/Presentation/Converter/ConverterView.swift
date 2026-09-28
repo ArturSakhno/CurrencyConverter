@@ -66,16 +66,19 @@ struct ConverterView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: .zero) {
             VStack(alignment: .leading, spacing: .zero) {
-                Text("Exchange calculator")
+                Text("Exchange calculator", comment: "Main screen title")
                     .padding(.horizontal, DS.Spacing.m)
                     .textStyle(\.h3)
                     .foregroundStyle(.textPrimary)
 
                 if let ratesAsOfText = viewModel.ratesAsOfText {
-                    Text("Rates as of \(ratesAsOfText)")
-                        .padding(.horizontal, DS.Spacing.m)
-                        .textStyle(\.bodySmall)
-                        .foregroundStyle(.textSecondary)
+                    Text(
+                        "Rates as of \(ratesAsOfText)",
+                        comment: "Caption under the screen title; %@ is the local time the rates were fetched"
+                    )
+                    .padding(.horizontal, DS.Spacing.m)
+                    .textStyle(\.bodySmall)
+                    .foregroundStyle(.textSecondary)
                 }
 
                 ZStack {

@@ -18,7 +18,7 @@ struct CurrencyPickerView: View {
                 .listRowBackground(Color.clear)
             }
             .listStyle(.plain)
-            .navigationTitle("Choose currency")
+            .navigationTitle(Text("Choose currency", comment: "Navigation title for the currency picker sheet"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -29,7 +29,7 @@ struct CurrencyPickerView: View {
                             .resizable()
                             .frame(width: 32, height: 32)
                     }
-                    .accessibilityLabel(Text("Close"))
+                    .accessibilityLabel(Text("Close", comment: "Accessibility label for the currency picker's close button"))
                 }
             }
         }

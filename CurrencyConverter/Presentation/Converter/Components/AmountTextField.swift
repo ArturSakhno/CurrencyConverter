@@ -73,7 +73,7 @@ struct AmountTextField: View {
                     .padding(.trailing, 2) // room for the caret
                     .hidden()
                     .overlay {
-                        TextField(text: $text, prompt: Text("0").foregroundStyle(.textSecondary)) {
+                        TextField(text: $text, prompt: Text(verbatim: "0").foregroundStyle(.textSecondary)) {
                             Text(accessibilityLabel)
                         }
                         .foregroundStyle(.textPrimary)
