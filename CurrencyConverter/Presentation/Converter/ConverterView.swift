@@ -80,7 +80,7 @@ struct ConverterView: View {
                         
                         bottomView
                             .padding(.top, 30)
-                            .background(.white)
+                            .background(Color(.systemBackground))
                         
                     }
                     
