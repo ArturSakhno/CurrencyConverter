@@ -1,7 +1,7 @@
 #if DEBUG
 import SwiftUI
 
-extension Theme {
+public extension Theme {
     /// Sample custom theme proving the system takes more than Light/Dark.
     /// Not shipped - previews and tests only.
     nonisolated static let sample = Theme(

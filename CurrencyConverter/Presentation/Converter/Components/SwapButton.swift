@@ -5,6 +5,7 @@
 //  Created by Artur Sakhno on 27/09/2026.
 //
 
+import DesignSystem
 import SwiftUI
 
 struct SwapButton: View {
@@ -16,11 +17,12 @@ struct SwapButton: View {
             ZStack {
                 Circle()
                     .fill(.interactivePrimary)
-                Image("arrow.down")
+                Image(.dsArrowDown)
                     .resizable()
                     .renderingMode(.template)
                     .foregroundStyle(.onInteractivePrimary)
-                    .frame(width: DS.Size.icon, height: DS.Size.icon)
+                    .frame(width: DS.Size.icon,
+                           height: DS.Size.icon)
             }
             .frame(width: DS.Size.swapButton,
                    height: DS.Size.swapButton)

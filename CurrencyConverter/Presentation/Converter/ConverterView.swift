@@ -1,7 +1,7 @@
+import DesignSystem
 import SwiftUI
 
 struct ConverterView: View {
-
     let coordinator: AppCoordinator
     let quoteCurrency: Currency
     private let baseCurrency: Currency
@@ -123,6 +123,9 @@ struct ConverterView: View {
                     isBaseOnTop: isBaseOnTop
                 ) ?? ""
             }
+        }
+        .onTapGesture {
+            focusedSlot = nil
         }
 
         Spacer()

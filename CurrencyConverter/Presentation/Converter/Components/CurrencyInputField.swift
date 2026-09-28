@@ -5,6 +5,7 @@
 //  Created by Artur Sakhno on 27/09/2026.
 //
 
+import DesignSystem
 import SwiftUI
 
 struct CurrencyInputField: View {
@@ -54,7 +55,7 @@ struct CurrencyInputField: View {
                             .textStyle(\.h3)
                             .foregroundStyle(.textPrimary)
                         if showsChevron {
-                            Image(.chevronDown)
+                            Image(.dsChevronDown)
                                 .resizable()
                                 .foregroundStyle(.iconPrimary)
                                 .frame(width: DS.Size.icon, height: DS.Size.icon)

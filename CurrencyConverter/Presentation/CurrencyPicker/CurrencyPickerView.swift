@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 
 struct CurrencyPickerView: View {
@@ -25,7 +26,7 @@ struct CurrencyPickerView: View {
                     Button {
                         coordinator.dismissSheet()
                     } label: {
-                        Image(.cross)
+                        Image(.dsCross)
                             .resizable()
                             .frame(width: 32, height: 32)
                     }

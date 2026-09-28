@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 
 struct CurrencyPickerRow: View {
@@ -26,7 +27,7 @@ struct CurrencyPickerRow: View {
                             Circle()
                                 .fill(.interactivePrimary)
 
-                            Image(.checkmark)
+                            Image(.dsCheckmark)
                                 .resizable()
                                 .foregroundStyle(.bgPrimary)
                                 .accessibilityHidden(true)

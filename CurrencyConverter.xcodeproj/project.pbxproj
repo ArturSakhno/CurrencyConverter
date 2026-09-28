@@ -6,6 +6,10 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		16EB2168306AF3BC00876834 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 16EB2167306AF3BC00876834 /* DesignSystem */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		16B65273306938660064BB5B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -51,6 +55,7 @@
 		16B65262306938650064BB5B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				16EB2168306AF3BC00876834 /* DesignSystem in Frameworks */,
 			);
 		};
 		16B6526F306938660064BB5B /* Frameworks */ = {
@@ -104,6 +109,9 @@
 				16B65267306938650064BB5B /* CurrencyConverter */,
 			);
 			name = CurrencyConverter;
+			packageProductDependencies = (
+				16EB2167306AF3BC00876834 /* DesignSystem */,
+			);
 			productName = CurrencyConverter;
 			productReference = 16B65265306938650064BB5B /* CurrencyConverter.app */;
 			productType = "com.apple.product-type.application";
@@ -183,6 +191,9 @@
 			);
 			mainGroup = 16B6525C306938650064BB5B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				16EB2166306AF3BC00876834 /* XCLocalSwiftPackageReference "Packages/DesignSystem" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 16B65266306938650064BB5B /* Products */;
 			projectDirPath = "";
@@ -601,6 +612,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		16EB2166306AF3BC00876834 /* XCLocalSwiftPackageReference "Packages/DesignSystem" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/DesignSystem;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		16EB2167306AF3BC00876834 /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DesignSystem;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 16B6525D306938650064BB5B /* Project object */;
 	validationLevel = 1;

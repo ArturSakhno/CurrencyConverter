@@ -2,15 +2,15 @@ import SwiftUI
 
 /// A color token resolved at render time against the environment's theme and color
 /// scheme, so views write `.foregroundStyle(.textPrimary)` and Light/Dark just works.
-nonisolated struct ThemeColor: ShapeStyle {
+public struct ThemeColor: ShapeStyle {
     let token: KeyPath<ColorPalette, Color> & Sendable
 
-    func resolve(in environment: EnvironmentValues) -> Color {
+    public func resolve(in environment: EnvironmentValues) -> Color {
         environment.theme.palette(for: environment.colorScheme)[keyPath: token]
     }
 }
 
-extension ShapeStyle where Self == ThemeColor {
+public extension ShapeStyle where Self == ThemeColor {
     nonisolated static var textPrimary: ThemeColor { ThemeColor(token: \.textPrimary) }
     nonisolated static var textSecondary: ThemeColor { ThemeColor(token: \.textSecondary) }
     nonisolated static var textAccent: ThemeColor { ThemeColor(token: \.textAccent) }

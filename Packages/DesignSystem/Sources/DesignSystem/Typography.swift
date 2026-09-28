@@ -3,7 +3,7 @@ import UIKit
 
 /// One Figma text style. Figma's font (Beausite Classic) isn't bundled, so sizes and
 /// weights are applied to the system font; swapping the family only touches `font(size:)`.
-nonisolated struct TextStyle: Sendable, Equatable {
+public struct TextStyle: Sendable, Equatable {
     let size: CGFloat
     let weight: Font.Weight
     /// Figma line height in points; applied as extra line spacing over the font's natural one.
@@ -16,20 +16,20 @@ nonisolated struct TextStyle: Sendable, Equatable {
     var tracking: CGFloat { size * trackingPercent / 100 }
 }
 
-nonisolated struct Typography: Sendable, Equatable {
+public struct Typography: Sendable, Equatable {
     /// Mobile/Header/H3
-    let h3: TextStyle
+    public let h3: TextStyle
     /// Mobile/Header/H4
-    let h4: TextStyle
+    public let h4: TextStyle
     /// Mobile/Misc/Amount Input
-    let amountInput: TextStyle
+    public let amountInput: TextStyle
     /// Mobile/Body/Default/Body Default
-    let body: TextStyle
+    public let body: TextStyle
     /// Mobile/Body/Small/Body Small
-    let bodySmall: TextStyle
+    public let bodySmall: TextStyle
 }
 
-nonisolated extension Typography {
+extension Typography {
     static let standard = Typography(
         h3: TextStyle(size: 32, weight: .medium, lineHeight: 36, trackingPercent: -4, relativeTo: .largeTitle),
         h4: TextStyle(size: 24, weight: .medium, lineHeight: 26, trackingPercent: -2, relativeTo: .title),
@@ -75,7 +75,7 @@ private struct ThemedTextStyleModifier: ViewModifier {
     }
 }
 
-extension View {
+public extension View {
     /// Applies a text style from the current theme: `.textStyle(\.h3)`.
     func textStyle(_ keyPath: KeyPath<Typography, TextStyle>) -> some View {
         modifier(ThemedTextStyleModifier(keyPath: keyPath))

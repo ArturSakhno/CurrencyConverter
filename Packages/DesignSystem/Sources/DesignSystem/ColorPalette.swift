@@ -3,7 +3,7 @@ import SwiftUI
 /// Semantic color tokens for one appearance. Names mirror the Figma variables
 /// (`text/primary` → `textPrimary`); variables that share a value and meaning are
 /// collapsed into one token. Views never use raw colors - see `ThemeColor`.
-nonisolated struct ColorPalette: Sendable, Equatable {
+struct ColorPalette: Sendable, Equatable {
     /// text/primary, Labels/Primary
     let textPrimary: Color
     /// text/secondary
@@ -42,7 +42,7 @@ nonisolated struct ColorPalette: Sendable, Equatable {
     let selectorUnselectedBorder: Color
 }
 
-nonisolated extension ColorPalette {
+extension ColorPalette {
     /// Figma values.
     static let standardLight = ColorPalette(
         textPrimary: Color(hex: "#000000"),
