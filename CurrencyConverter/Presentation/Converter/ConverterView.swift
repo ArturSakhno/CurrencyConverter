@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ConverterView: View {
-    let dependencies: DependencyContainer
+    
     let coordinator: AppCoordinator
     let quoteCurrency: Currency
     private let baseCurrency: Currency
@@ -19,8 +19,11 @@ struct ConverterView: View {
     @FocusState private var focusedSlot: FocusSlot?
     @Environment(\.scenePhase) private var scenePhase
 
-    init(dependencies: DependencyContainer, coordinator: AppCoordinator, quoteCurrency: Currency) {
-        self.dependencies = dependencies
+    init(
+        dependencies: DependencyContainer,
+        coordinator: AppCoordinator,
+        quoteCurrency: Currency
+    ) {
         self.coordinator = coordinator
         self.quoteCurrency = quoteCurrency
         self.baseCurrency = dependencies.currencyCatalogUseCase.baseCurrency()
