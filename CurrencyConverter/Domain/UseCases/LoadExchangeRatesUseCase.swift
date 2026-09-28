@@ -3,8 +3,8 @@ nonisolated enum RatesLoadResult: Equatable, Sendable {
     case unavailable
 }
 
-protocol LoadExchangeRatesUseCase: Sendable {
-    nonisolated func load() async -> RatesLoadResult
+nonisolated protocol LoadExchangeRatesUseCase: Sendable {
+    func load() async -> RatesLoadResult
 }
 
 struct DefaultLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {

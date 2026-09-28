@@ -13,7 +13,7 @@ nonisolated struct AmountInputSanitizer: Sendable {
     /// Keeps digits and the first locale decimal separator; anything else (including
     /// grouping separators from a previously formatted value) is dropped. Excess digits
     /// are truncated, never rounded.
-    nonisolated func sanitize(_ raw: String) -> String {
+    func sanitize(_ raw: String) -> String {
         var integerPart = ""
         var fractionPart = ""
         var hasSeparator = false
@@ -41,7 +41,7 @@ nonisolated struct AmountInputSanitizer: Sendable {
         return integerPart + String(decimalSeparator) + String(fractionPart.prefix(maxFractionDigits))
     }
 
-    nonisolated func decimal(from text: String) -> Decimal? {
+    func decimal(from text: String) -> Decimal? {
         let sanitized = sanitize(text)
         guard !sanitized.isEmpty else { return nil }
         return Decimal(string: sanitized, locale: locale)

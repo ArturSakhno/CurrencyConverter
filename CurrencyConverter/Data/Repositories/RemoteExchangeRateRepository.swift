@@ -9,7 +9,7 @@ nonisolated struct RemoteExchangeRateRepository: ExchangeRateRepository {
     }
 
     /// Interim: always nil until roadmap item 3 adds a real cache store.
-    nonisolated func lastCachedSnapshot() -> ExchangeRatesSnapshot? {
+    func lastCachedSnapshot() -> ExchangeRatesSnapshot? {
         nil
     }
 }

@@ -135,7 +135,7 @@ struct ConverterViewModelTests {
 private struct StubLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
     let result: RatesLoadResult
 
-    nonisolated func load() async -> RatesLoadResult {
+    func load() async -> RatesLoadResult {
         result
     }
 }
