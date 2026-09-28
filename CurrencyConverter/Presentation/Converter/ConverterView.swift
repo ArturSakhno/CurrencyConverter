@@ -36,6 +36,7 @@ struct ConverterView: View {
             .overlay(alignment: .bottom) {
                 ExchangeRateView()
                     .frame(maxWidth: .infinity)
+                    .allowsHitTesting(false)
                     .alignmentGuide(.bottom) { $0[VerticalAlignment.top]
                     }
                     .overlay(alignment: .leading) {
