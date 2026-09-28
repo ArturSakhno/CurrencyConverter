@@ -4,7 +4,6 @@ import Foundation
 /// currency is on top, keyboard focus, the raw text in each field) intentionally stays on
 /// `ConverterView` itself - this type only knows about Domain protocols and business logic.
 @Observable
-@MainActor
 final class ConverterViewModel {
     private(set) var ratesResult: RatesLoadResult = .unavailable
 

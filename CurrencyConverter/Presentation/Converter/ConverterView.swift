@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ConverterView: View {
-    
+
     let coordinator: AppCoordinator
     let quoteCurrency: Currency
     private let baseCurrency: Currency
@@ -162,12 +162,12 @@ struct ConverterView: View {
     var exchange: some View {
         ZStack(alignment: .leading) {
             SwapButton {
-                    isBaseOnTop.toggle()
-                    // Keep the same *currency* focused (now in the other slot),
-                    // not the same slot - only meaningful when something is focused.
-                    if focusedSlot != nil {
-                        focusedSlot = focusedSlot == .top ? .bottom : .top
-                    }
+                isBaseOnTop.toggle()
+                // Keep the same *currency* focused (now in the other slot),
+                // not the same slot - only meaningful when something is focused.
+                if focusedSlot != nil {
+                    focusedSlot = focusedSlot == .top ? .bottom : .top
+                }
             }
             .padding(.leading, 16)
 

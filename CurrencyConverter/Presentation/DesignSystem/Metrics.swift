@@ -21,10 +21,3 @@ enum DS {
 
     static let borderWidth: CGFloat = 1.5
 }
-
-extension View {
-    /// Figma "Screen Drop Shadow": #0000001A, offset (0, 4), blur 10.
-    func screenShadow() -> some View {
-        shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 4)
-    }
-}

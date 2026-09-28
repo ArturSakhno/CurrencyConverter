@@ -1,6 +1,5 @@
 import Observation
 
-@MainActor
 @Observable
 final class AppCoordinator {
     enum SheetRoute: Identifiable {

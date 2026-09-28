@@ -5,7 +5,7 @@ struct CurrencyPickerRow: View {
     let isSelected: Bool
     let onSelect: EmptyClosure
 
-    @ScaledMetric(relativeTo: .headline) private var flagSize: CGFloat = 28
+    @ScaledMetric(relativeTo: .headline) private var flagSize: CGFloat = 24
 
     var body: some View {
         Button(action: onSelect) {
@@ -18,13 +18,26 @@ struct CurrencyPickerRow: View {
                         .foregroundStyle(.textPrimary)
                 }
 
-                Spacer(minLength: 0)
+                Spacer()
 
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .foregroundStyle(.interactivePrimary)
-                        .accessibilityHidden(true)
+                Group {
+                    if isSelected {
+                        ZStack {
+                            Circle()
+                                .fill(.interactivePrimary)
+
+                            Image(.checkmark)
+                                .resizable()
+                                .foregroundStyle(.bgPrimary)
+                                .accessibilityHidden(true)
+                        }
+                    } else {
+                        Circle()
+                            .stroke(.selectorUnselectedBorder,
+                                    lineWidth: 2)
+                    }
                 }
+                .frame(width: DS.Size.icon, height: DS.Size.icon)
             }
             .contentShape(Rectangle())
         }
@@ -33,18 +46,19 @@ struct CurrencyPickerRow: View {
 
     @ViewBuilder
     private var flag: some View {
-        if let flagAssetName = info.flagAssetName {
-            Image(flagAssetName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: flagSize, height: flagSize)
-                .clipShape(Circle())
-                .accessibilityHidden(true)
-        } else {
+        ZStack {
             Circle()
                 .fill(.surfaceDefault)
-                .frame(width: flagSize, height: flagSize)
+            if let flagAssetName = info.flagAssetName {
+                Image(flagAssetName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: flagSize, height: flagSize)
+                    .clipShape(Circle())
+                    .accessibilityHidden(true)
+            }
         }
+        .frame(width: 40, height: 40)
     }
 }
 
