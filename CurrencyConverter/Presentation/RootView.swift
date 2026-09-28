@@ -3,7 +3,12 @@ import SwiftUI
 struct RootView: View {
     let dependencies: DependencyContainer
     @State private var coordinator = AppCoordinator()
-    @State private var selectedQuoteCurrency = CurrencyCatalog.defaultQuote
+    @State private var selectedQuoteCurrency: Currency
+
+    init(dependencies: DependencyContainer) {
+        self.dependencies = dependencies
+        _selectedQuoteCurrency = State(initialValue: dependencies.currencyCatalogUseCase.defaultQuoteCurrency())
+    }
 
     var body: some View {
         NavigationStack {
@@ -13,7 +18,7 @@ struct RootView: View {
                     case .currencyPicker:
                         CurrencyPickerView(
                             coordinator: coordinator,
-                            currencies: CurrencyCatalog.availableQuoteCurrencies,
+                            currencies: dependencies.currencyCatalogUseCase.availableQuoteCurrencies(),
                             selection: $selectedQuoteCurrency
                         )
                     }
