@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct CurrencyInputField: View {
+    @Binding var amountText: String
     let currencyCode: String
     let sign: String?
     let currencySymbol: String?
     let subtitle: String
     let showsChevron: Bool
-    @Binding var amountText: String
+    let imageName: String?
     let onSelectCurrency: EmptyClosure
 
     var body: some View {
@@ -26,7 +27,7 @@ struct CurrencyInputField: View {
                         Text(currencyCode)
                             .font(.system(size: 32, weight: .medium))
                         if showsChevron {
-                            Image("chevron.down")
+                            Image(.chevronDown)
                                 .resizable()
                                 .frame(width: 24, height: 24)
                         }
@@ -47,9 +48,11 @@ struct CurrencyInputField: View {
             }
 
             HStack(spacing: 4) {
-                Image(systemName: "0.circle")
-                    .resizable()
-                    .frame(width: 11, height: 11)
+                if let imageName {
+                    Image(imageName)
+                        .resizable()
+                        .frame(width: 11, height: 11)
+                }
                 Text(subtitle)
                     .foregroundStyle(Color(hex: "#A8A29F"))
                     .font(.system(size: 14,
@@ -63,12 +66,13 @@ struct CurrencyInputField: View {
 #Preview {
     @Previewable @State var text = ""
     CurrencyInputField(
+        amountText: $text,
         currencyCode: "USDC",
         sign: "−",
         currencySymbol: "$",
         subtitle: "Digital dollars",
         showsChevron: true,
-        amountText: $text,
+        imageName: "us",
         onSelectCurrency: {}
     )
 }

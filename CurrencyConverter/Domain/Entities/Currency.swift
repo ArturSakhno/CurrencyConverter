@@ -14,4 +14,6 @@ nonisolated enum CurrencyCatalog {
         Currency(code: "COP"),
         Currency(code: "BRL"),
     ]
+
+    static let defaultQuote: Currency = availableQuoteCurrencies[0]
 }

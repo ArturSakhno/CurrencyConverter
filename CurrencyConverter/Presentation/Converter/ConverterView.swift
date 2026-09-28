@@ -3,10 +3,14 @@ import SwiftUI
 struct ConverterView: View {
     let dependencies: DependencyContainer
     let coordinator: AppCoordinator
-    
+    let quoteCurrency: Currency
+
     @State private var baseAmountText = ""
     @State private var quoteAmountText = ""
-    
+
+    private var baseInfo: CurrencyDisplayInfo { .info(for: CurrencyCatalog.base) }
+    private var quoteInfo: CurrencyDisplayInfo { .info(for: quoteCurrency) }
+
     var body: some View {
         VStack(alignment: .leading, spacing: .zero) {
             VStack(alignment: .leading, spacing: .zero) {
@@ -16,18 +20,19 @@ struct ConverterView: View {
                     .fontWeight(.medium)
                 
                 CurrencyInputField(
-                    currencyCode: "USDC",
-                    sign: "−",
-                    currencySymbol: "$",
-                    subtitle: "Digital dollars",
-                    showsChevron: false,
                     amountText: $baseAmountText,
+                    currencyCode: baseInfo.displayCode,
+                    sign: "−",
+                    currencySymbol: baseInfo.currencySymbol,
+                    subtitle: baseInfo.subtitle,
+                    showsChevron: false,
+                    imageName: baseInfo.flagAssetName,
                     onSelectCurrency: {}
                 )
                 .padding(.top, 20)
                 .padding(.horizontal, 16)
             }
-            .padding(.top, 126)
+            .padding(.top, 54)
             .overlay(alignment: .bottom) {
                 ExchangeRateView()
                     .frame(maxWidth: .infinity)
@@ -41,21 +46,22 @@ struct ConverterView: View {
             .zIndex(1)
             
             .padding(.bottom, 20)
-            .background(Color(hex: "#F9F9F9"))
+            .background(Color(hex: "#F9F9F9").ignoresSafeArea())
             
             CurrencyInputField(
-                currencyCode: "MXN",
-                sign: "+",
-                currencySymbol: "$",
-                subtitle: "Mexican pesos",
-                showsChevron: true,
                 amountText: $quoteAmountText,
+                currencyCode: quoteInfo.displayCode,
+                sign: "+",
+                currencySymbol: quoteInfo.currencySymbol,
+                subtitle: quoteInfo.subtitle,
+                showsChevron: true,
+                imageName: quoteInfo.flagAssetName,
                 onSelectCurrency: { coordinator.presentCurrencyPicker() }
             )
             .padding(.horizontal, 16)
             .padding(.top, 20)
         }
-        .ignoresSafeArea()
+        
         Spacer()
     }
 }
@@ -63,6 +69,7 @@ struct ConverterView: View {
 #Preview {
     ConverterView(
         dependencies: .init(),
-        coordinator: .init()
+        coordinator: .init(),
+        quoteCurrency: CurrencyCatalog.defaultQuote
     )
 }
