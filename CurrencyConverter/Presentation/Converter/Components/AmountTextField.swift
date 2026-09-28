@@ -32,7 +32,7 @@ struct AmountTextField: View {
     @Binding var text: String
     let sign: String?
     /// Currency symbol shown glued to the number ("$100"); display-only, never part of `text`.
-    var currencySymbol: String? = nil
+    var currencySymbol: String?
     let accessibilityLabel: LocalizedStringKey
     let field: FocusSlot
     var focusedField: FocusState<FocusSlot?>.Binding
@@ -117,21 +117,42 @@ struct AmountTextField: View {
 #Preview("Empty") {
     @Previewable @State var text = ""
     @Previewable @FocusState var focusedField: FocusSlot?
-    AmountTextField(text: $text, sign: "−", currencySymbol: "$", accessibilityLabel: "Amount in USDc", field: .top, focusedField: $focusedField)
+    AmountTextField(
+        text: $text,
+        sign: "−",
+        currencySymbol: "$",
+        accessibilityLabel: "Amount in USDc",
+        field: .top,
+        focusedField: $focusedField
+    )
         .padding()
 }
 
 #Preview("Filled") {
     @Previewable @State var text = "1841.12"
     @Previewable @FocusState var focusedField: FocusSlot?
-    AmountTextField(text: $text, sign: "+", currencySymbol: "$", accessibilityLabel: "Amount in MXN", field: .bottom, focusedField: $focusedField)
+    AmountTextField(
+        text: $text,
+        sign: "+",
+        currencySymbol: "$",
+        accessibilityLabel: "Amount in MXN",
+        field: .bottom,
+        focusedField: $focusedField
+    )
         .padding()
 }
 
 #Preview("Dark Mode") {
     @Previewable @State var text = "100"
     @Previewable @FocusState var focusedField: FocusSlot?
-    AmountTextField(text: $text, sign: "−", currencySymbol: "$", accessibilityLabel: "Amount in USDc", field: .top, focusedField: $focusedField)
+    AmountTextField(
+        text: $text,
+        sign: "−",
+        currencySymbol: "$",
+        accessibilityLabel: "Amount in USDc",
+        field: .top,
+        focusedField: $focusedField
+    )
         .padding()
         .preferredColorScheme(.dark)
 }
@@ -139,7 +160,14 @@ struct AmountTextField: View {
 #Preview("Accessibility XXXL") {
     @Previewable @State var text = "338724.99"
     @Previewable @FocusState var focusedField: FocusSlot?
-    AmountTextField(text: $text, sign: "+", currencySymbol: "$", accessibilityLabel: "Amount in COP", field: .bottom, focusedField: $focusedField)
+    AmountTextField(
+        text: $text,
+        sign: "+",
+        currencySymbol: "$",
+        accessibilityLabel: "Amount in COP",
+        field: .bottom,
+        focusedField: $focusedField
+    )
         .padding()
         .environment(\.dynamicTypeSize, .accessibility5)
 }

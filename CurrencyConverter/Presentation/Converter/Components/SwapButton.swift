@@ -28,6 +28,6 @@ struct SwapButton: View {
 
 #Preview {
     SwapButton {
-        
+
     }
 }

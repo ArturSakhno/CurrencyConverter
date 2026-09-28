@@ -79,13 +79,13 @@ struct ConverterView: View {
                     VStack {
                         topView
                             .padding(.bottom, 30)
-                        
+
                         bottomView
                             .padding(.top, 30)
                             .background(Color(.systemBackground))
-                        
+
                     }
-                    
+
                     exchange
                 }
 
@@ -123,7 +123,7 @@ struct ConverterView: View {
 
         Spacer()
     }
-    
+
     var topView: some View {
         CurrencyInputField(
             amountText: topAmountText,
@@ -140,7 +140,7 @@ struct ConverterView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 20)
     }
-    
+
     var bottomView: some View {
         CurrencyInputField(
             amountText: bottomAmountText,
@@ -157,7 +157,7 @@ struct ConverterView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 20)
     }
-    
+
     var exchange: some View {
         ZStack(alignment: .leading) {
             SwapButton {
@@ -169,7 +169,7 @@ struct ConverterView: View {
                     }
             }
             .padding(.leading, 16)
-            
+
             ExchangeRateView(
                 text: viewModel.ratePillText(
                     quoteCurrency: quoteCurrency,

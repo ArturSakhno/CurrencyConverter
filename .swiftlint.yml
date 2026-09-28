@@ -1,0 +1,97 @@
+included:
+  - CurrencyConverter
+  - CurrencyConverterTests
+  - CurrencyConverterUITests
+
+excluded:
+  - CurrencyConverter.xcodeproj
+  - DerivedData
+  - .build
+
+disabled_rules:
+  - trailing_comma # trailing commas keep multi-line literal diffs to one line
+  - todo
+
+opt_in_rules:
+  - array_init
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - contains_over_first_not_nil
+  - contains_over_range_nil_comparison
+  - discouraged_optional_boolean
+  - empty_collection_literal
+  - empty_count
+  - explicit_init
+  - fatal_error_message
+  - first_where
+  - flatmap_over_map_reduce
+  - identical_operands
+  - implicit_return
+  - joined_default_parameter
+  - last_where
+  - literal_expression_end_indentation
+  - modifier_order
+  - multiline_arguments
+  - multiline_parameters
+  - operator_usage_whitespace
+  - overridden_super_call
+  - prefer_self_type_over_type_of_self
+  - private_swiftui_state
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - sorted_first_last
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_parameter_alignment_on_call
+  - yoda_condition
+
+analyzer_rules:
+  - unused_declaration
+  - unused_import
+
+line_length:
+  warning: 140
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+  ignores_interpolated_strings: true
+
+identifier_name:
+  min_length: 2
+  excluded:
+    - a
+    - b
+    - g
+    - r
+    - x
+    - y
+
+type_name:
+  max_length: 50
+
+function_body_length:
+  warning: 60
+  error: 100
+
+file_length:
+  warning: 400
+  error: 600
+
+type_body_length:
+  warning: 300
+  error: 450
+
+nesting:
+  type_level: 2
+
+custom_rules:
+  no_double_money:
+    name: "Money is Decimal"
+    regex: '\b(amount|rate|bid|ask|price)\w*\s*:\s*Double\b'
+    message: "Money values must be Decimal, never Double."
+    severity: error
+
+reporter: xcode

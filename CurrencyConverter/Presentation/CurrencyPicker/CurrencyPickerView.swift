@@ -13,7 +13,7 @@ struct CurrencyPickerView: View {
                     isSelected: currency == selection,
                     onSelect: { select(currency) }
                 )
-                
+
                 .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
