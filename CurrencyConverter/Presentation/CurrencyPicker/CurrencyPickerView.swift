@@ -13,6 +13,7 @@ struct CurrencyPickerView: View {
                     isSelected: currency == selection,
                     onSelect: { select(currency) }
                 )
+                
                 .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
@@ -30,10 +31,11 @@ struct CurrencyPickerView: View {
                     .accessibilityLabel(Text("Close"))
                 }
             }
-            .background(.white)
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .frame(maxHeight: .infinity)
+        .presentationBackground(Color(.systemBackground))
     }
 
     private func select(_ currency: Currency) {

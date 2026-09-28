@@ -15,6 +15,7 @@ struct CurrencyPickerRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(verbatim: info.displayCode)
                         .font(.headline)
+                        .foregroundStyle(.primary)
                 }
 
                 Spacer(minLength: 0)
@@ -26,8 +27,8 @@ struct CurrencyPickerRow: View {
                 }
             }
             .contentShape(Rectangle())
+            .listRowBackground(Color.clear)
         }
-        .foregroundStyle(.primary)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
