@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ExchangeRateView: View {
-    let text: String = "1 USDc = 18.4097 MXN"
+    let text: String
     var body: some View {
         Text(text)
             .foregroundStyle(.black)
@@ -24,5 +24,5 @@ struct ExchangeRateView: View {
 }
 
 #Preview {
-    ExchangeRateView()
+    ExchangeRateView(text: "1 USDc = 18.4097 MXN")
 }
