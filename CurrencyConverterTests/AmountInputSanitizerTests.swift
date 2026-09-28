@@ -31,12 +31,22 @@ struct AmountInputSanitizerTests {
         #expect(sut.sanitize(input) == expected)
     }
 
-    @Test func stripsGroupingSeparators() {
-        #expect(sut.sanitize("1,234.5") == "1234.5")
+    @Test func regroupsExistingGroupingSeparators() {
+        #expect(sut.sanitize("1,234.5") == "1,234.5")
     }
 
     @Test func capsIntegerDigits() {
-        #expect(sut.sanitize("1234567890123456") == "123456789012")
+        #expect(sut.sanitize("1234567890123456") == "123,456,789,012")
+    }
+
+    @Test(arguments: [
+        ("1000", "1,000"),
+        ("10000", "10,000"),
+        ("100000", "100,000"),
+        ("1000000", "1,000,000"),
+    ])
+    func groupsIntegerPartEveryThreeDigits(input: String, expected: String) {
+        #expect(sut.sanitize(input) == expected)
     }
 
     @Test func usesLocaleDecimalSeparator() {
@@ -51,5 +61,9 @@ struct AmountInputSanitizerTests {
 
     @Test func parsesWithoutDoublePrecisionDrift() {
         #expect(sut.decimal(from: "0.1") == Decimal(string: "0.1"))
+    }
+
+    @Test func parsesGroupedIntegerToCorrectDecimal() {
+        #expect(sut.decimal(from: "10000") == Decimal(string: "10000"))
     }
 }

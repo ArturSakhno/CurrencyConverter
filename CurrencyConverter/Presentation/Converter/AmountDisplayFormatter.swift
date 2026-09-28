@@ -12,7 +12,7 @@ nonisolated struct AmountDisplayFormatter: Sendable {
             .number
                 .locale(locale)
                 .precision(.fractionLength(fractionDigits))
-                .grouping(.never)
+                .grouping(.automatic)
         )
     }
 }
