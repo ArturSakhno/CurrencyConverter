@@ -71,10 +71,11 @@ identifier_name:
     - s
     - m
     - l
-    - DS
-    
+
 type_name:
   max_length: 50
+  excluded:
+    - DS
 
 function_body_length:
   warning: 60
