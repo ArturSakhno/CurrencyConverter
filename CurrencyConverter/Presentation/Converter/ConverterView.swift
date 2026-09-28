@@ -73,49 +73,22 @@ struct ConverterView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                CurrencyInputField(
-                    amountText: topAmountText,
-                    currencyCode: topInfo.displayCode,
-                    sign: "−",
-                    currencySymbol: topInfo.currencySymbol,
-                    subtitle: topInfo.subtitle,
-                    showsChevron: !isBaseOnTop,
-                    imageName: topInfo.flagAssetName,
-                    field: .top,
-                    focusedField: $focusedSlot,
-                    onSelectCurrency: { coordinator.presentCurrencyPicker() }
-                )
-                .padding(.top, 20)
-                .padding(.horizontal, 16)
+                ZStack {
+                    VStack {
+                        topView
+                            .padding(.bottom, 30)
+                        
+                        bottomView
+                            .padding(.top, 30)
+                            .background(.white)
+                        
+                    }
+                    
+                    exchange
+                }
+
             }
             .padding(.top, 54)
-            .overlay(alignment: .bottom) {
-                ExchangeRateView(
-                    text: viewModel.ratePillText(
-                        quoteCurrency: quoteCurrency,
-                        isBaseOnTop: isBaseOnTop,
-                        baseDisplayCode: baseInfo.displayCode,
-                        quoteDisplayCode: quoteInfo.displayCode
-                    )
-                )
-                .frame(maxWidth: .infinity)
-                .allowsHitTesting(false)
-                .alignmentGuide(.bottom) { $0[VerticalAlignment.top]
-                }
-                .overlay(alignment: .leading) {
-                    SwapButton {
-                            isBaseOnTop.toggle()
-                            // Keep the same *currency* focused (now in the other slot),
-                            // not the same slot - only meaningful when something is focused.
-                            if focusedSlot != nil {
-                                focusedSlot = focusedSlot == .top ? .bottom : .top
-                            }
-                    }
-                    .padding(.leading, 16)
-                }
-            }
-            .zIndex(1)
-            .padding(.bottom, 20)
             .background(Color(hex: "#F9F9F9").ignoresSafeArea())
             .task {
                 await viewModel.loadRates()
@@ -144,24 +117,68 @@ struct ConverterView: View {
                     isBaseOnTop: isBaseOnTop
                 ) ?? ""
             }
-
-            CurrencyInputField(
-                amountText: bottomAmountText,
-                currencyCode: bottomInfo.displayCode,
-                sign: "+",
-                currencySymbol: bottomInfo.currencySymbol,
-                subtitle: bottomInfo.subtitle,
-                showsChevron: isBaseOnTop,
-                imageName: bottomInfo.flagAssetName,
-                field: .bottom,
-                focusedField: $focusedSlot,
-                onSelectCurrency: { coordinator.presentCurrencyPicker() }
-            )
-            .padding(.horizontal, 16)
-            .padding(.top, 20)
         }
 
         Spacer()
+    }
+    
+    var topView: some View {
+        CurrencyInputField(
+            amountText: topAmountText,
+            currencyCode: topInfo.displayCode,
+            sign: "−",
+            currencySymbol: topInfo.currencySymbol,
+            subtitle: topInfo.subtitle,
+            showsChevron: !isBaseOnTop,
+            imageName: topInfo.flagAssetName,
+            field: .top,
+            focusedField: $focusedSlot,
+            onSelectCurrency: { coordinator.presentCurrencyPicker() }
+        )
+        .padding(.horizontal, 16)
+        .padding(.vertical, 20)
+    }
+    
+    var bottomView: some View {
+        CurrencyInputField(
+            amountText: bottomAmountText,
+            currencyCode: bottomInfo.displayCode,
+            sign: "+",
+            currencySymbol: bottomInfo.currencySymbol,
+            subtitle: bottomInfo.subtitle,
+            showsChevron: isBaseOnTop,
+            imageName: bottomInfo.flagAssetName,
+            field: .bottom,
+            focusedField: $focusedSlot,
+            onSelectCurrency: { coordinator.presentCurrencyPicker() }
+        )
+        .padding(.horizontal, 16)
+        .padding(.vertical, 20)
+    }
+    
+    var exchange: some View {
+        ZStack(alignment: .leading) {
+            SwapButton {
+                    isBaseOnTop.toggle()
+                    // Keep the same *currency* focused (now in the other slot),
+                    // not the same slot - only meaningful when something is focused.
+                    if focusedSlot != nil {
+                        focusedSlot = focusedSlot == .top ? .bottom : .top
+                    }
+            }
+            .padding(.leading, 16)
+            
+            ExchangeRateView(
+                text: viewModel.ratePillText(
+                    quoteCurrency: quoteCurrency,
+                    isBaseOnTop: isBaseOnTop,
+                    baseDisplayCode: baseInfo.displayCode,
+                    quoteDisplayCode: quoteInfo.displayCode
+                )
+            )
+            .frame(maxWidth: .infinity)
+            .allowsHitTesting(false)
+        }
     }
 }
 
