@@ -1,5 +1,5 @@
-protocol CurrencyCatalogRepository: Sendable {
-    nonisolated func availableQuoteCurrencies() -> [Currency]
-    nonisolated func baseCurrency() -> Currency
-    nonisolated func defaultQuoteCurrency() -> Currency
+nonisolated protocol CurrencyCatalogRepository: Sendable {
+    func availableQuoteCurrencies() -> [Currency]
+    func baseCurrency() -> Currency
+    func defaultQuoteCurrency() -> Currency
 }

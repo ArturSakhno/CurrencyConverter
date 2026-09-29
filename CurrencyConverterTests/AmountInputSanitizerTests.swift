@@ -35,8 +35,31 @@ struct AmountInputSanitizerTests {
         #expect(sut.sanitize("1,234.5") == "1,234.5")
     }
 
-    @Test func capsIntegerDigits() {
-        #expect(sut.sanitize("1234567890123456") == "123,456,789,012")
+    @Test func sanitizeKeepsIntegerDigitsBeyondEntryCap() {
+        #expect(sut.sanitize("1234567890123456") == "1,234,567,890,123,456")
+        #expect(sut.decimal(from: "3,999,999,999,996,000.00") == Decimal(string: "3999999999996000"))
+    }
+
+    @Test func editWithinCapIsAccepted() {
+        #expect(sut.sanitizeEdit(from: "12345678901", to: "123456789012") == "123,456,789,012")
+    }
+
+    @Test func editGrowingIntegerPastCapIsRejected() {
+        #expect(sut.sanitizeEdit(from: "123456789012", to: "1234567890123") == "123,456,789,012")
+    }
+
+    @Test func pastingPastCapIntoEmptyFieldIsRejected() {
+        #expect(sut.sanitizeEdit(from: "", to: "1234567890123456") == "")
+    }
+
+    @Test func editShrinkingValueAlreadyOverCapIsAccepted() {
+        // A converted amount the user focuses and deletes from.
+        #expect(sut.sanitizeEdit(from: "3,999,999,999,996,000.00", to: "3,999,999,999,996,00.00")
+            == "399,999,999,999,600.00")
+    }
+
+    @Test func fractionEditBeyondCapIsNotRejectedByIntegerRule() {
+        #expect(sut.sanitizeEdit(from: "123456789012.1", to: "123456789012.12") == "123,456,789,012.12")
     }
 
     @Test(arguments: [
@@ -47,6 +70,18 @@ struct AmountInputSanitizerTests {
     ])
     func groupsIntegerPartEveryThreeDigits(input: String, expected: String) {
         #expect(sut.sanitize(input) == expected)
+    }
+
+    @Test func sanitizeIsIdempotent() {
+        let once = sut.sanitize("1234567.89")
+        #expect(once == "1,234,567.89")
+        #expect(sut.sanitize(once) == once)
+    }
+
+    @Test func groupsWithLocaleSeparators() {
+        let spanish = AmountInputSanitizer(locale: Locale(identifier: "es_ES"))
+        #expect(spanish.sanitize("1234567,5") == "1.234.567,5")
+        #expect(spanish.decimal(from: "1.234.567,5") == Decimal(string: "1234567.5"))
     }
 
     @Test func usesLocaleDecimalSeparator() {
@@ -64,6 +99,6 @@ struct AmountInputSanitizerTests {
     }
 
     @Test func parsesGroupedIntegerToCorrectDecimal() {
-        #expect(sut.decimal(from: "10000") == Decimal(string: "10000"))
+        #expect(sut.decimal(from: "10,000") == Decimal(string: "10000"))
     }
 }

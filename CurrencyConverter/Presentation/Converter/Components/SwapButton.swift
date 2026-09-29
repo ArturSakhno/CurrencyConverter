@@ -1,10 +1,4 @@
-//
-//  SwapButton.swift
-//  CurrencyConverter
-//
-//  Created by Artur Sakhno on 27/09/2026.
-//
-
+import DesignSystem
 import SwiftUI
 
 struct SwapButton: View {
@@ -15,19 +9,30 @@ struct SwapButton: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(Color(hex: "#004B2B"))
-                Image("arrow.down")
+                    .fill(.interactivePrimary)
+                DS.Icon.arrowDown
                     .resizable()
-                    .frame(width: 24, height: 24)
+                    .renderingMode(.template)
+                    .foregroundStyle(.onInteractivePrimary)
+                    .frame(width: DS.Size.icon,
+                           height: DS.Size.icon)
             }
-            .frame(width: 40, height: 40)
+            .frame(width: DS.Size.swapButton,
+                   height: DS.Size.swapButton)
         }
-
     }
 }
 
 #Preview {
-    SwapButton {
-        
-    }
+    SwapButton {}
+}
+
+#Preview("Dark Mode") {
+    SwapButton {}
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Sample theme") {
+    SwapButton {}
+        .theme(.sample)
 }

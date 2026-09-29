@@ -17,8 +17,8 @@ struct AmountDisplayFormatterTests {
         #expect(sut.string(from: Decimal(string: "18.4")!, fractionDigits: 4) == "18.4000")
     }
 
-    @Test func neverGroupsThousands() {
-        #expect(sut.string(from: 338724, fractionDigits: 2) == "338724.00")
+    @Test func groupsThousands() {
+        #expect(sut.string(from: 338724, fractionDigits: 2) == "338,724.00")
     }
 
     @Test func usesLocaleDecimalSeparator() {

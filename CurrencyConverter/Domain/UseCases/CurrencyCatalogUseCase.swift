@@ -1,21 +1,21 @@
-protocol CurrencyCatalogUseCase: Sendable {
-    nonisolated func availableQuoteCurrencies() -> [Currency]
-    nonisolated func baseCurrency() -> Currency
-    nonisolated func defaultQuoteCurrency() -> Currency
+nonisolated protocol CurrencyCatalogUseCase: Sendable {
+    func availableQuoteCurrencies() -> [Currency]
+    func baseCurrency() -> Currency
+    func defaultQuoteCurrency() -> Currency
 }
 
-nonisolated struct DefaultCurrencyCatalogUseCase: CurrencyCatalogUseCase {
+struct DefaultCurrencyCatalogUseCase: CurrencyCatalogUseCase {
     let repository: CurrencyCatalogRepository
 
-    nonisolated func availableQuoteCurrencies() -> [Currency] {
+    func availableQuoteCurrencies() -> [Currency] {
         repository.availableQuoteCurrencies()
     }
 
-    nonisolated func baseCurrency() -> Currency {
+    func baseCurrency() -> Currency {
         repository.baseCurrency()
     }
 
-    nonisolated func defaultQuoteCurrency() -> Currency {
+    func defaultQuoteCurrency() -> Currency {
         repository.defaultQuoteCurrency()
     }
 }

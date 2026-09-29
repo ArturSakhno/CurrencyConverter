@@ -1,12 +1,12 @@
+import DesignSystem
 import SwiftUI
 
 struct ConverterView: View {
-    let dependencies: DependencyContainer
-    let coordinator: AppCoordinator
+    let viewModel: ConverterViewModel
+    let baseCurrency: Currency
     let quoteCurrency: Currency
-    private let baseCurrency: Currency
+    let onSelectCurrency: EmptyClosure
 
-    @State private var viewModel: ConverterViewModel
     @State private var baseAmountText = ""
     @State private var quoteAmountText = ""
     /// Only swap toggles this. Drives both row chrome (sign/chevron) and bid vs. ask -
@@ -19,15 +19,17 @@ struct ConverterView: View {
     @FocusState private var focusedSlot: FocusSlot?
     @Environment(\.scenePhase) private var scenePhase
 
-    init(dependencies: DependencyContainer, coordinator: AppCoordinator, quoteCurrency: Currency) {
-        self.dependencies = dependencies
-        self.coordinator = coordinator
-        self.quoteCurrency = quoteCurrency
-        self.baseCurrency = dependencies.currencyCatalogUseCase.baseCurrency()
-        _viewModel = State(wrappedValue: ConverterViewModel(
-            convertUseCase: dependencies.convertUseCase,
-            loadRatesUseCase: dependencies.loadRatesUseCase
-        ))
+    /// Screen-specific metrics from the Figma layout (not reusable design tokens).
+    private enum Layout {
+        static let screenTop: CGFloat = 54
+        /// Half the swap button's height, so the button and rate pill straddle both rows.
+        static let rowGap: CGFloat = 30
+    }
+
+    /// Top row sells (money leaves), bottom row buys - see the bid/ask rule in the view model.
+    private enum Sign {
+        static let outgoing = "−"
+        static let incoming = "+"
     }
 
     private var baseInfo: CurrencyDisplayInfo { .info(for: baseCurrency) }
@@ -63,35 +65,36 @@ struct ConverterView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: .zero) {
             VStack(alignment: .leading, spacing: .zero) {
-                Text("Exchange calculator")
-                    .padding(.horizontal, 16)
-                    .font(.system(size: 32))
-                    .fontWeight(.medium)
+                Text("Exchange calculator", comment: "Main screen title")
+                    .padding(.horizontal, DS.Spacing.m)
+                    .textStyle(\.h3)
+                    .foregroundStyle(.textPrimary)
 
                 if let ratesAsOfText = viewModel.ratesAsOfText {
-                    Text("Rates as of \(ratesAsOfText)")
-                        .padding(.horizontal, 16)
-                        .font(.system(size: 13))
-                        .foregroundStyle(.secondary)
+                    Text(
+                        "Rates as of \(ratesAsOfText)",
+                        comment: "Caption under the screen title; %@ is the local time the rates were fetched"
+                    )
+                    .padding(.horizontal, DS.Spacing.m)
+                    .textStyle(\.bodySmall)
+                    .foregroundStyle(.textSecondary)
                 }
 
                 ZStack {
                     VStack {
                         topView
-                            .padding(.bottom, 30)
-                        
+                            .padding(.bottom, Layout.rowGap)
+
                         bottomView
-                            .padding(.top, 30)
-                            .background(Color(.systemBackground))
-                        
+                            .padding(.top, Layout.rowGap)
+                            .background(.bgPrimary)
                     }
-                    
+
                     exchange
                 }
-
             }
-            .padding(.top, 54)
-            .background(Color(hex: "#F9F9F9").ignoresSafeArea())
+            .padding(.top, Layout.screenTop)
+            .background(.bgSelected)
             .task {
                 await viewModel.loadRates()
             }
@@ -119,57 +122,64 @@ struct ConverterView: View {
                     isBaseOnTop: isBaseOnTop
                 ) ?? ""
             }
-        }
 
-        Spacer()
+            Spacer(minLength: 0)
+        }
+        // Tapping anywhere outside the fields - including the empty area below - dismisses the keyboard.
+        .contentShape(.rect)
+        .onTapGesture {
+            focusedSlot = nil
+        }
     }
-    
+
     var topView: some View {
         CurrencyInputField(
             amountText: topAmountText,
             currencyCode: topInfo.displayCode,
-            sign: "−",
+            sign: Sign.outgoing,
             currencySymbol: topInfo.currencySymbol,
             subtitle: topInfo.subtitle,
             showsChevron: !isBaseOnTop,
             imageName: topInfo.flagAssetName,
             field: .top,
             focusedField: $focusedSlot,
-            onSelectCurrency: { coordinator.presentCurrencyPicker() }
+            onSelectCurrency: onSelectCurrency
         )
-        .padding(.horizontal, 16)
-        .padding(.vertical, 20)
+        .padding(.horizontal, DS.Spacing.m)
+        .padding(.vertical, DS.Spacing.l)
     }
-    
+
     var bottomView: some View {
         CurrencyInputField(
             amountText: bottomAmountText,
             currencyCode: bottomInfo.displayCode,
-            sign: "+",
+            sign: Sign.incoming,
             currencySymbol: bottomInfo.currencySymbol,
             subtitle: bottomInfo.subtitle,
             showsChevron: isBaseOnTop,
             imageName: bottomInfo.flagAssetName,
             field: .bottom,
             focusedField: $focusedSlot,
-            onSelectCurrency: { coordinator.presentCurrencyPicker() }
+            onSelectCurrency: onSelectCurrency
         )
-        .padding(.horizontal, 16)
-        .padding(.vertical, 20)
+        .padding(.horizontal, DS.Spacing.m)
+        .padding(.vertical, DS.Spacing.l)
     }
-    
+
     var exchange: some View {
         ZStack(alignment: .leading) {
             SwapButton {
-                    isBaseOnTop.toggle()
-                    // Keep the same *currency* focused (now in the other slot),
-                    // not the same slot - only meaningful when something is focused.
-                    if focusedSlot != nil {
-                        focusedSlot = focusedSlot == .top ? .bottom : .top
-                    }
+                isBaseOnTop.toggle()
+                // Keep the same *currency* focused (now in the other slot),
+                // not the same slot - only meaningful when something is focused.
+                if focusedSlot != nil {
+                    focusedSlot = focusedSlot == .top ? .bottom : .top
+                }
             }
-            .padding(.leading, 16)
-            
+            .rotationEffect(isBaseOnTop ? .degrees(0) : .degrees(180))
+            .animation(.default, value: isBaseOnTop)
+            .padding(.leading, DS.Spacing.m)
+
             ExchangeRateView(
                 text: viewModel.ratePillText(
                     quoteCurrency: quoteCurrency,
@@ -186,8 +196,9 @@ struct ConverterView: View {
 
 #Preview {
     ConverterView(
-        dependencies: .init(),
-        coordinator: .init(),
-        quoteCurrency: CurrencyCatalog.defaultQuote
+        viewModel: DependencyContainer().makeConverterViewModel(),
+        baseCurrency: CurrencyCatalog.base,
+        quoteCurrency: CurrencyCatalog.defaultQuote,
+        onSelectCurrency: {}
     )
 }

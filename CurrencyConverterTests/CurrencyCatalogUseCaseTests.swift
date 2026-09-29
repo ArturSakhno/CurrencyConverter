@@ -40,15 +40,15 @@ private struct StubCurrencyCatalogRepository: CurrencyCatalogRepository {
     let base: Currency
     let defaultQuote: Currency
 
-    nonisolated func availableQuoteCurrencies() -> [Currency] {
+    func availableQuoteCurrencies() -> [Currency] {
         currencies
     }
 
-    nonisolated func baseCurrency() -> Currency {
+    func baseCurrency() -> Currency {
         base
     }
 
-    nonisolated func defaultQuoteCurrency() -> Currency {
+    func defaultQuoteCurrency() -> Currency {
         defaultQuote
     }
 }

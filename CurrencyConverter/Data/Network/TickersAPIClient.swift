@@ -1,18 +1,18 @@
 import Foundation
 
-protocol TickersAPIClient: Sendable {
-    nonisolated func fetchTickers(quoteCurrencyCodes: [String]) async throws -> [ExchangeRate]
+nonisolated protocol TickersAPIClient: Sendable {
+    func fetchTickers(quoteCurrencyCodes: [String]) async throws -> [ExchangeRate]
 }
 
-nonisolated struct URLSessionTickersAPIClient: TickersAPIClient {
-    let session: URLSession
+struct URLSessionTickersAPIClient: TickersAPIClient {
+    private let session: URLSession
     private static let endpoint = URL(string: "https://api.dolarapp.dev/v1/tickers")!
 
     init(session: URLSession = .shared) {
         self.session = session
     }
 
-    nonisolated func fetchTickers(quoteCurrencyCodes: [String]) async throws -> [ExchangeRate] {
+    func fetchTickers(quoteCurrencyCodes: [String]) async throws -> [ExchangeRate] {
         var components = URLComponents(url: Self.endpoint, resolvingAgainstBaseURL: false)!
         // No space in the separator: a space in the currency list 500s the whole batch.
         components.queryItems = [URLQueryItem(name: "currencies", value: quoteCurrencyCodes.joined(separator: ","))]

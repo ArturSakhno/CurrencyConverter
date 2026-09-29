@@ -71,7 +71,7 @@ struct ConverterViewModelTests {
             isBaseOnTop: true
         )
 
-        #expect(result == "1840.00")
+        #expect(result == "1,840.00")
     }
 
     @Test func convertedAmountFromQuoteMatchesUseCaseMath() async {
@@ -86,6 +86,26 @@ struct ConverterViewModelTests {
         )
 
         #expect(result == "100.00")
+    }
+
+    @Test func convertedAmountKeepsEveryDigitBeyondEntryCap() async {
+        let cop = Currency(code: "COP")
+        let snapshot = ExchangeRatesSnapshot(
+            rates: [ExchangeRate(quoteCurrencyCode: "COP", ask: 4000, bid: 4000)],
+            fetchedAt: Date(timeIntervalSince1970: 0)
+        )
+        let sut = makeSUT(result: .loaded(snapshot, isFresh: true))
+        await sut.loadRates()
+
+        let result = sut.convertedAmount(
+            sourceText: "999999999999",
+            sourceField: .base,
+            quoteCurrency: cop,
+            isBaseOnTop: true
+        )
+
+        let parser = AmountInputSanitizer(locale: Locale(identifier: "en_US"))
+        #expect(result.flatMap(parser.decimal(from:)) == Decimal(string: "3999999999996000"))
     }
 
     @Test func convertedAmountReturnsNilForUnparsableInput() async {
@@ -135,7 +155,7 @@ struct ConverterViewModelTests {
 private struct StubLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
     let result: RatesLoadResult
 
-    nonisolated func load() async -> RatesLoadResult {
+    func load() async -> RatesLoadResult {
         result
     }
 }

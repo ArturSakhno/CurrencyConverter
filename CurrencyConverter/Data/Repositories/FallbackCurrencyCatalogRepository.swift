@@ -1,17 +1,17 @@
-nonisolated struct MockCurrencyCatalogRepository: CurrencyCatalogRepository {
+nonisolated struct FallbackCurrencyCatalogRepository: CurrencyCatalogRepository {
     /// Explicit stand-in for the real `/v1/currencies` endpoint, which always returns
     /// HTTP 403 (see CLAUDE.md). Not test scaffolding - this is the production
     /// implementation until that endpoint becomes usable, at which point only this
     /// type changes.
-    nonisolated func availableQuoteCurrencies() -> [Currency] {
+    func availableQuoteCurrencies() -> [Currency] {
         CurrencyCatalog.availableQuoteCurrencies
     }
 
-    nonisolated func baseCurrency() -> Currency {
+    func baseCurrency() -> Currency {
         CurrencyCatalog.base
     }
 
-    nonisolated func defaultQuoteCurrency() -> Currency {
+    func defaultQuoteCurrency() -> Currency {
         CurrencyCatalog.defaultQuote
     }
 }

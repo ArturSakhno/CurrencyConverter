@@ -7,7 +7,7 @@ import Foundation
 nonisolated struct AmountDisplayFormatter: Sendable {
     let locale: Locale
 
-    nonisolated func string(from value: Decimal, fractionDigits: Int) -> String {
+    func string(from value: Decimal, fractionDigits: Int) -> String {
         value.formatted(
             .number
                 .locale(locale)

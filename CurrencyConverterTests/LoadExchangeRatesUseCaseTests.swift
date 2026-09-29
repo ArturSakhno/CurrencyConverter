@@ -42,11 +42,11 @@ private struct StubExchangeRateRepository: ExchangeRateRepository {
     let fetchResult: Result<ExchangeRatesSnapshot, StubError>
     let cachedSnapshot: ExchangeRatesSnapshot?
 
-    nonisolated func fetchLatestRates(for quoteCurrencyCodes: [String]) async throws -> ExchangeRatesSnapshot {
+    func fetchLatestRates(for quoteCurrencyCodes: [String]) async throws -> ExchangeRatesSnapshot {
         try fetchResult.get()
     }
 
-    nonisolated func lastCachedSnapshot() -> ExchangeRatesSnapshot? {
+    func lastCachedSnapshot() -> ExchangeRatesSnapshot? {
         cachedSnapshot
     }
 }
