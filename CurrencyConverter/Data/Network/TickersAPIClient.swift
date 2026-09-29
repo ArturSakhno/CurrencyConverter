@@ -4,7 +4,7 @@ nonisolated protocol TickersAPIClient: Sendable {
     func fetchTickers(quoteCurrencyCodes: [String]) async throws -> [ExchangeRate]
 }
 
- struct URLSessionTickersAPIClient: TickersAPIClient {
+struct URLSessionTickersAPIClient: TickersAPIClient {
     private let session: URLSession
     private static let endpoint = URL(string: "https://api.dolarapp.dev/v1/tickers")!
 

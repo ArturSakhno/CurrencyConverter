@@ -1,10 +1,13 @@
 import DesignSystem
 import SwiftUI
 
+/// Knows nothing about navigation: it reports the pick or the close, and the caller
+/// decides what happens next (update state, dismiss the sheet).
 struct CurrencyPickerView: View {
-    let coordinator: AppCoordinator
     let currencies: [Currency]
-    @Binding var selection: Currency
+    let selection: Currency
+    let onSelect: (Currency) -> Void
+    let onClose: EmptyClosure
 
     var body: some View {
         NavigationStack {
@@ -12,9 +15,8 @@ struct CurrencyPickerView: View {
                 CurrencyPickerRow(
                     info: .info(for: currency),
                     isSelected: currency == selection,
-                    onSelect: { select(currency) }
+                    onSelect: { onSelect(currency) }
                 )
-
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
             }
@@ -22,17 +24,15 @@ struct CurrencyPickerView: View {
             .listStyle(.plain)
             .toolbarRole(.browser)
             .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Text("Choose currency")
-                            .textStyle(\.h4)
-                    }
+                ToolbarItem(placement: .principal) {
+                    Text("Choose currency", comment: "Navigation title for the currency picker sheet")
+                        .textStyle(\.h4)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        coordinator.dismissSheet()
-                    } label: {
-                        Image(.dsCross)
+                    Button(action: onClose) {
+                        DS.Icon.cross
                             .resizable()
-                            .frame(width: 32, height: 32)
+                            .frame(width: DS.Size.closeButton, height: DS.Size.closeButton)
                     }
                     .accessibilityLabel(Text("Close", comment: "Accessibility label for the currency picker's close button"))
                 }
@@ -43,11 +43,6 @@ struct CurrencyPickerView: View {
         .frame(maxHeight: .infinity)
         .presentationBackground(.bgPrimary)
     }
-
-    private func select(_ currency: Currency) {
-        selection = currency
-        coordinator.dismissSheet()
-    }
 }
 
 #Preview {
@@ -55,9 +50,10 @@ struct CurrencyPickerView: View {
     Color.clear
         .sheet(isPresented: .constant(true)) {
             CurrencyPickerView(
-                coordinator: .init(),
                 currencies: CurrencyCatalog.availableQuoteCurrencies,
-                selection: $selection
+                selection: selection,
+                onSelect: { selection = $0 },
+                onClose: {}
             )
         }
 }

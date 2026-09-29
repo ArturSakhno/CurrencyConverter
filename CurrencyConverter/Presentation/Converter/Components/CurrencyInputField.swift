@@ -13,6 +13,9 @@ struct CurrencyInputField: View {
     var focusedField: FocusState<FocusSlot?>.Binding
     let onSelectCurrency: EmptyClosure
 
+    /// Figma row inset, centering the 36pt title in a 55pt row.
+    private let verticalPadding: CGFloat = 9.5
+
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
             HStack(spacing: DS.Spacing.xxs) {
@@ -24,7 +27,7 @@ struct CurrencyInputField: View {
                             .textStyle(\.h3)
                             .foregroundStyle(.textPrimary)
                         if showsChevron {
-                            Image(.dsChevronDown)
+                            DS.Icon.chevronDown
                                 .resizable()
                                 .foregroundStyle(.iconPrimary)
                                 .frame(width: DS.Size.icon, height: DS.Size.icon)
@@ -44,18 +47,18 @@ struct CurrencyInputField: View {
                 )
             }
 
-            HStack(spacing: 4) {
+            HStack(spacing: DS.Spacing.xxs) {
                 if let imageName {
                     Image(imageName)
                         .resizable()
-                        .frame(width: 11, height: 11)
+                        .frame(width: DS.Size.flagSmall, height: DS.Size.flagSmall)
                 }
                 Text(subtitle)
                     .textStyle(\.bodySmall)
                     .foregroundStyle(.textSecondary)
             }
         }
-        .padding(.vertical, 9.5)
+        .padding(.vertical, verticalPadding)
     }
 }
 

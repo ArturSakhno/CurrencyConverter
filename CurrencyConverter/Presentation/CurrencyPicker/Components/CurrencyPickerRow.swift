@@ -10,7 +10,7 @@ struct CurrencyPickerRow: View {
 
     var body: some View {
         Button(action: onSelect) {
-            HStack(spacing: 12) {
+            HStack(spacing: DS.Spacing.s) {
                 flag
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -27,7 +27,7 @@ struct CurrencyPickerRow: View {
                             Circle()
                                 .fill(.interactivePrimary)
 
-                            Image(.dsCheckmark)
+                            DS.Icon.checkmark
                                 .resizable()
                                 .foregroundStyle(.bgPrimary)
                                 .accessibilityHidden(true)
@@ -59,7 +59,7 @@ struct CurrencyPickerRow: View {
                     .accessibilityHidden(true)
             }
         }
-        .frame(width: 40, height: 40)
+        .frame(width: DS.Size.avatar, height: DS.Size.avatar)
     }
 }
 

@@ -2,11 +2,11 @@ import DesignSystem
 import SwiftUI
 
 struct ConverterView: View {
-    let coordinator: AppCoordinator
+    let viewModel: ConverterViewModel
+    let baseCurrency: Currency
     let quoteCurrency: Currency
-    private let baseCurrency: Currency
+    let onSelectCurrency: EmptyClosure
 
-    @State private var viewModel: ConverterViewModel
     @State private var baseAmountText = ""
     @State private var quoteAmountText = ""
     /// Only swap toggles this. Drives both row chrome (sign/chevron) and bid vs. ask -
@@ -19,18 +19,17 @@ struct ConverterView: View {
     @FocusState private var focusedSlot: FocusSlot?
     @Environment(\.scenePhase) private var scenePhase
 
-    init(
-        dependencies: DependencyContainer,
-        coordinator: AppCoordinator,
-        quoteCurrency: Currency
-    ) {
-        self.coordinator = coordinator
-        self.quoteCurrency = quoteCurrency
-        self.baseCurrency = dependencies.currencyCatalogUseCase.baseCurrency()
-        _viewModel = State(wrappedValue: ConverterViewModel(
-            convertUseCase: dependencies.convertUseCase,
-            loadRatesUseCase: dependencies.loadRatesUseCase
-        ))
+    /// Screen-specific metrics from the Figma layout (not reusable design tokens).
+    private enum Layout {
+        static let screenTop: CGFloat = 54
+        /// Half the swap button's height, so the button and rate pill straddle both rows.
+        static let rowGap: CGFloat = 30
+    }
+
+    /// Top row sells (money leaves), bottom row buys - see the bid/ask rule in the view model.
+    private enum Sign {
+        static let outgoing = "−"
+        static let incoming = "+"
     }
 
     private var baseInfo: CurrencyDisplayInfo { .info(for: baseCurrency) }
@@ -84,17 +83,17 @@ struct ConverterView: View {
                 ZStack {
                     VStack {
                         topView
-                            .padding(.bottom, 30)
+                            .padding(.bottom, Layout.rowGap)
 
                         bottomView
-                            .padding(.top, 30)
+                            .padding(.top, Layout.rowGap)
                             .background(.bgPrimary)
                     }
 
                     exchange
                 }
             }
-            .padding(.top, 54)
+            .padding(.top, Layout.screenTop)
             .background(.bgSelected)
             .task {
                 await viewModel.loadRates()
@@ -123,26 +122,28 @@ struct ConverterView: View {
                     isBaseOnTop: isBaseOnTop
                 ) ?? ""
             }
+
+            Spacer(minLength: 0)
         }
+        // Tapping anywhere outside the fields - including the empty area below - dismisses the keyboard.
+        .contentShape(.rect)
         .onTapGesture {
             focusedSlot = nil
         }
-
-        Spacer()
     }
 
     var topView: some View {
         CurrencyInputField(
             amountText: topAmountText,
             currencyCode: topInfo.displayCode,
-            sign: "−",
+            sign: Sign.outgoing,
             currencySymbol: topInfo.currencySymbol,
             subtitle: topInfo.subtitle,
             showsChevron: !isBaseOnTop,
             imageName: topInfo.flagAssetName,
             field: .top,
             focusedField: $focusedSlot,
-            onSelectCurrency: { coordinator.presentCurrencyPicker() }
+            onSelectCurrency: onSelectCurrency
         )
         .padding(.horizontal, DS.Spacing.m)
         .padding(.vertical, DS.Spacing.l)
@@ -152,14 +153,14 @@ struct ConverterView: View {
         CurrencyInputField(
             amountText: bottomAmountText,
             currencyCode: bottomInfo.displayCode,
-            sign: "+",
+            sign: Sign.incoming,
             currencySymbol: bottomInfo.currencySymbol,
             subtitle: bottomInfo.subtitle,
             showsChevron: isBaseOnTop,
             imageName: bottomInfo.flagAssetName,
             field: .bottom,
             focusedField: $focusedSlot,
-            onSelectCurrency: { coordinator.presentCurrencyPicker() }
+            onSelectCurrency: onSelectCurrency
         )
         .padding(.horizontal, DS.Spacing.m)
         .padding(.vertical, DS.Spacing.l)
@@ -195,8 +196,9 @@ struct ConverterView: View {
 
 #Preview {
     ConverterView(
-        dependencies: .init(),
-        coordinator: .init(),
-        quoteCurrency: CurrencyCatalog.defaultQuote
+        viewModel: DependencyContainer().makeConverterViewModel(),
+        baseCurrency: CurrencyCatalog.base,
+        quoteCurrency: CurrencyCatalog.defaultQuote,
+        onSelectCurrency: {}
     )
 }

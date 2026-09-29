@@ -4,8 +4,7 @@ import SwiftUI
 public extension Theme {
     /// Sample custom theme proving the system takes more than Light/Dark.
     /// Not shipped - previews and tests only.
-    nonisolated static let sample = Theme(
-        name: "Sample",
+    static let sample = Theme(
         light: ColorPalette(
             textPrimary: Color(hex: "#1E1B4B"),
             textSecondary: Color(hex: "#6B7280"),

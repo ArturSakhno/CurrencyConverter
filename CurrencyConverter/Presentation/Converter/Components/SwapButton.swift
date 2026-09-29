@@ -10,7 +10,7 @@ struct SwapButton: View {
             ZStack {
                 Circle()
                     .fill(.interactivePrimary)
-                Image(.dsArrowDown)
+                DS.Icon.arrowDown
                     .resizable()
                     .renderingMode(.template)
                     .foregroundStyle(.onInteractivePrimary)

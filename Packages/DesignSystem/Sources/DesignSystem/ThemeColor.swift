@@ -11,24 +11,24 @@ public struct ThemeColor: ShapeStyle {
 }
 
 public extension ShapeStyle where Self == ThemeColor {
-    nonisolated static var textPrimary: ThemeColor { ThemeColor(token: \.textPrimary) }
-    nonisolated static var textSecondary: ThemeColor { ThemeColor(token: \.textSecondary) }
-    nonisolated static var textAccent: ThemeColor { ThemeColor(token: \.textAccent) }
-    nonisolated static var textError: ThemeColor { ThemeColor(token: \.textError) }
+    static var textPrimary: ThemeColor { ThemeColor(token: \.textPrimary) }
+    static var textSecondary: ThemeColor { ThemeColor(token: \.textSecondary) }
+    static var textAccent: ThemeColor { ThemeColor(token: \.textAccent) }
+    static var textError: ThemeColor { ThemeColor(token: \.textError) }
 
-    nonisolated static var bgPrimary: ThemeColor { ThemeColor(token: \.bgPrimary) }
-    nonisolated static var bgSelected: ThemeColor { ThemeColor(token: \.bgSelected) }
-    nonisolated static var bgOverlay: ThemeColor { ThemeColor(token: \.bgOverlay) }
+    static var bgPrimary: ThemeColor { ThemeColor(token: \.bgPrimary) }
+    static var bgSelected: ThemeColor { ThemeColor(token: \.bgSelected) }
+    static var bgOverlay: ThemeColor { ThemeColor(token: \.bgOverlay) }
 
-    nonisolated static var surfaceDefault: ThemeColor { ThemeColor(token: \.surfaceDefault) }
-    nonisolated static var surfaceOverlay: ThemeColor { ThemeColor(token: \.surfaceOverlay) }
-    nonisolated static var borderDefault: ThemeColor { ThemeColor(token: \.borderDefault) }
+    static var surfaceDefault: ThemeColor { ThemeColor(token: \.surfaceDefault) }
+    static var surfaceOverlay: ThemeColor { ThemeColor(token: \.surfaceOverlay) }
+    static var borderDefault: ThemeColor { ThemeColor(token: \.borderDefault) }
 
-    nonisolated static var iconPrimary: ThemeColor { ThemeColor(token: \.iconPrimary) }
-    nonisolated static var iconSecondary: ThemeColor { ThemeColor(token: \.iconSecondary) }
+    static var iconPrimary: ThemeColor { ThemeColor(token: \.iconPrimary) }
+    static var iconSecondary: ThemeColor { ThemeColor(token: \.iconSecondary) }
 
-    nonisolated static var interactivePrimary: ThemeColor { ThemeColor(token: \.interactivePrimary) }
-    nonisolated static var onInteractivePrimary: ThemeColor { ThemeColor(token: \.onInteractivePrimary) }
-    nonisolated static var selectorUnselectedBg: ThemeColor { ThemeColor(token: \.selectorUnselectedBg) }
-    nonisolated static var selectorUnselectedBorder: ThemeColor { ThemeColor(token: \.selectorUnselectedBorder) }
+    static var interactivePrimary: ThemeColor { ThemeColor(token: \.interactivePrimary) }
+    static var onInteractivePrimary: ThemeColor { ThemeColor(token: \.onInteractivePrimary) }
+    static var selectorUnselectedBg: ThemeColor { ThemeColor(token: \.selectorUnselectedBg) }
+    static var selectorUnselectedBorder: ThemeColor { ThemeColor(token: \.selectorUnselectedBorder) }
 }

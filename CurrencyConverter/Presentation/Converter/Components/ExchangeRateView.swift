@@ -3,12 +3,16 @@ import SwiftUI
 
 struct ExchangeRateView: View {
     let text: String
+
+    /// Makes the pill 40pt tall like the swap button next to it (18pt body line + 2 × 11).
+    private let verticalPadding: CGFloat = 11
+
     var body: some View {
         Text(text)
             .textStyle(\.body)
             .foregroundStyle(.interactivePrimary)
             .padding(.horizontal, DS.Spacing.s)
-            .padding(.vertical, 11)
+            .padding(.vertical, verticalPadding)
             .background(.surfaceOverlay, in: .rect(cornerRadius: DS.Radius.pill))
             .overlay(
                 RoundedRectangle(cornerRadius: DS.Radius.pill)

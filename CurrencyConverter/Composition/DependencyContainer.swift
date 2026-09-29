@@ -5,7 +5,7 @@ struct DependencyContainer {
 
     init() {
         let repository = RemoteExchangeRateRepository(apiClient: URLSessionTickersAPIClient())
-        let currencyCatalogRepository = MockCurrencyCatalogRepository()
+        let currencyCatalogRepository = FallbackCurrencyCatalogRepository()
 
         convertUseCase = DefaultConvertCurrencyUseCase()
         currencyCatalogUseCase = DefaultCurrencyCatalogUseCase(repository: currencyCatalogRepository)
@@ -13,5 +13,9 @@ struct DependencyContainer {
             repository: repository,
             quoteCurrencyCodes: currencyCatalogUseCase.availableQuoteCurrencies().map(\.code)
         )
+    }
+
+    func makeConverterViewModel() -> ConverterViewModel {
+        ConverterViewModel(convertUseCase: convertUseCase, loadRatesUseCase: loadRatesUseCase)
     }
 }
