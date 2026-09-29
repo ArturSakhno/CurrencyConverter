@@ -24,8 +24,7 @@ nonisolated enum FocusSlot: Hashable {
 /// `.focused(_:equals:)`, so the component stays independent of any ViewModel field enum.
 ///
 /// Fills the width it's offered (trailing-aligned) and shrinks, down to `minimumScale`,
-/// when the amount wouldn't fit at full size. Below that floor the caller is expected to
-/// give it more room - see `CurrencyInputField`.
+/// when the amount wouldn't fit at full size. Below that floor it overflows.
 struct AmountTextField: View {
     /// Smallest scale the amount shrinks to before it's allowed to overflow.
     static let minimumScale: CGFloat = 0.6
@@ -38,9 +37,6 @@ struct AmountTextField: View {
     let field: FocusSlot
     var focusedField: FocusState<FocusSlot?>.Binding
     var sanitizer = AmountInputSanitizer(locale: .current)
-    /// Reports the width the amount needs at full size, which doesn't depend on the space
-    /// this view is given - so a caller can pick its layout from it without feedback.
-    var onNaturalWidthChange: (CGFloat) -> Void = { _ in }
 
     @State private var availableWidth: CGFloat?
     @State private var naturalWidth: CGFloat = 0
@@ -91,7 +87,6 @@ struct AmountTextField: View {
         .fixedSize()
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
             naturalWidth = width
-            onNaturalWidthChange(width)
         }
         // Shrinks visually rather than via a smaller font: the focused UITextField ignores
         // font changes while editing, so its text would outgrow the hidden Text's width and
