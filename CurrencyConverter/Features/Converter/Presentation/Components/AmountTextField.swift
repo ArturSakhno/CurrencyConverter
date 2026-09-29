@@ -22,6 +22,8 @@ nonisolated enum FocusSlot: Hashable {
 
 /// Amount entry on the native decimal pad. Focus is applied by the caller via
 /// `.focused(_:equals:)`, so the component stays independent of any ViewModel field enum.
+/// The owner of `text` decides what an edit becomes (sanitized, regrouped or rejected);
+/// this view only displays the result.
 ///
 /// Fills the width it's offered (trailing-aligned) and shrinks, down to `minimumScale`,
 /// when the amount wouldn't fit at full size. Below that floor it overflows.
@@ -36,8 +38,11 @@ struct AmountTextField: View {
     let accessibilityLabel: LocalizedStringKey
     let field: FocusSlot
     var focusedField: FocusState<FocusSlot?>.Binding
-    var sanitizer = AmountInputSanitizer(locale: .current)
 
+    /// What the field shows. Each keystroke is written to `text`, then `draft` is reset to
+    /// whatever `text` holds afterwards. A rejected edit leaves `text` unchanged, so without
+    /// this copy nothing would redraw the field and the rejected characters would stay on screen.
+    @State private var draft = ""
     @State private var availableWidth: CGFloat?
     @State private var naturalWidth: CGFloat = 0
 
@@ -50,27 +55,27 @@ struct AmountTextField: View {
         HStack(spacing: 4) {
             if let sign {
                 Text(sign)
-                    .foregroundStyle(text.isEmpty ? .textSecondary : .textPrimary)
+                    .foregroundStyle(draft.isEmpty ? .textSecondary : .textPrimary)
                     .accessibilityHidden(true)
             }
 
             HStack(spacing: .zero) {
                 if let currencySymbol {
                     Text(currencySymbol)
-                        .foregroundStyle(text.isEmpty ? .textSecondary : .textPrimary)
+                        .foregroundStyle(draft.isEmpty ? .textSecondary : .textPrimary)
                         .accessibilityHidden(true)
                 }
 
                 // Width comes from a hidden Text mirroring the current value, so the prefixes stay
                 // attached to the number. Relying on the TextField's own intrinsic width doesn't
                 // work: UIKit doesn't re-measure it after edit-menu actions like Cut.
-                Text(text.isEmpty ? "0" : text)
+                Text(draft.isEmpty ? "0" : draft)
                     .lineLimit(1)
                     .fixedSize()
                     .padding(.trailing, 2) // room for the caret
                     .hidden()
                     .overlay {
-                        TextField(text: $text, prompt: Text(verbatim: "0").foregroundStyle(.textSecondary)) {
+                        TextField(text: $draft, prompt: Text(verbatim: "0").foregroundStyle(.textSecondary)) {
                             Text(accessibilityLabel)
                         }
                         .foregroundStyle(.textPrimary)
@@ -98,14 +103,15 @@ struct AmountTextField: View {
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
             availableWidth = width
         }
-        .onChange(of: text) { oldValue, newValue in
-            // Only the user's own typing is sanitized. The unfocused field receives an
-            // already-formatted converted amount, which may legitimately exceed the entry cap.
-            guard focusedField.wrappedValue == field else { return }
-            let sanitized = sanitizer.sanitizeEdit(from: oldValue, to: newValue)
-            if sanitized != newValue {
-                text = sanitized
-            }
+        // Converted amounts, swaps and the first appearance arrive through `text`.
+        .onChange(of: text, initial: true) {
+            draft = text
+        }
+        // Only typing changes `draft` to something other than `text`.
+        .onChange(of: draft) {
+            guard draft != text else { return }
+            text = draft
+            draft = text
         }
     }
 }

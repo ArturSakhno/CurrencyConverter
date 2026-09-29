@@ -10,12 +10,15 @@ struct ConverterViewModelTests {
         fetchedAt: Date(timeIntervalSince1970: 0)
     )
 
-    private func makeSUT(result: RatesLoadResult) -> ConverterViewModel {
+    private func makeSUT(
+        result: RatesLoadResult,
+        locale: Locale = Locale(identifier: "en_US")
+    ) -> ConverterViewModel {
         ConverterViewModel(
             convertUseCase: DefaultConvertCurrencyUseCase(),
             loadRatesUseCase: StubLoadExchangeRatesUseCase(result: result),
             quoteCurrency: mxn,
-            locale: Locale(identifier: "en_US")
+            locale: locale
         )
     }
 
@@ -370,6 +373,47 @@ struct ConverterViewModelTests {
 
         #expect(await useCase.callCount == 3)
         #expect(await recorder.delays == [15, 15, 15])
+    }
+}
+
+// MARK: - Edits
+
+@MainActor
+extension ConverterViewModelTests {
+    @Test func typedAmountIsSanitizedBeforeItIsStored() async {
+        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        await sut.loadRates()
+
+        sut.setAmountText("1234.567", for: .base)
+
+        #expect(sut.baseAmountText == "1,234.56")
+        #expect(sut.quoteAmountText == "22,715.90")
+    }
+
+    @Test func rejectedEditInDerivedFieldKeepsTypedAmountAsSource() async {
+        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        await sut.loadRates()
+        sut.setAmountText("100", for: .base)
+
+        // A third decimal sanitizes back to the current text, so the edit is rejected.
+        sut.setAmountText("1,840.005", for: .quote)
+
+        #expect(sut.quoteAmountText == "1,840.00")
+        #expect(sut.baseAmountText == "100")
+        // USDc is still the source: a swap keeps it and re-derives the quote with the ask.
+        sut.swap()
+        #expect(sut.baseAmountText == "100")
+        #expect(sut.quoteAmountText == "1,842.00")
+    }
+
+    @Test func editsUseTheInjectedLocale() async {
+        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true), locale: Locale(identifier: "es_ES"))
+        await sut.loadRates()
+
+        sut.setAmountText("12345,5", for: .base)
+
+        #expect(sut.baseAmountText == "12.345,5")
+        #expect(sut.quoteAmountText == "227.157,20")
     }
 }
 
