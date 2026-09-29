@@ -1,0 +1,18 @@
+# SwiftFormat config - applied to staged Swift files by .githooks/pre-commit.
+# Kept in step with .swiftlint.yml (140-column lines, trailing commas allowed).
+
+--swiftversion 6.0
+--exclude .build,DerivedData,**/.swiftpm,*.xcodeproj
+
+--indent 4
+--maxwidth 140
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--closingparen balanced
+--commas always
+--header strip
+--stripunusedargs closure-only
+
+# Keep short computed properties and functions on one line: `var id: String { code }`.
+--disable wrapPropertyBodies,wrapFunctionBodies
