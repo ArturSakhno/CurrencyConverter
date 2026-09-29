@@ -23,7 +23,7 @@ Architecture: Clean Architecture (Domain → Data → Presentation, dependency i
 
 ## The concurrency gotcha you must apply everywhere in Domain and Data
 
-The app target sets `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`. This means **every type, its methods, and its synthesized conformances (`Equatable`, `Hashable`, etc.) declared in the app module are implicitly `@MainActor`-isolated unless marked `nonisolated` at the declaration** — this already caused two real build failures in the Domain layer (a protocol conformance, and a synthesized `Equatable` used from the test target, which has no such default). Mark every Domain/Data type `nonisolated` at its `struct`/`enum`/`protocol` declaration up front; don't wait for the build to tell you. The two test targets (`CurrencyConverterTests`, `CurrencyConverterUITests`) do *not* have this default — code there is ordinary `nonisolated` Swift.
+The app target sets `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`. This means **every type, its methods, and its synthesized conformances (`Equatable`, `Hashable`, etc.) declared in the app module are implicitly `@MainActor`-isolated unless marked `nonisolated` at the declaration** — this already caused two real build failures in the Domain layer (a protocol conformance, and a synthesized `Equatable` used from the test target, which has no such default). Mark every Domain/Data type `nonisolated` at its `struct`/`enum`/`protocol` declaration up front; don't wait for the build to tell you. The test target (`CurrencyConverterTests`) does *not* have this default — code there is ordinary `nonisolated` Swift.
 
 ## Conventions
 

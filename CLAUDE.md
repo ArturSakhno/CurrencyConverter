@@ -14,7 +14,7 @@ Always ask before running `git commit`, even for routine commits.
 # Build
 xcodebuild build -scheme CurrencyConverter -destination 'platform=iOS Simulator,name=iPhone 17'
 
-# All tests (unit + UI)
+# All tests
 xcodebuild test -scheme CurrencyConverter -destination 'platform=iOS Simulator,name=iPhone 17'
 
 # One suite / one test (Swift Testing identifiers take a trailing "()" for functions)

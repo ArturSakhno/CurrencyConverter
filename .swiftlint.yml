@@ -1,7 +1,6 @@
 included:
   - CurrencyConverter
   - CurrencyConverterTests
-  - CurrencyConverterUITests
 
 excluded:
   - CurrencyConverter.xcodeproj
