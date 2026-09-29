@@ -144,8 +144,8 @@ struct ConverterView: View {
             focusedField: $focusedSlot,
             onSelectCurrency: { coordinator.presentCurrencyPicker() }
         )
-        .padding(.horizontal, 16)
-        .padding(.vertical, 20)
+        .padding(.horizontal, DS.Spacing.m)
+        .padding(.vertical, DS.Spacing.l)
     }
 
     var bottomView: some View {
@@ -161,8 +161,8 @@ struct ConverterView: View {
             focusedField: $focusedSlot,
             onSelectCurrency: { coordinator.presentCurrencyPicker() }
         )
-        .padding(.horizontal, 16)
-        .padding(.vertical, 20)
+        .padding(.horizontal, DS.Spacing.m)
+        .padding(.vertical, DS.Spacing.l)
     }
 
     var exchange: some View {
@@ -177,8 +177,7 @@ struct ConverterView: View {
             }
             .rotationEffect(isBaseOnTop ? .degrees(0) : .degrees(180))
             .animation(.default, value: isBaseOnTop)
-            .padding(.leading, 16)
-
+            .padding(.leading, DS.Spacing.m)
 
             ExchangeRateView(
                 text: viewModel.ratePillText(
