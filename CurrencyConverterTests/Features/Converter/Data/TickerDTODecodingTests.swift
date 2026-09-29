@@ -39,6 +39,32 @@ struct TickerDTODecodingTests {
         #expect(rates.contains { $0.quoteCurrencyCode == "MXN" })
     }
 
+    @Test func parsesDateAsUTCWithFractionalSeconds() throws {
+        let json = """
+        [{"ask": "18.41", "bid": "18.40", "book": "usdc_mxn", "date": "2026-09-29T10:37:52.798864882"}]
+        """
+
+        let quotedAt = try #require(try decode(json).first?.quotedAt)
+
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = .gmt
+        let expected = try #require(utc.date(from: DateComponents(
+            year: 2026, month: 9, day: 29, hour: 10, minute: 37, second: 52
+        ))).addingTimeInterval(0.798864882)
+        #expect(abs(quotedAt.timeIntervalSince(expected)) < 0.000_001)
+    }
+
+    @Test func unparsableDateKeepsTheRateWithoutQuoteTime() throws {
+        let json = """
+        [{"ask": "18.41", "bid": "18.40", "book": "usdc_mxn", "date": "yesterday"}]
+        """
+
+        let rates = try decode(json)
+
+        #expect(rates.count == 1)
+        #expect(rates.first?.quotedAt == nil)
+    }
+
     @Test func dropsTickerWithNonNumericAskOrBidWithoutFailingTheBatch() throws {
         let json = """
         [

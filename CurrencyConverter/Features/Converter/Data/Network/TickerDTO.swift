@@ -4,11 +4,9 @@ nonisolated struct TickerDTO: Decodable {
     let ask: String
     let bid: String
     let book: String
-    /// Nanosecond precision, no timezone. Kept as a raw string for possible future
-    /// debugging/logging use — not parsed into `Date`. The app's own "rates as of"
-    /// timestamp uses client-capture time instead, stamped by the repository on a
-    /// successful fetch, since this field is awkward to parse reliably and nothing
-    /// user-visible depends on it.
+    /// When the server issued the quote, e.g. `2026-09-29T10:37:52.798864882`: UTC (it matches
+    /// the response's HTTP `Date` header), nanosecond precision, no timezone suffix. Drives
+    /// when the next refresh is due; "Rates as of" still shows client capture time.
     let date: String
 }
 
@@ -26,7 +24,29 @@ extension TickerDTO {
         return ExchangeRate(
             quoteCurrencyCode: quoteCode.uppercased(),
             ask: askDecimal,
-            bid: bidDecimal
+            bid: bidDecimal,
+            quotedAt: Self.parseDate(date)
         )
     }
+
+    /// Parses the API's timezone-less UTC timestamp. The seconds part goes through a fixed
+    /// POSIX formatter; the fraction is added separately, because Foundation's ISO 8601
+    /// parsers don't reliably accept 9 fractional digits. `nil` for anything unexpected -
+    /// a missing timestamp must never drop the rate itself.
+    nonisolated static func parseDate(_ string: String) -> Date? {
+        let parts = string.split(separator: ".", maxSplits: 1)
+        guard let whole = parts.first, let seconds = try? Date(String(whole), strategy: secondsStrategy) else { return nil }
+        guard parts.count == 2 else { return seconds }
+        guard let fraction = Double("0." + parts[1]) else { return nil }
+        return seconds.addingTimeInterval(fraction)
+    }
+
+    private nonisolated static let secondsStrategy = Date.ParseStrategy(
+        format: """
+        \(year: .defaultDigits)-\(month: .twoDigits)-\(day: .twoDigits)T\
+        \(hour: .twoDigits(clock: .twentyFourHour, hourCycle: .zeroBased)):\(minute: .twoDigits):\(second: .twoDigits)
+        """,
+        locale: Locale(identifier: "en_US_POSIX"),
+        timeZone: .gmt
+    )
 }

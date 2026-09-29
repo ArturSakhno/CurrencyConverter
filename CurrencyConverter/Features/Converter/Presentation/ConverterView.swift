@@ -48,47 +48,50 @@ struct ConverterView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: .zero) {
+        ScrollView {
             VStack(alignment: .leading, spacing: .zero) {
-                Text("Exchange calculator")
-                    .padding(.horizontal, DS.Spacing.m)
-                    .textStyle(\.h3)
-                    .foregroundStyle(.textPrimary)
-
-                if let ratesAsOfText = viewModel.ratesAsOfText {
-                    Text("Rates as of \(ratesAsOfText)")
+                VStack(alignment: .leading, spacing: .zero) {
+                    Text("Exchange calculator")
                         .padding(.horizontal, DS.Spacing.m)
-                        .textStyle(\.bodySmall)
-                        .foregroundStyle(.textSecondary)
-                }
+                        .textStyle(\.h3)
+                        .foregroundStyle(.textPrimary)
 
-                ZStack {
-                    VStack {
-                        topView
-                            .padding(.bottom, Layout.rowGap)
-
-                        bottomView
-                            .padding(.top, Layout.rowGap)
-                            .background(.bgPrimary)
+                    if let ratesAsOfText = viewModel.ratesAsOfText {
+                        Text("Rates as of \(ratesAsOfText)")
+                            .padding(.horizontal, DS.Spacing.m)
+                            .textStyle(\.bodySmall)
+                            .foregroundStyle(.textSecondary)
                     }
 
-                    exchange
-                }
-            }
-            .padding(.top, Layout.screenTop)
-            .background(.bgSelected)
-            .task {
-                await viewModel.loadRates()
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                guard newPhase == .active else { return }
-                Task {
-                    await viewModel.loadRates()
-                }
-            }
+                    ZStack {
+                        VStack {
+                            topView
+                                .padding(.bottom, Layout.rowGap)
 
-            Spacer(minLength: 0)
+                            bottomView
+                                .padding(.top, Layout.rowGap)
+                                .background(.bgPrimary)
+                        }
+
+                        exchange
+                    }
+                }
+                .padding(.top, Layout.screenTop)
+                .background(.bgSelected)
+                .task {
+                    await viewModel.keepRatesUpdated()
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    guard newPhase == .active else { return }
+                    Task {
+                        await viewModel.refreshIfStale()
+                    }
+                }
+
+                Spacer(minLength: 0)
+            }
         }
+        .scrollBounceBehavior(.basedOnSize)
         // Tapping anywhere outside the fields - including the empty area below - dismisses the keyboard.
         .contentShape(.rect)
         .onTapGesture {

@@ -27,7 +27,7 @@ nonisolated enum FocusSlot: Hashable {
 /// when the amount wouldn't fit at full size. Below that floor it overflows.
 struct AmountTextField: View {
     /// Smallest scale the amount shrinks to before it's allowed to overflow.
-    static let minimumScale: CGFloat = 0.6
+    static let minimumScale: CGFloat = 0.1
 
     @Binding var text: String
     let sign: String?
