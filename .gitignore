@@ -66,3 +66,6 @@ fastlane/test_output
 
 # Claude Code (local worktrees and session files)
 .claude/
+
+# Local Swift packages: Xcode regenerates .swiftpm (schemes + user data)
+Packages/*/.swiftpm/
