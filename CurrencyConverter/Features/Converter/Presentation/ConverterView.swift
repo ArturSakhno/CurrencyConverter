@@ -90,13 +90,13 @@ struct ConverterView: View {
 
                 Spacer(minLength: 0)
             }
-            // Tapping anywhere outside the fields - including the empty area below - dismisses the keyboard.
-            .contentShape(.rect)
-            .onTapGesture {
-                focusedSlot = nil
-            }
         }
         .scrollBounceBehavior(.basedOnSize)
+        // Tapping anywhere outside the fields - including the empty area below - dismisses the keyboard.
+        .contentShape(.rect)
+        .onTapGesture {
+            focusedSlot = nil
+        }
     }
 
     var topView: some View {
