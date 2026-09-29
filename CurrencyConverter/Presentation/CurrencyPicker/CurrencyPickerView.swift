@@ -18,11 +18,15 @@ struct CurrencyPickerView: View {
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
             }
-            .listStyle(.plain)
-            .navigationTitle(Text("Choose currency", comment: "Navigation title for the currency picker sheet"))
             .navigationBarTitleDisplayMode(.inline)
+            .listStyle(.plain)
+            .toolbarRole(.browser)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
+                    ToolbarItem(placement: .principal) {
+                        Text("Choose currency")
+                            .textStyle(\.h4)
+                    }
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         coordinator.dismissSheet()
                     } label: {
