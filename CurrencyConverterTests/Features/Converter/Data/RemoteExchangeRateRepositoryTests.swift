@@ -5,49 +5,22 @@ import Testing
 struct RemoteExchangeRateRepositoryTests {
     private let mxnRate = ExchangeRate(quoteCurrencyCode: "MXN", ask: 18.42, bid: 18.40)
 
-    @Test func successfulFetchSavesSnapshotToStore() async throws {
-        let store = InMemorySnapshotStore()
-        let sut = RemoteExchangeRateRepository(apiClient: StubTickersAPIClient(result: .success([mxnRate])), store: store)
+    @Test func successfulFetchReturnsRatesStampedWithFetchTime() async throws {
+        let sut = RemoteExchangeRateRepository(apiClient: StubTickersAPIClient(result: .success([mxnRate])))
+        let before = Date()
 
         let snapshot = try await sut.fetchLatestRates(for: ["MXN"])
 
         #expect(snapshot.rates == [mxnRate])
-        #expect(store.load() == snapshot)
+        #expect(snapshot.fetchedAt >= before)
     }
 
-    @Test func lastCachedSnapshotReadsFromStore() throws {
-        let cached = ExchangeRatesSnapshot(rates: [mxnRate], fetchedAt: Date(timeIntervalSince1970: 0))
-        let store = InMemorySnapshotStore()
-        try store.save(cached)
-        let sut = RemoteExchangeRateRepository(apiClient: StubTickersAPIClient(result: .success([])), store: store)
-
-        #expect(sut.lastCachedSnapshot() == cached)
-    }
-
-    @Test func failedFetchThrowsAndKeepsStoredSnapshot() async throws {
-        let cached = ExchangeRatesSnapshot(rates: [mxnRate], fetchedAt: Date(timeIntervalSince1970: 0))
-        let store = InMemorySnapshotStore()
-        try store.save(cached)
-        let sut = RemoteExchangeRateRepository(
-            apiClient: StubTickersAPIClient(result: .failure(.transport("offline"))),
-            store: store
-        )
+    @Test func failedFetchThrows() async {
+        let sut = RemoteExchangeRateRepository(apiClient: StubTickersAPIClient(result: .failure(.transport("offline"))))
 
         await #expect(throws: APIError.self) {
             try await sut.fetchLatestRates(for: ["MXN"])
         }
-        #expect(store.load() == cached)
-    }
-
-    @Test func failedSaveDoesNotFailTheFetch() async throws {
-        let sut = RemoteExchangeRateRepository(
-            apiClient: StubTickersAPIClient(result: .success([mxnRate])),
-            store: FailingSnapshotStore()
-        )
-
-        let snapshot = try await sut.fetchLatestRates(for: ["MXN"])
-
-        #expect(snapshot.rates == [mxnRate])
     }
 }
 
@@ -56,28 +29,5 @@ private struct StubTickersAPIClient: TickersAPIClient {
 
     func fetchTickers(quoteCurrencyCodes _: [String]) async throws -> [ExchangeRate] {
         try result.get()
-    }
-}
-
-private final class InMemorySnapshotStore: ExchangeRatesSnapshotStore, @unchecked Sendable {
-    private let lock = NSLock()
-    private var snapshot: ExchangeRatesSnapshot?
-
-    func load() -> ExchangeRatesSnapshot? {
-        lock.withLock { snapshot }
-    }
-
-    func save(_ snapshot: ExchangeRatesSnapshot) throws {
-        lock.withLock { self.snapshot = snapshot }
-    }
-}
-
-private struct FailingSnapshotStore: ExchangeRatesSnapshotStore {
-    struct SaveError: Error {}
-
-    func load() -> ExchangeRatesSnapshot? { nil }
-
-    func save(_: ExchangeRatesSnapshot) throws {
-        throw SaveError()
     }
 }
