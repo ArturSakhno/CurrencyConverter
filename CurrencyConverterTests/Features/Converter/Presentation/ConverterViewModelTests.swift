@@ -6,7 +6,7 @@ import Testing
 struct ConverterViewModelTests {
     private let mxn = Currency(code: "MXN")
     private let sampleSnapshot = ExchangeRatesSnapshot(
-        rates: [ExchangeRate(quoteCurrencyCode: "MXN", ask: 18.42, bid: 18.40)],
+        rates: [ExchangeRate(quoteCurrency: Currency(code: "MXN"), ask: 18.42, bid: 18.40)],
         fetchedAt: Date(timeIntervalSince1970: 0)
     )
 
@@ -91,7 +91,7 @@ struct ConverterViewModelTests {
     @Test func convertedAmountKeepsEveryDigitBeyondEntryCap() async {
         let cop = Currency(code: "COP")
         let snapshot = ExchangeRatesSnapshot(
-            rates: [ExchangeRate(quoteCurrencyCode: "COP", ask: 4000, bid: 4000)],
+            rates: [ExchangeRate(quoteCurrency: Currency(code: "COP"), ask: 4000, bid: 4000)],
             fetchedAt: Date(timeIntervalSince1970: 0)
         )
         let sut = makeSUT(result: .loaded(snapshot, isFresh: true))
@@ -173,8 +173,8 @@ struct ConverterViewModelTests {
     @Test func selectingQuoteCurrencyRecalculatesDerivedAmount() async {
         let snapshot = ExchangeRatesSnapshot(
             rates: [
-                ExchangeRate(quoteCurrencyCode: "MXN", ask: 18.42, bid: 18.40),
-                ExchangeRate(quoteCurrencyCode: "COP", ask: 4000, bid: 3990),
+                ExchangeRate(quoteCurrency: Currency(code: "MXN"), ask: 18.42, bid: 18.40),
+                ExchangeRate(quoteCurrency: Currency(code: "COP"), ask: 4000, bid: 3990),
             ],
             fetchedAt: Date(timeIntervalSince1970: 0)
         )
@@ -302,7 +302,7 @@ struct ConverterViewModelTests {
     private func snapshot(fetchedAt: TimeInterval, quotedAt: TimeInterval?) -> ExchangeRatesSnapshot {
         ExchangeRatesSnapshot(
             rates: [ExchangeRate(
-                quoteCurrencyCode: "MXN",
+                quoteCurrency: Currency(code: "MXN"),
                 ask: 18.42,
                 bid: 18.40,
                 quotedAt: quotedAt.map(Date.init(timeIntervalSince1970:))

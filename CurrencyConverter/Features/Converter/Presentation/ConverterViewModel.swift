@@ -174,7 +174,7 @@ final class ConverterViewModel {
     /// catalog currency's rate.
     func rate(for quoteCurrency: Currency) -> ExchangeRate? {
         guard case let .loaded(snapshot, _) = ratesResult else { return nil }
-        return snapshot.rates.first { $0.quoteCurrencyCode == quoteCurrency.code }
+        return snapshot.rate(for: quoteCurrency)
     }
 
     /// Bid when the base currency is on top (selling USDc), ask when it's on the

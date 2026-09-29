@@ -14,7 +14,8 @@ struct DependencyContainer {
         currencyCatalogUseCase = DefaultCurrencyCatalogUseCase(repository: currencyCatalogRepository)
         loadRatesUseCase = DefaultLoadExchangeRatesUseCase(
             repository: repository,
-            quoteCurrencyCodes: currencyCatalogUseCase.availableQuoteCurrencies().map(\.code)
+            baseCurrency: currencyCatalogUseCase.baseCurrency(),
+            quoteCurrencies: currencyCatalogUseCase.availableQuoteCurrencies()
         )
     }
 

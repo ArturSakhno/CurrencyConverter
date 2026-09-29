@@ -4,13 +4,21 @@ import Testing
 
 struct LoadExchangeRatesUseCaseTests {
     private let sampleSnapshot = ExchangeRatesSnapshot(
-        rates: [ExchangeRate(quoteCurrencyCode: "MXN", ask: 18.41, bid: 18.40)],
+        rates: [ExchangeRate(quoteCurrency: Currency(code: "MXN"), ask: 18.41, bid: 18.40)],
         fetchedAt: Date(timeIntervalSince1970: 0)
     )
 
+    private func makeSUT(repository: ExchangeRateRepository) -> DefaultLoadExchangeRatesUseCase {
+        DefaultLoadExchangeRatesUseCase(
+            repository: repository,
+            baseCurrency: CurrencyCatalog.base,
+            quoteCurrencies: [Currency(code: "MXN")]
+        )
+    }
+
     @Test func loadReturnsFreshSnapshotOnNetworkSuccess() async {
         let repository = StubExchangeRateRepository(fetchResult: .success(sampleSnapshot), cachedSnapshot: nil)
-        let sut = DefaultLoadExchangeRatesUseCase(repository: repository, quoteCurrencyCodes: ["MXN"])
+        let sut = makeSUT(repository: repository)
 
         let result = await sut.load()
 
@@ -19,7 +27,7 @@ struct LoadExchangeRatesUseCaseTests {
 
     @Test func loadFallsBackToCacheOnNetworkFailure() async {
         let repository = StubExchangeRateRepository(fetchResult: .failure(.networkError), cachedSnapshot: sampleSnapshot)
-        let sut = DefaultLoadExchangeRatesUseCase(repository: repository, quoteCurrencyCodes: ["MXN"])
+        let sut = makeSUT(repository: repository)
 
         let result = await sut.load()
 
@@ -28,7 +36,7 @@ struct LoadExchangeRatesUseCaseTests {
 
     @Test func loadReturnsUnavailableWhenNoNetworkAndNoCache() async {
         let repository = StubExchangeRateRepository(fetchResult: .failure(.networkError), cachedSnapshot: nil)
-        let sut = DefaultLoadExchangeRatesUseCase(repository: repository, quoteCurrencyCodes: ["MXN"])
+        let sut = makeSUT(repository: repository)
 
         let result = await sut.load()
 
@@ -42,7 +50,7 @@ private struct StubExchangeRateRepository: ExchangeRateRepository {
     let fetchResult: Result<ExchangeRatesSnapshot, StubError>
     let cachedSnapshot: ExchangeRatesSnapshot?
 
-    func fetchLatestRates(for _: [String]) async throws -> ExchangeRatesSnapshot {
+    func fetchLatestRates(base _: Currency, quotes _: [Currency]) async throws -> ExchangeRatesSnapshot {
         try fetchResult.get()
     }
 

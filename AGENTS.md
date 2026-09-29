@@ -67,6 +67,7 @@ Other project settings that matter:
 - An unknown or lowercase code, or a space in the `currencies` list, makes the **whole batch** return HTTP 500. Join codes with `","` and no space.
 - A code like `EUR` returns a `null` array element. Decode `[TickerDTO?]` and filter out the nulls.
 - Match tickers back to a currency by content (the `book` field, e.g. `usdc_mxn`), never by array index, because filtering nulls shifts the indices.
+- A ticker is used only if `book` is exactly `<base>_<requested quote>` and both prices are positive; anything else is dropped like a null. A response with no usable ticker throws `APIError.noUsableRates` and never replaces the cache. A partial response is accepted as is: a currency the API left out shows "Rate unavailable" until it's quoted again.
 - `ask` and `bid` arrive as strings with 10 decimal places. `date` has nanosecond precision and no timezone.
 - The `x-correlation-id` response header is attached to `APIError`.
 

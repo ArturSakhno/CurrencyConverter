@@ -3,13 +3,13 @@ import Foundation
 import Testing
 
 struct RemoteExchangeRateRepositoryTests {
-    private let mxnRate = ExchangeRate(quoteCurrencyCode: "MXN", ask: 18.42, bid: 18.40)
+    private let mxnRate = ExchangeRate(quoteCurrency: Currency(code: "MXN"), ask: 18.42, bid: 18.40)
 
     @Test func successfulFetchSavesSnapshotToStore() async throws {
         let store = InMemorySnapshotStore()
         let sut = RemoteExchangeRateRepository(apiClient: StubTickersAPIClient(result: .success([mxnRate])), store: store)
 
-        let snapshot = try await sut.fetchLatestRates(for: ["MXN"])
+        let snapshot = try await sut.fetchLatestRates(base: CurrencyCatalog.base, quotes: [Currency(code: "MXN")])
 
         #expect(snapshot.rates == [mxnRate])
         #expect(store.load() == snapshot)
@@ -34,7 +34,7 @@ struct RemoteExchangeRateRepositoryTests {
         )
 
         await #expect(throws: APIError.self) {
-            try await sut.fetchLatestRates(for: ["MXN"])
+            try await sut.fetchLatestRates(base: CurrencyCatalog.base, quotes: [Currency(code: "MXN")])
         }
         #expect(store.load() == cached)
     }
@@ -45,7 +45,7 @@ struct RemoteExchangeRateRepositoryTests {
             store: FailingSnapshotStore()
         )
 
-        let snapshot = try await sut.fetchLatestRates(for: ["MXN"])
+        let snapshot = try await sut.fetchLatestRates(base: CurrencyCatalog.base, quotes: [Currency(code: "MXN")])
 
         #expect(snapshot.rates == [mxnRate])
     }
@@ -54,7 +54,7 @@ struct RemoteExchangeRateRepositoryTests {
 private struct StubTickersAPIClient: TickersAPIClient {
     let result: Result<[ExchangeRate], APIError>
 
-    func fetchTickers(quoteCurrencyCodes _: [String]) async throws -> [ExchangeRate] {
+    func fetchTickers(base _: Currency, quotes _: [Currency]) async throws -> [ExchangeRate] {
         try result.get()
     }
 }

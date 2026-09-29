@@ -11,7 +11,7 @@ struct FileExchangeRatesSnapshotStoreTests {
     private func snapshot(ask: String, bid: String, fetchedAt: TimeInterval = 1_790_000_000) throws -> ExchangeRatesSnapshot {
         try ExchangeRatesSnapshot(
             rates: [ExchangeRate(
-                quoteCurrencyCode: "MXN",
+                quoteCurrency: Currency(code: "MXN"),
                 ask: #require(Decimal(string: ask)),
                 bid: #require(Decimal(string: bid)),
                 quotedAt: Date(timeIntervalSince1970: fetchedAt - 0.5)
@@ -61,9 +61,14 @@ struct FileExchangeRatesSnapshotStoreTests {
         #expect(sut.load() == nil)
     }
 
-    @Test func unparsableRateLoadsNil() throws {
+    @Test(arguments: [
+        #"{"rates":[{"quoteCurrencyCode":"MXN","ask":"abc","bid":"18.4"}],"fetchedAt":0}"#,
+        #"{"rates":[{"quoteCurrencyCode":"MXN","ask":"0","bid":"18.4"}],"fetchedAt":0}"#,
+        #"{"rates":[{"quoteCurrencyCode":"MXN","ask":"18.41","bid":"-18.4"}],"fetchedAt":0}"#,
+        #"{"rates":[],"fetchedAt":0}"#,
+    ])
+    func unusableSnapshotLoadsNil(json: String) throws {
         try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-        let json = #"{"rates":[{"quoteCurrencyCode":"MXN","ask":"abc","bid":"18.4"}],"fetchedAt":0}"#
         try Data(json.utf8).write(to: fileURL)
         let sut = FileExchangeRatesSnapshotStore(fileURL: fileURL)
 
