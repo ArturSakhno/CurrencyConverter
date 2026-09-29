@@ -4,18 +4,11 @@ import SwiftUI
 struct ConverterView: View {
     let viewModel: ConverterViewModel
     let baseCurrency: Currency
-    let quoteCurrency: Currency
     let onSelectCurrency: EmptyClosure
 
-    @State private var baseAmountText = ""
-    @State private var quoteAmountText = ""
-    /// Only swap toggles this. Drives both row chrome (sign/chevron) and bid vs. ask -
-    /// never keyboard focus, which is tracked independently via `focusedSlot`.
-    @State private var isBaseOnTop = true
-    /// The actual FocusState is keyed by screen slot, not currency - reassigning which
-    /// *currency* a slot's `.focused(_:equals:)` claim represents on every swap doesn't
-    /// reliably carry focus across the swap in practice. `focusedField` below derives
-    /// which currency is logically focused from this plus `isBaseOnTop`.
+    /// Keyed by screen slot, not currency - reassigning which *currency* a slot's
+    /// `.focused(_:equals:)` claim represents on every swap doesn't reliably carry focus
+    /// across the swap in practice.
     @FocusState private var focusedSlot: FocusSlot?
     @Environment(\.scenePhase) private var scenePhase
 
@@ -32,6 +25,8 @@ struct ConverterView: View {
         static let incoming = "+"
     }
 
+    private var isBaseOnTop: Bool { viewModel.isBaseOnTop }
+    private var quoteCurrency: Currency { viewModel.quoteCurrency }
     private var baseInfo: CurrencyDisplayInfo { .info(for: baseCurrency) }
     private var quoteInfo: CurrencyDisplayInfo { .info(for: quoteCurrency) }
 
@@ -44,22 +39,12 @@ struct ConverterView: View {
     private var topField: AmountField { isBaseOnTop ? .base : .quote }
     private var bottomField: AmountField { isBaseOnTop ? .quote : .base }
 
-    /// Which currency is logically focused, derived from the slot-stable `focusedSlot`
-    /// plus `isBaseOnTop`. Used only to gate the conversion `.onChange` handlers below.
-    private var focusedField: AmountField? {
-        switch focusedSlot {
-        case .top: topField
-        case .bottom: bottomField
-        case nil: nil
-        }
-    }
-
-    private var topAmountText: Binding<String> {
-        isBaseOnTop ? $baseAmountText : $quoteAmountText
-    }
-
-    private var bottomAmountText: Binding<String> {
-        isBaseOnTop ? $quoteAmountText : $baseAmountText
+    /// Only the text field writes through this, so every `set` is a user edit.
+    private func amountText(for field: AmountField) -> Binding<String> {
+        Binding(
+            get: { viewModel.amountText(for: field) },
+            set: { viewModel.setAmountText($0, for: field) }
+        )
     }
 
     var body: some View {
@@ -101,24 +86,6 @@ struct ConverterView: View {
                     await viewModel.loadRates()
                 }
             }
-            .onChange(of: baseAmountText) { _, newValue in
-                guard focusedField == .base else { return }
-                quoteAmountText = viewModel.convertedAmount(
-                    sourceText: newValue,
-                    sourceField: .base,
-                    quoteCurrency: quoteCurrency,
-                    isBaseOnTop: isBaseOnTop
-                ) ?? ""
-            }
-            .onChange(of: quoteAmountText) { _, newValue in
-                guard focusedField == .quote else { return }
-                baseAmountText = viewModel.convertedAmount(
-                    sourceText: newValue,
-                    sourceField: .quote,
-                    quoteCurrency: quoteCurrency,
-                    isBaseOnTop: isBaseOnTop
-                ) ?? ""
-            }
 
             Spacer(minLength: 0)
         }
@@ -131,7 +98,7 @@ struct ConverterView: View {
 
     var topView: some View {
         CurrencyInputField(
-            amountText: topAmountText,
+            amountText: amountText(for: topField),
             currencyCode: topInfo.displayCode,
             sign: Sign.outgoing,
             currencySymbol: topInfo.currencySymbol,
@@ -148,7 +115,7 @@ struct ConverterView: View {
 
     var bottomView: some View {
         CurrencyInputField(
-            amountText: bottomAmountText,
+            amountText: amountText(for: bottomField),
             currencyCode: bottomInfo.displayCode,
             sign: Sign.incoming,
             currencySymbol: bottomInfo.currencySymbol,
@@ -166,7 +133,7 @@ struct ConverterView: View {
     var exchange: some View {
         ZStack(alignment: .leading) {
             SwapButton {
-                isBaseOnTop.toggle()
+                viewModel.swap()
                 // Keep the same *currency* focused (now in the other slot),
                 // not the same slot - only meaningful when something is focused.
                 if focusedSlot != nil {
@@ -179,8 +146,6 @@ struct ConverterView: View {
 
             ExchangeRateView(
                 text: viewModel.ratePillText(
-                    quoteCurrency: quoteCurrency,
-                    isBaseOnTop: isBaseOnTop,
                     baseDisplayCode: baseInfo.displayCode,
                     quoteDisplayCode: quoteInfo.displayCode
                 )
@@ -195,7 +160,6 @@ struct ConverterView: View {
     ConverterView(
         viewModel: DependencyContainer().makeConverterViewModel(),
         baseCurrency: CurrencyCatalog.base,
-        quoteCurrency: CurrencyCatalog.defaultQuote,
         onSelectCurrency: {}
     )
 }

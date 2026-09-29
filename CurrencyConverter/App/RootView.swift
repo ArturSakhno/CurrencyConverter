@@ -5,12 +5,10 @@ struct RootView: View {
     private let currencyCatalog: CurrencyCatalogUseCase
     @State private var coordinator = AppCoordinator()
     @State private var converterViewModel: ConverterViewModel
-    @State private var selectedQuoteCurrency: Currency
 
     init(dependencies: DependencyContainer) {
         currencyCatalog = dependencies.currencyCatalogUseCase
         _converterViewModel = State(initialValue: dependencies.makeConverterViewModel())
-        _selectedQuoteCurrency = State(initialValue: dependencies.currencyCatalogUseCase.defaultQuoteCurrency())
     }
 
     var body: some View {
@@ -18,7 +16,6 @@ struct RootView: View {
             ConverterView(
                 viewModel: converterViewModel,
                 baseCurrency: currencyCatalog.baseCurrency(),
-                quoteCurrency: selectedQuoteCurrency,
                 onSelectCurrency: { coordinator.presentCurrencyPicker() }
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -28,9 +25,9 @@ struct RootView: View {
                 case .currencyPicker:
                     CurrencyPickerView(
                         currencies: currencyCatalog.availableQuoteCurrencies(),
-                        selection: selectedQuoteCurrency,
+                        selection: converterViewModel.quoteCurrency,
                         onSelect: { currency in
-                            selectedQuoteCurrency = currency
+                            converterViewModel.selectQuoteCurrency(currency)
                             coordinator.dismissSheet()
                         },
                         onClose: { coordinator.dismissSheet() }
