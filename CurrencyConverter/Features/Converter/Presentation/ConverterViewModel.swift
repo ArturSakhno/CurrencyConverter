@@ -119,11 +119,15 @@ final class ConverterViewModel {
 
     /// Called only for the user's own edits (the text field binding), never for derived
     /// values - so the field written here becomes the source the other one follows.
+    /// The edit is sanitized first; one that sanitizes back to the current text (a third
+    /// decimal, a digit past the entry cap) changes nothing, so the source stays put.
     func setAmountText(_ text: String, for field: AmountField) {
-        guard text != amountText(for: field) else { return }
+        let current = amountText(for: field)
+        let accepted = sanitizer.sanitizeEdit(from: current, to: text)
+        guard accepted != current else { return }
         switch field {
-        case .base: baseAmountText = text
-        case .quote: quoteAmountText = text
+        case .base: baseAmountText = accepted
+        case .quote: quoteAmountText = accepted
         }
         lastEditedField = field
         recalculateDerivedAmount()
