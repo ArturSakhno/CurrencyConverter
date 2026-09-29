@@ -175,7 +175,10 @@ struct ConverterView: View {
                     focusedSlot = focusedSlot == .top ? .bottom : .top
                 }
             }
+            .rotationEffect(isBaseOnTop ? .degrees(0) : .degrees(180))
+            .animation(.default, value: isBaseOnTop)
             .padding(.leading, 16)
+
 
             ExchangeRateView(
                 text: viewModel.ratePillText(
