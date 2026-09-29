@@ -71,7 +71,7 @@ struct ConverterViewModelTests {
             isBaseOnTop: true
         )
 
-        #expect(result == "1840.00")
+        #expect(result == "1,840.00")
     }
 
     @Test func convertedAmountFromQuoteMatchesUseCaseMath() async {

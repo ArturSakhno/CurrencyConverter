@@ -13,10 +13,20 @@ nonisolated struct AmountInputSanitizer: Sendable {
         locale.decimalSeparator?.first ?? "."
     }
 
-    /// Keeps digits and the first locale decimal separator; anything else (including
-    /// grouping separators from a previously formatted value) is dropped. Excess fraction
-    /// digits are truncated, never rounded.
+    /// Keeps digits and the first locale decimal separator, then regroups the integer part
+    /// with the locale's grouping separator (en_US "1234.5" -> "1,234.5") - the same grouping
+    /// `AmountDisplayFormatter` uses, so typed and converted amounts look alike. Anything else,
+    /// including stale grouping separators, is dropped. Excess fraction digits are truncated,
+    /// never rounded. Idempotent, so re-sanitizing the field's own output is a no-op.
     func sanitize(_ raw: String) -> String {
+        let plain = ungroupedSanitize(raw)
+        let integerDigits = plain.prefix { $0 != decimalSeparator }
+        return grouped(String(integerDigits)) + plain.dropFirst(integerDigits.count)
+    }
+
+    /// `sanitize` without the grouping step: the canonical digits-and-separator form that
+    /// `Decimal(string:locale:)` can parse, since it stops at a grouping separator.
+    private func ungroupedSanitize(_ raw: String) -> String {
         var integerPart = ""
         var fractionPart = ""
         var hasSeparator = false
@@ -48,23 +58,35 @@ nonisolated struct AmountInputSanitizer: Sendable {
     /// would grow the integer part past `maxIntegerDigits`. A value already over the cap
     /// (a converted amount the user then edits) can still shrink.
     func sanitizeEdit(from previous: String, to raw: String) -> String {
-        let sanitized = sanitize(raw)
-        let sanitizedPrevious = sanitize(previous)
-        let digitCount = integerDigitCount(of: sanitized)
+        let digitCount = integerDigitCount(of: ungroupedSanitize(raw))
         guard digitCount > maxIntegerDigits,
-              digitCount > integerDigitCount(of: sanitizedPrevious) else {
-            return sanitized
+              digitCount > integerDigitCount(of: ungroupedSanitize(previous)) else {
+            return sanitize(raw)
         }
-        return sanitizedPrevious
+        return sanitize(previous)
     }
 
     func decimal(from text: String) -> Decimal? {
-        let sanitized = sanitize(text)
+        let sanitized = ungroupedSanitize(text)
         guard !sanitized.isEmpty else { return nil }
         return Decimal(string: sanitized, locale: locale)
     }
 
-    private func integerDigitCount(of sanitized: String) -> Int {
-        sanitized.prefix { $0 != decimalSeparator }.count
+    private func integerDigitCount(of ungrouped: String) -> Int {
+        ungrouped.prefix { $0 != decimalSeparator }.count
+    }
+
+    /// Groups a run of plain digits the way the locale's number formatter would, including
+    /// locales that skip grouping for four-digit values (es_ES "1000", but "10.000").
+    private func grouped(_ integerDigits: String) -> String {
+        guard integerDigits.count > 3, let value = Decimal(string: integerDigits) else {
+            return integerDigits
+        }
+        return value.formatted(
+            .number
+                .locale(locale)
+                .precision(.fractionLength(0))
+                .grouping(.automatic)
+        )
     }
 }
