@@ -9,10 +9,11 @@ nonisolated struct FileExchangeRatesSnapshotStore: ExchangeRatesSnapshotStore {
     let fileURL: URL
 
     private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
 
     func load() -> ExchangeRatesSnapshot? {
         guard let data = try? Data(contentsOf: fileURL),
-              let dto = try? JSONDecoder().decode(CachedExchangeRatesSnapshotDTO.self, from: data)
+              let dto = try? decoder.decode(CachedExchangeRatesSnapshotDTO.self, from: data)
         else { return nil }
         return dto.toDomain()
     }

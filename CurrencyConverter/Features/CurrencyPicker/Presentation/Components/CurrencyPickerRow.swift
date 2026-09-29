@@ -6,7 +6,7 @@ struct CurrencyPickerRow: View {
     let isSelected: Bool
     let onSelect: () -> Void
 
-    @ScaledMetric(relativeTo: .headline) private var flagSize: CGFloat = 24
+    @ScaledMetric(relativeTo: .largeTitle) private var flagSize: CGFloat = 24
 
     var body: some View {
         Button(action: onSelect) {

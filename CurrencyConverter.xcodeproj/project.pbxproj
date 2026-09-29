@@ -44,11 +44,6 @@
 			path = CurrencyConverterTests;
 			sourceTree = "<group>";
 		};
-		16B6527F306938660064BB5B /* CurrencyConverterUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = CurrencyConverterUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,7 +71,6 @@
 			children = (
 				16B65267306938650064BB5B /* CurrencyConverter */,
 				16B65275306938660064BB5B /* CurrencyConverterTests */,
-				16B6527F306938660064BB5B /* CurrencyConverterUITests */,
 				16B65266306938650064BB5B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -149,9 +143,6 @@
 			);
 			dependencies = (
 				16B6527E306938660064BB5B /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				16B6527F306938660064BB5B /* CurrencyConverterUITests */,
 			);
 			name = CurrencyConverterUITests;
 			productName = CurrencyConverterUITests;
