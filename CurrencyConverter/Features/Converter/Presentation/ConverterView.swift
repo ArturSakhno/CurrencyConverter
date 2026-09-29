@@ -50,7 +50,7 @@ struct ConverterView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: .zero) {
             VStack(alignment: .leading, spacing: .zero) {
-                Text("Exchange calculator", comment: "Main screen title")
+                Text("Exchange calculator")
                     .padding(.horizontal, DS.Spacing.m)
                     .textStyle(\.h3)
                     .foregroundStyle(.textPrimary)
