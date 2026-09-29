@@ -4,7 +4,7 @@ import SwiftUI
 struct CurrencyPickerRow: View {
     let info: CurrencyDisplayInfo
     let isSelected: Bool
-    let onSelect: EmptyClosure
+    let onSelect: () -> Void
 
     @ScaledMetric(relativeTo: .headline) private var flagSize: CGFloat = 24
 

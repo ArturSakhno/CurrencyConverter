@@ -7,7 +7,7 @@ struct CurrencyPickerView: View {
     let currencies: [Currency]
     let selection: Currency
     let onSelect: (Currency) -> Void
-    let onClose: EmptyClosure
+    let onClose: () -> Void
 
     var body: some View {
         NavigationStack {

@@ -169,14 +169,6 @@ final class ConverterViewModel {
 
     // MARK: - Rates
 
-    /// Looks up `quoteCurrency`'s rate in the already-loaded snapshot. Switching the
-    /// quote currency never triggers a re-fetch: the snapshot already holds every
-    /// catalog currency's rate.
-    func rate(for quoteCurrency: Currency) -> ExchangeRate? {
-        guard case let .loaded(snapshot, _) = ratesResult else { return nil }
-        return snapshot.rates.first { $0.quoteCurrencyCode == quoteCurrency.code }
-    }
-
     /// Bid when the base currency is on top (selling USDc), ask when it's on the
     /// bottom (buying USDc) - driven purely by row position, never by focus.
     func activeRateValue(for quoteCurrency: Currency, isBaseOnTop: Bool) -> Decimal? {
@@ -199,6 +191,16 @@ final class ConverterViewModel {
         return snapshot.fetchedAt.formatted(
             Date.FormatStyle(date: .omitted, time: .shortened).locale(locale)
         )
+    }
+}
+
+private extension ConverterViewModel {
+    /// Looks up `quoteCurrency`'s rate in the already-loaded snapshot. Switching the
+    /// quote currency never triggers a re-fetch: the snapshot already holds every
+    /// catalog currency's rate.
+    func rate(for quoteCurrency: Currency) -> ExchangeRate? {
+        guard case let .loaded(snapshot, _) = ratesResult else { return nil }
+        return snapshot.rates.first { $0.quoteCurrencyCode == quoteCurrency.code }
     }
 
     /// Converts `sourceText` (raw text from whichever field the user is typing in) to the

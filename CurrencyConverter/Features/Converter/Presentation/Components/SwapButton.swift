@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct SwapButton: View {
-    let action: EmptyClosure
+    let action: () -> Void
     var body: some View {
         Button {
             action()

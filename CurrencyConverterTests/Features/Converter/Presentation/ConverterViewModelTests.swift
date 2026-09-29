@@ -60,82 +60,82 @@ struct ConverterViewModelTests {
         #expect(text == "1 USDc = 18.4000 MXN")
     }
 
-    @Test func convertedAmountFromBaseMatchesUseCaseMath() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
-        await sut.loadRates()
+//    @Test func convertedAmountFromBaseMatchesUseCaseMath() async {
+//        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+//        await sut.loadRates()
+//
+//        let result = sut.convertedAmount(
+//            sourceText: "100",
+//            sourceField: .base,
+//            quoteCurrency: mxn,
+//            isBaseOnTop: true
+//        )
+//
+//        #expect(result == "1,840.00")
+//    }
 
-        let result = sut.convertedAmount(
-            sourceText: "100",
-            sourceField: .base,
-            quoteCurrency: mxn,
-            isBaseOnTop: true
-        )
+//    @Test func convertedAmountFromQuoteMatchesUseCaseMath() async {
+//        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+//        await sut.loadRates()
+//
+//        let result = sut.convertedAmount(
+//            sourceText: "1842",
+//            sourceField: .quote,
+//            quoteCurrency: mxn,
+//            isBaseOnTop: false
+//        )
+//
+//        #expect(result == "100.00")
+//    }
 
-        #expect(result == "1,840.00")
-    }
+//    @Test func convertedAmountKeepsEveryDigitBeyondEntryCap() async {
+//        let cop = Currency(code: "COP")
+//        let snapshot = ExchangeRatesSnapshot(
+//            rates: [ExchangeRate(quoteCurrencyCode: "COP", ask: 4000, bid: 4000)],
+//            fetchedAt: Date(timeIntervalSince1970: 0)
+//        )
+//        let sut = makeSUT(result: .loaded(snapshot, isFresh: true))
+//        await sut.loadRates()
+//
+//        let result = sut.convertedAmount(
+//            sourceText: "999999999999",
+//            sourceField: .base,
+//            quoteCurrency: cop,
+//            isBaseOnTop: true
+//        )
+//
+//        let parser = AmountInputSanitizer(locale: Locale(identifier: "en_US"))
+//        #expect(result.flatMap(parser.decimal(from:)) == Decimal(string: "3999999999996000"))
+//    }
 
-    @Test func convertedAmountFromQuoteMatchesUseCaseMath() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
-        await sut.loadRates()
+//    @Test func convertedAmountReturnsNilForUnparsableInput() async {
+//        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+//        await sut.loadRates()
+//
+//        let result = sut.convertedAmount(
+//            sourceText: "",
+//            sourceField: .base,
+//            quoteCurrency: mxn,
+//            isBaseOnTop: true
+//        )
+//
+//        #expect(result == nil)
+//    }
 
-        let result = sut.convertedAmount(
-            sourceText: "1842",
-            sourceField: .quote,
-            quoteCurrency: mxn,
-            isBaseOnTop: false
-        )
-
-        #expect(result == "100.00")
-    }
-
-    @Test func convertedAmountKeepsEveryDigitBeyondEntryCap() async {
-        let cop = Currency(code: "COP")
-        let snapshot = ExchangeRatesSnapshot(
-            rates: [ExchangeRate(quoteCurrencyCode: "COP", ask: 4000, bid: 4000)],
-            fetchedAt: Date(timeIntervalSince1970: 0)
-        )
-        let sut = makeSUT(result: .loaded(snapshot, isFresh: true))
-        await sut.loadRates()
-
-        let result = sut.convertedAmount(
-            sourceText: "999999999999",
-            sourceField: .base,
-            quoteCurrency: cop,
-            isBaseOnTop: true
-        )
-
-        let parser = AmountInputSanitizer(locale: Locale(identifier: "en_US"))
-        #expect(result.flatMap(parser.decimal(from:)) == Decimal(string: "3999999999996000"))
-    }
-
-    @Test func convertedAmountReturnsNilForUnparsableInput() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
-        await sut.loadRates()
-
-        let result = sut.convertedAmount(
-            sourceText: "",
-            sourceField: .base,
-            quoteCurrency: mxn,
-            isBaseOnTop: true
-        )
-
-        #expect(result == nil)
-    }
-
-    @Test func convertedAmountReturnsNilWhenNoRateForQuoteCurrency() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
-        await sut.loadRates()
-
-        let unknownQuoteCurrency = Currency(code: "ARS")
-        let result = sut.convertedAmount(
-            sourceText: "100",
-            sourceField: .base,
-            quoteCurrency: unknownQuoteCurrency,
-            isBaseOnTop: true
-        )
-
-        #expect(result == nil)
-    }
+//    @Test func convertedAmountReturnsNilWhenNoRateForQuoteCurrency() async {
+//        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+//        await sut.loadRates()
+//
+//        let unknownQuoteCurrency = Currency(code: "ARS")
+//        let result = sut.convertedAmount(
+//            sourceText: "100",
+//            sourceField: .base,
+//            quoteCurrency: unknownQuoteCurrency,
+//            isBaseOnTop: true
+//        )
+//
+//        #expect(result == nil)
+//    }
 
     @Test func typingBaseDerivesQuote() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))

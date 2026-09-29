@@ -4,7 +4,7 @@ import SwiftUI
 struct ConverterView: View {
     let viewModel: ConverterViewModel
     let baseCurrency: Currency
-    let onSelectCurrency: EmptyClosure
+    let onSelectCurrency: () -> Void
 
     /// Keyed by screen slot, not currency - reassigning which *currency* a slot's
     /// `.focused(_:equals:)` claim represents on every swap doesn't reliably carry focus

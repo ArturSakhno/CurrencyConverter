@@ -11,9 +11,8 @@ struct CurrencyInputField: View {
     let imageName: String?
     let field: FocusSlot
     var focusedField: FocusState<FocusSlot?>.Binding
-    let onSelectCurrency: EmptyClosure
+    let onSelectCurrency: () -> Void
 
-    /// Figma row inset, centering the 36pt title in a 55pt row.
     private let verticalPadding: CGFloat = 9.5
 
     var body: some View {
