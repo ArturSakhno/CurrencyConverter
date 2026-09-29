@@ -1,7 +1,7 @@
+@testable import CurrencyConverter
 import Foundation
 import Testing
 import UIKit
-@testable import CurrencyConverter
 
 struct CurrencyDisplayInfoTests {
     @Test(arguments: [CurrencyCatalog.base] + CurrencyCatalog.availableQuoteCurrencies)

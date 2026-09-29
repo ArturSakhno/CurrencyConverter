@@ -34,8 +34,10 @@ struct CurrencyPickerRow: View {
                         }
                     } else {
                         Circle()
-                            .stroke(.selectorUnselectedBorder,
-                                    lineWidth: 2)
+                            .stroke(
+                                .selectorUnselectedBorder,
+                                lineWidth: 2
+                            )
                     }
                 }
                 .frame(width: DS.Size.icon, height: DS.Size.icon)
@@ -45,7 +47,6 @@ struct CurrencyPickerRow: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
-    @ViewBuilder
     private var flag: some View {
         ZStack {
             Circle()

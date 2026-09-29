@@ -1,6 +1,6 @@
+@testable import CurrencyConverter
 import Foundation
 import Testing
-@testable import CurrencyConverter
 
 @MainActor
 struct ConverterViewModelTests {

@@ -24,7 +24,7 @@ xcodebuild test -scheme CurrencyConverter -destination 'platform=iOS Simulator,n
   -only-testing:'CurrencyConverterTests/ConvertCurrencyUseCaseTests/quoteAmountMultipliesBaseByRate()'
 ```
 
-The repo has no linter configured. Trust `xcodebuild` output over SourceKit's live diagnostics. Right after you create a file, "cannot find type" errors from SourceKit are usually a stale index.
+SwiftLint is configured in `.swiftlint.yml`. SwiftFormat (`.swiftformat`) runs as a pre-commit hook from `.githooks/pre-commit`: it formats staged Swift files and re-stages them, and blocks a partially staged file that needs formatting. Enable it once per clone with `git config core.hooksPath .githooks`. Trust `xcodebuild` output over SourceKit's live diagnostics. Right after you create a file, "cannot find type" errors from SourceKit are usually a stale index.
 
 New files under `CurrencyConverter/` and `CurrencyConverterTests/` are picked up automatically (file-system-synchronized groups). Never edit `project.pbxproj` to add a file.
 

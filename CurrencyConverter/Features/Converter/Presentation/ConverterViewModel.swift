@@ -20,8 +20,8 @@ final class ConverterViewModel {
     ) {
         self.convertUseCase = convertUseCase
         self.loadRatesUseCase = loadRatesUseCase
-        self.sanitizer = AmountInputSanitizer(locale: locale)
-        self.displayFormatter = AmountDisplayFormatter(locale: locale)
+        sanitizer = AmountInputSanitizer(locale: locale)
+        displayFormatter = AmountDisplayFormatter(locale: locale)
         self.locale = locale
     }
 
@@ -53,10 +53,7 @@ final class ConverterViewModel {
         quoteDisplayCode: String
     ) -> String {
         guard let value = activeRateValue(for: quoteCurrency, isBaseOnTop: isBaseOnTop) else {
-            return String(
-                localized: "Rate unavailable",
-                comment: "Shown in place of the rate pill when no exchange rate could be loaded"
-            )
+            return String(localized: "Rate unavailable")
         }
         let formattedRate = displayFormatter.string(from: value, fractionDigits: 4)
         return "1 \(baseDisplayCode) = \(formattedRate) \(quoteDisplayCode)"
@@ -82,16 +79,16 @@ final class ConverterViewModel {
         isBaseOnTop: Bool
     ) -> String? {
         guard let rate = activeRateValue(for: quoteCurrency, isBaseOnTop: isBaseOnTop),
-              let sourceAmount = sanitizer.decimal(from: sourceText) else {
+              let sourceAmount = sanitizer.decimal(from: sourceText)
+        else {
             return nil
         }
 
-        let result: Decimal
-        switch sourceField {
+        let result: Decimal = switch sourceField {
         case .base:
-            result = convertUseCase.quoteAmount(fromBase: sourceAmount, rate: rate)
+            convertUseCase.quoteAmount(fromBase: sourceAmount, rate: rate)
         case .quote:
-            result = convertUseCase.baseAmount(fromQuote: sourceAmount, rate: rate)
+            convertUseCase.baseAmount(fromQuote: sourceAmount, rate: rate)
         }
         return displayFormatter.string(from: result, fractionDigits: 2)
     }

@@ -1,6 +1,6 @@
+@testable import DesignSystem
 import SwiftUI
 import Testing
-@testable import DesignSystem
 
 struct ThemeTests {
     @Test func standardThemePicksPaletteByColorScheme() {

@@ -1,6 +1,6 @@
+@testable import CurrencyConverter
 import Foundation
 import Testing
-@testable import CurrencyConverter
 
 struct AmountInputSanitizerTests {
     private let sut = AmountInputSanitizer(locale: Locale(identifier: "en_US"))

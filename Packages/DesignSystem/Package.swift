@@ -21,14 +21,14 @@ let package = Package(
             resources: [.process("Resources")],
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency"),
-            ],
+            ]
         ),
         .testTarget(
             name: "DesignSystemTests",
             dependencies: ["DesignSystem"],
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency"),
-            ],
+            ]
         ),
     ]
 )

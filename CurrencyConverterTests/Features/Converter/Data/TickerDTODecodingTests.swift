@@ -1,6 +1,6 @@
+@testable import CurrencyConverter
 import Foundation
 import Testing
-@testable import CurrencyConverter
 
 struct TickerDTODecodingTests {
     private func decode(_ json: String) throws -> [ExchangeRate] {

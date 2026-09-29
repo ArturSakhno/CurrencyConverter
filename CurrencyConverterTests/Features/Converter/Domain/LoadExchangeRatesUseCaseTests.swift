@@ -1,6 +1,6 @@
+@testable import CurrencyConverter
 import Foundation
 import Testing
-@testable import CurrencyConverter
 
 struct LoadExchangeRatesUseCaseTests {
     private let sampleSnapshot = ExchangeRatesSnapshot(
@@ -42,7 +42,7 @@ private struct StubExchangeRateRepository: ExchangeRateRepository {
     let fetchResult: Result<ExchangeRatesSnapshot, StubError>
     let cachedSnapshot: ExchangeRatesSnapshot?
 
-    func fetchLatestRates(for quoteCurrencyCodes: [String]) async throws -> ExchangeRatesSnapshot {
+    func fetchLatestRates(for _: [String]) async throws -> ExchangeRatesSnapshot {
         try fetchResult.get()
     }
 
