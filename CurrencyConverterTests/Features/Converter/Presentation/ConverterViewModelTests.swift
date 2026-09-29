@@ -14,6 +14,7 @@ struct ConverterViewModelTests {
         ConverterViewModel(
             convertUseCase: DefaultConvertCurrencyUseCase(),
             loadRatesUseCase: StubLoadExchangeRatesUseCase(result: result),
+            quoteCurrency: mxn,
             locale: Locale(identifier: "en_US")
         )
     }
@@ -37,8 +38,6 @@ struct ConverterViewModelTests {
         await sut.loadRates()
 
         let text = sut.ratePillText(
-            quoteCurrency: mxn,
-            isBaseOnTop: true,
             baseDisplayCode: "USDc",
             quoteDisplayCode: "MXN"
         )
@@ -51,8 +50,6 @@ struct ConverterViewModelTests {
         await sut.loadRates()
 
         let text = sut.ratePillText(
-            quoteCurrency: mxn,
-            isBaseOnTop: true,
             baseDisplayCode: "USDc",
             quoteDisplayCode: "MXN"
         )
@@ -135,6 +132,76 @@ struct ConverterViewModelTests {
         )
 
         #expect(result == nil)
+    }
+
+    @Test func typingBaseDerivesQuote() async {
+        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        await sut.loadRates()
+
+        sut.setAmountText("100", for: .base)
+
+        #expect(sut.quoteAmountText == "1,840.00")
+    }
+
+    @Test func swapRecalculatesDerivedAmountWithAskAndKeepsTypedAmount() async {
+        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        await sut.loadRates()
+        sut.setAmountText("100", for: .base)
+
+        sut.swap()
+
+        #expect(sut.baseAmountText == "100")
+        #expect(sut.quoteAmountText == "1,842.00")
+    }
+
+    @Test func swapAfterTypingQuoteRecalculatesBase() async {
+        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        await sut.loadRates()
+        sut.swap()
+        sut.setAmountText("1,842", for: .quote)
+        #expect(sut.baseAmountText == "100.00")
+
+        sut.swap()
+
+        #expect(sut.quoteAmountText == "1,842")
+        #expect(sut.baseAmountText == "100.11")
+    }
+
+    @Test func selectingQuoteCurrencyRecalculatesDerivedAmount() async {
+        let snapshot = ExchangeRatesSnapshot(
+            rates: [
+                ExchangeRate(quoteCurrencyCode: "MXN", ask: 18.42, bid: 18.40),
+                ExchangeRate(quoteCurrencyCode: "COP", ask: 4000, bid: 3990),
+            ],
+            fetchedAt: Date(timeIntervalSince1970: 0)
+        )
+        let sut = makeSUT(result: .loaded(snapshot, isFresh: true))
+        await sut.loadRates()
+        sut.setAmountText("100", for: .base)
+
+        sut.selectQuoteCurrency(Currency(code: "COP"))
+
+        #expect(sut.quoteCurrency == Currency(code: "COP"))
+        #expect(sut.quoteAmountText == "399,000.00")
+    }
+
+    @Test func loadingRatesRecalculatesDerivedAmount() async {
+        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        sut.setAmountText("100", for: .base)
+        #expect(sut.quoteAmountText == "")
+
+        await sut.loadRates()
+
+        #expect(sut.quoteAmountText == "1,840.00")
+    }
+
+    @Test func derivedAmountClearsWhenRateIsMissing() async {
+        let sut = makeSUT(result: .unavailable)
+        await sut.loadRates()
+
+        sut.setAmountText("100", for: .base)
+
+        #expect(sut.quoteAmountText == "")
     }
 
     @Test func ratesAsOfTextIsNilWhenUnavailable() async {

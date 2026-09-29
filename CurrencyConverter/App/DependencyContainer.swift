@@ -16,6 +16,10 @@ struct DependencyContainer {
     }
 
     func makeConverterViewModel() -> ConverterViewModel {
-        ConverterViewModel(convertUseCase: convertUseCase, loadRatesUseCase: loadRatesUseCase)
+        ConverterViewModel(
+            convertUseCase: convertUseCase,
+            loadRatesUseCase: loadRatesUseCase,
+            quoteCurrency: currencyCatalogUseCase.defaultQuoteCurrency()
+        )
     }
 }
