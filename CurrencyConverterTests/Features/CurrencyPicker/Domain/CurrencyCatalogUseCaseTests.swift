@@ -1,5 +1,5 @@
-import Testing
 @testable import CurrencyConverter
+import Testing
 
 struct CurrencyCatalogUseCaseTests {
     @Test func availableQuoteCurrenciesReturnsCurrenciesFromRepository() {

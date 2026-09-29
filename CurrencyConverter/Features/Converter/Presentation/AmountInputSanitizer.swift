@@ -60,7 +60,8 @@ nonisolated struct AmountInputSanitizer: Sendable {
     func sanitizeEdit(from previous: String, to raw: String) -> String {
         let digitCount = integerDigitCount(of: ungroupedSanitize(raw))
         guard digitCount > maxIntegerDigits,
-              digitCount > integerDigitCount(of: ungroupedSanitize(previous)) else {
+              digitCount > integerDigitCount(of: ungroupedSanitize(previous))
+        else {
             return sanitize(raw)
         }
         return sanitize(previous)

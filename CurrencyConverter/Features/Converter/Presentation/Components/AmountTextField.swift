@@ -121,7 +121,7 @@ struct AmountTextField: View {
         field: .top,
         focusedField: $focusedField
     )
-        .padding()
+    .padding()
 }
 
 #Preview("Filled") {
@@ -135,7 +135,7 @@ struct AmountTextField: View {
         field: .bottom,
         focusedField: $focusedField
     )
-        .padding()
+    .padding()
 }
 
 #Preview("Dark Mode") {
@@ -149,8 +149,8 @@ struct AmountTextField: View {
         field: .top,
         focusedField: $focusedField
     )
-        .padding()
-        .preferredColorScheme(.dark)
+    .padding()
+    .preferredColorScheme(.dark)
 }
 
 #Preview("Accessibility XXXL") {
@@ -164,6 +164,6 @@ struct AmountTextField: View {
         field: .bottom,
         focusedField: $focusedField
     )
-        .padding()
-        .environment(\.dynamicTypeSize, .accessibility5)
+    .padding()
+    .environment(\.dynamicTypeSize, .accessibility5)
 }

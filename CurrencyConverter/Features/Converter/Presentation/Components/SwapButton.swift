@@ -14,11 +14,15 @@ struct SwapButton: View {
                     .resizable()
                     .renderingMode(.template)
                     .foregroundStyle(.onInteractivePrimary)
-                    .frame(width: DS.Size.icon,
-                           height: DS.Size.icon)
+                    .frame(
+                        width: DS.Size.icon,
+                        height: DS.Size.icon
+                    )
             }
-            .frame(width: DS.Size.swapButton,
-                   height: DS.Size.swapButton)
+            .frame(
+                width: DS.Size.swapButton,
+                height: DS.Size.swapButton
+            )
         }
     }
 }

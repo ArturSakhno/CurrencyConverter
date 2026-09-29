@@ -1,13 +1,13 @@
+@testable import CurrencyConverter
 import Foundation
 import Testing
-@testable import CurrencyConverter
 
 struct ConvertCurrencyUseCaseTests {
     private let sut = DefaultConvertCurrencyUseCase()
 
-    @Test func quoteAmountMultipliesBaseByRate() {
-        let rate = Decimal(string: "18.4112")!
-        let expected = Decimal(string: "1841.12")!
+    @Test func quoteAmountMultipliesBaseByRate() throws {
+        let rate = try #require(Decimal(string: "18.4112"))
+        let expected = try #require(Decimal(string: "1841.12"))
         #expect(sut.quoteAmount(fromBase: 100, rate: rate) == expected)
     }
 
