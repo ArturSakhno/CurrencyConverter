@@ -4,7 +4,10 @@ struct DependencyContainer {
     let currencyCatalogUseCase: CurrencyCatalogUseCase
 
     init() {
-        let repository = RemoteExchangeRateRepository(apiClient: URLSessionTickersAPIClient())
+        let repository = RemoteExchangeRateRepository(
+            apiClient: URLSessionTickersAPIClient(),
+            store: FileExchangeRatesSnapshotStore(fileURL: FileExchangeRatesSnapshotStore.defaultFileURL)
+        )
         let currencyCatalogRepository = FallbackCurrencyCatalogRepository()
 
         convertUseCase = DefaultConvertCurrencyUseCase()

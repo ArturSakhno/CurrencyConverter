@@ -78,12 +78,12 @@ struct ConverterView: View {
             .padding(.top, Layout.screenTop)
             .background(.bgSelected)
             .task {
-                await viewModel.loadRates()
+                await viewModel.keepRatesUpdated()
             }
             .onChange(of: scenePhase) { _, newPhase in
                 guard newPhase == .active else { return }
                 Task {
-                    await viewModel.loadRates()
+                    await viewModel.refreshIfStale()
                 }
             }
 
