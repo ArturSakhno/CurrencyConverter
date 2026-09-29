@@ -53,10 +53,7 @@ final class ConverterViewModel {
         quoteDisplayCode: String
     ) -> String {
         guard let value = activeRateValue(for: quoteCurrency, isBaseOnTop: isBaseOnTop) else {
-            return String(
-                localized: "Rate unavailable",
-                comment: "Shown in place of the rate pill when no exchange rate could be loaded"
-            )
+            return String(localized: "Rate unavailable")
         }
         let formattedRate = displayFormatter.string(from: value, fractionDigits: 4)
         return "1 \(baseDisplayCode) = \(formattedRate) \(quoteDisplayCode)"

@@ -71,13 +71,10 @@ struct ConverterView: View {
                     .foregroundStyle(.textPrimary)
 
                 if let ratesAsOfText = viewModel.ratesAsOfText {
-                    Text(
-                        "Rates as of \(ratesAsOfText)",
-                        comment: "Caption under the screen title; %@ is the local time the rates were fetched"
-                    )
-                    .padding(.horizontal, DS.Spacing.m)
-                    .textStyle(\.bodySmall)
-                    .foregroundStyle(.textSecondary)
+                    Text("Rates as of \(ratesAsOfText)")
+                        .padding(.horizontal, DS.Spacing.m)
+                        .textStyle(\.bodySmall)
+                        .foregroundStyle(.textSecondary)
                 }
 
                 ZStack {

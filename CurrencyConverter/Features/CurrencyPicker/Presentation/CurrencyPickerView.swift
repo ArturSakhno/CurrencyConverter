@@ -25,7 +25,7 @@ struct CurrencyPickerView: View {
             .toolbarRole(.browser)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("Choose currency", comment: "Navigation title for the currency picker sheet")
+                    Text("Choose currency")
                         .textStyle(\.h4)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -34,7 +34,7 @@ struct CurrencyPickerView: View {
                             .resizable()
                             .frame(width: DS.Size.closeButton, height: DS.Size.closeButton)
                     }
-                    .accessibilityLabel(Text("Close", comment: "Accessibility label for the currency picker's close button"))
+                    .accessibilityLabel(Text("Close"))
                 }
             }
         }

@@ -24,37 +24,37 @@ nonisolated struct CurrencyDisplayInfo: Equatable, Sendable {
     private static let table: [String: CurrencyDisplayInfo] = [
         "USDC": CurrencyDisplayInfo(
             displayCode: "USDc",
-            subtitle: String(localized: "Digital dollars", comment: "Subtitle for USDC"),
+            subtitle: String(localized: "Digital dollars"),
             currencySymbol: "$",
             flagAssetName: "us"
         ),
         "MXN": CurrencyDisplayInfo(
             displayCode: "MXN",
-            subtitle: String(localized: "Mexican pesos", comment: "Subtitle for MXN"),
+            subtitle: String(localized: "Mexican pesos"),
             currencySymbol: "$",
             flagAssetName: "mxn"
         ),
         "EURC": CurrencyDisplayInfo(
             displayCode: "EURc",
-            subtitle: String(localized: "Digital euros", comment: "Subtitle for EURC"),
+            subtitle: String(localized: "Digital euros"),
             currencySymbol: "€",
             flagAssetName: "eur"
         ),
         "ARS": CurrencyDisplayInfo(
             displayCode: "ARS",
-            subtitle: String(localized: "Argentine pesos", comment: "Subtitle for ARS"),
+            subtitle: String(localized: "Argentine pesos"),
             currencySymbol: "$",
             flagAssetName: "ars"
         ),
         "COP": CurrencyDisplayInfo(
             displayCode: "COP",
-            subtitle: String(localized: "Colombian pesos", comment: "Subtitle for COP"),
+            subtitle: String(localized: "Colombian pesos"),
             currencySymbol: "$",
             flagAssetName: "cop"
         ),
         "BRL": CurrencyDisplayInfo(
             displayCode: "BRL",
-            subtitle: String(localized: "Brazilian reais", comment: "Subtitle for BRL"),
+            subtitle: String(localized: "Brazilian reais"),
             currencySymbol: "R$",
             flagAssetName: "brl"
         ),
