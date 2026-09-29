@@ -30,12 +30,15 @@ New files under `CurrencyConverter/` and `CurrencyConverterTests/` are picked up
 
 ## Architecture
 
-The app uses Clean Architecture plus MVVM and a Coordinator. Dependencies point inward: Domain depends on nothing, and both Data and Presentation depend on Domain.
+The app uses Clean Architecture plus MVVM and a Coordinator, organized by feature. Each feature under `CurrencyConverter/Features/` is a vertical slice: `Presentation/` → `Domain/` (use cases, repository protocols, entities) → `Data/` (repository implementations → network or local storage). Dependencies point inward: Domain depends on nothing, and both Data and Presentation depend on Domain.
 
-- **Domain/**: pure Swift with no SwiftUI/UIKit or networking. It holds entities (`Currency`, `ExchangeRate`, `ExchangeRatesSnapshot`), the `ExchangeRateRepository` protocol and the use cases. `ConvertCurrencyUseCase` does the math. `LoadExchangeRatesUseCase` applies the three-way offline policy: `.loaded(snapshot, isFresh: true)`, `.loaded(cached, isFresh: false)` or `.unavailable`.
-- **Data/**: `TickersAPIClient` calls `GET https://api.dolarapp.dev/v1/tickers?currencies=…` and decodes into `TickerDTO`, which maps to the Domain entity. DTOs never leak into Domain. `RemoteExchangeRateRepository` is currently an interim repository whose `lastCachedSnapshot()` returns `nil`. Roadmap item 3 will add a real cache to the same type.
-- **Presentation/**: `AppCoordinator` (`@Observable`) owns sheet routing only; there are no push destinations. `RootView` hosts the `NavigationStack` and the sheet switch. `ConverterView` and its `Components/` are still a hand-built layout with placeholder values, and no ViewModel exists yet. When one is added, it should be `@Observable @MainActor` and depend only on Domain protocols.
-- **Composition/**: `DependencyContainer` is the only place that wires Data types to Domain protocols. It is built in `CurrencyConverterApp` and passed down.
+- **Features/Converter/**: `ConverterView` and `ConverterViewModel` (`@Observable`) with `Components/`, plus `AmountInputSanitizer` and `AmountDisplayFormatter`. `ConvertCurrencyUseCase` does the math. `LoadExchangeRatesUseCase` applies the three-way offline policy: `.loaded(snapshot, isFresh: true)`, `.loaded(cached, isFresh: false)` or `.unavailable`. `TickersAPIClient` calls `GET https://api.dolarapp.dev/v1/tickers?currencies=…` and decodes into `TickerDTO`, which maps to the Domain entity. DTOs never leak into Domain. `RemoteExchangeRateRepository` is currently an interim repository whose `lastCachedSnapshot()` returns `nil`. Roadmap item 3 will add a real cache to the same type, under `Data/`.
+- **Features/CurrencyPicker/**: `CurrencyPickerView` reports `onSelect`/`onClose` and knows nothing about navigation. `CurrencyCatalogUseCase` → `CurrencyCatalogRepository` → `FallbackCurrencyCatalogRepository`, which serves the hardcoded catalog because the currencies endpoint returns 403.
+- **Shared/**: code both features use. `Currency` and `CurrencyCatalog` live in `Domain/`, `CurrencyDisplayInfo` (code → label, subtitle, symbol, flag) in `Presentation/`, and small helpers in `Utils/`. Features must not import from each other; anything both need goes here.
+- **App/**: `CurrencyConverterApp`, `RootView` (hosts the `NavigationStack` and the sheet switch), `AppCoordinator` (`@Observable`, sheet routing only, no push destinations), and `DependencyContainer`, which is the only place that wires Data types to Domain protocols and builds view models.
+- **Packages/DesignSystem**: a local Swift package with the color, typography and spacing tokens and the generic icons (`DS.Icon`). Test it with `xcodebuild test -scheme DesignSystem` from `Packages/DesignSystem`.
+
+Tests in `CurrencyConverterTests/` mirror the same `Features/` and `Shared/` layout.
 
 ## Concurrency gotcha (has broken the build repeatedly)
 
