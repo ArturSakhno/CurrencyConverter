@@ -24,6 +24,7 @@ final class ConverterViewModel {
     private(set) var baseAmountText = ""
     private(set) var quoteAmountText = ""
     private(set) var isBaseOnTop = true
+    private(set) var isRetrying = false
     private var lastEditedField: AmountField = .base
 
     static let refreshInterval: Duration = .seconds(30)
@@ -73,36 +74,28 @@ final class ConverterViewModel {
         recalculateDerivedAmount()
     }
 
+    func onRetry() {
+        Task { [weak self] in
+            await self?.retry()
+        }
+    }
+
+    private let minimumRetryDuration: Duration = .seconds(1)
+
     func retry() async {
+        guard !isRetrying else { return }
+        isRetrying = true
+        defer { isRetrying = false }
+
+        let deadline = ContinuousClock.now + minimumRetryDuration
         await loadConverter()
+        try? await Task.sleep(until: deadline, clock: .continuous)
     }
 
     func retryWhenBackOnline() async {
         for await isConnected in networkMonitor.connectivityUpdates() where isConnected && state == .failed(.noConnection) {
             await retry()
         }
-    }
-
-    private func loadConverter() async {
-        do {
-            state = try await .converter(loadContent())
-            recalculateDerivedAmount()
-        } catch {
-            state = .failed(error)
-        }
-    }
-
-    private func loadContent() async throws(LoadError) -> Content {
-        let currencies = await loadAvailableCurrenciesUseCase()
-        guard let firstCurrency = currencies.first, let snapshot = try? await loadRatesUseCase(rates: currencies.map(\.code)) else {
-            throw await networkMonitor.isConnected ? .unavailable : .noConnection
-        }
-
-        return Content(
-            quoteCurrency: firstCurrency,
-            availableCurrencies: currencies,
-            snapshot: snapshot
-        )
     }
 
     func amountText(for field: AmountField) -> String {
@@ -124,6 +117,13 @@ final class ConverterViewModel {
         recalculateDerivedAmount()
     }
 
+    func onAppear() async {
+        async let keepUpdated = keepRatesUpdated()
+        async let retry = retryWhenBackOnline()
+
+        _ = await (keepUpdated, retry)
+    }
+
     func swap() {
         isBaseOnTop.toggle()
         recalculateDerivedAmount()
@@ -134,13 +134,6 @@ final class ConverterViewModel {
         content.quoteCurrency = currency
         state = .converter(content)
         recalculateDerivedAmount()
-    }
-
-    private func recalculateDerivedAmount() {
-        switch lastEditedField {
-        case .base: quoteAmountText = convertedAmount(from: baseAmountText, side: .base) ?? ""
-        case .quote: baseAmountText = convertedAmount(from: quoteAmountText, side: .quote) ?? ""
-        }
     }
 
     func ratePillText(baseDisplayCode: String, quoteDisplayCode: String) -> String {
@@ -188,5 +181,34 @@ private extension ConverterViewModel {
             return nil
         }
         return displayFormatter.string(from: result, fractionDigits: 2)
+    }
+
+    func recalculateDerivedAmount() {
+        switch lastEditedField {
+        case .base: quoteAmountText = convertedAmount(from: baseAmountText, side: .base) ?? ""
+        case .quote: baseAmountText = convertedAmount(from: quoteAmountText, side: .quote) ?? ""
+        }
+    }
+
+    func loadConverter() async {
+        do {
+            state = try await .converter(loadContent())
+            recalculateDerivedAmount()
+        } catch {
+            state = .failed(error)
+        }
+    }
+
+    func loadContent() async throws(LoadError) -> Content {
+        let currencies = await loadAvailableCurrenciesUseCase()
+        guard let firstCurrency = currencies.first, let snapshot = try? await loadRatesUseCase(rates: currencies.map(\.code)) else {
+            throw await networkMonitor.isConnected ? .unavailable : .noConnection
+        }
+
+        return Content(
+            quoteCurrency: firstCurrency,
+            availableCurrencies: currencies,
+            snapshot: snapshot
+        )
     }
 }

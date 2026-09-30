@@ -29,25 +29,24 @@ struct ConverterScreen: View {
                 StatusScreenView(
                     systemImage: "exclamationmark.triangle",
                     title: Localized.Converter.unavailableTitle,
-                    message: Localized.Converter.unavailableMessage
+                    message: Localized.Converter.unavailableMessage,
+                    isRetrying: viewModel.isRetrying
                 ) {
-                    await viewModel.retry()
+                    viewModel.onRetry()
                 }
             case .failed(.noConnection):
                 StatusScreenView(
                     systemImage: "wifi.slash",
                     title: Localized.Converter.noConnectionTitle,
-                    message: Localized.Converter.noConnectionMessage
+                    message: Localized.Converter.noConnectionMessage,
+                    isRetrying: viewModel.isRetrying
                 ) {
-                    await viewModel.retry()
+                    viewModel.onRetry()
                 }
             }
         }
         .task {
-            await viewModel.keepRatesUpdated()
-        }
-        .task {
-            await viewModel.retryWhenBackOnline()
+            await viewModel.onAppear()
         }
     }
 }

@@ -6,7 +6,8 @@ struct StatusScreenView: View {
     let systemImage: String
     let title: LocalizedStringResource
     let message: LocalizedStringResource
-    let onRetry: () async -> Void
+    var isRetrying: Bool = false
+    let onRetry: () -> Void
 
     var body: some View {
         VStack(spacing: DS.Spacing.m) {
@@ -23,14 +24,17 @@ struct StatusScreenView: View {
                 .textStyle(\.body)
                 .foregroundStyle(.textSecondary)
 
-            Button {
-                Task {
-                    await onRetry()
-                }
-            } label: {
+            Button(action: onRetry) {
                 Text(Localized.Common.retry)
                     .textStyle(\.body)
                     .foregroundStyle(.onInteractivePrimary)
+                    .opacity(isRetrying ? 0 : 1)
+                    .overlay {
+                        if isRetrying {
+                            ProgressView()
+                                .tint(ThemeColor.onInteractivePrimary)
+                        }
+                    }
                     .padding(.horizontal, DS.Spacing.l)
                     .padding(.vertical, DS.Spacing.s)
                     .background(.interactivePrimary, in: .capsule)
@@ -40,6 +44,7 @@ struct StatusScreenView: View {
         .multilineTextAlignment(.center)
         .padding(DS.Spacing.l)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .disabled(isRetrying)
     }
 }
 
