@@ -15,31 +15,21 @@ final class ConverterViewModel {
     /// The field the user last typed in - the source of truth. The other amount is always
     /// derived from it, including after a swap, a currency change or a rate refresh.
     private var lastEditedField: AmountField = .base
-    /// The load in progress, so overlapping triggers (launch + foreground) share one request.
-    private var loadTask: Task<Void, Never>?
 
-    /// Rates are refreshed this long after the server issued them (`quotedAt`), and a failed
-    /// load is retried after the same interval.
-    static let refreshInterval: TimeInterval = 30
-    /// Floor for the wait between refreshes, so a device clock ahead of the server's can't
-    /// turn the loop into back-to-back requests.
-    static let minimumRefreshDelay: TimeInterval = 1
+    /// How long to wait after a response, successful or not, before asking again.
+    static let refreshInterval: Duration = .seconds(30)
 
     private let convertUseCase: ConvertCurrencyUseCase
     private let loadRatesUseCase: LoadExchangeRatesUseCase
     private let sanitizer: AmountInputSanitizer
     private let displayFormatter: AmountDisplayFormatter
     private let locale: Locale
-    private let now: () -> Date
-    private let sleep: @Sendable (TimeInterval) async throws -> Void
 
     init(
         convertUseCase: ConvertCurrencyUseCase,
         loadRatesUseCase: LoadExchangeRatesUseCase,
         quoteCurrency: Currency,
-        locale: Locale = .current,
-        now: @escaping () -> Date = Date.init,
-        sleep: @escaping @Sendable (TimeInterval) async throws -> Void = { try await Task.sleep(for: .seconds($0)) }
+        locale: Locale = .current
     ) {
         self.quoteCurrency = quoteCurrency
         self.convertUseCase = convertUseCase
@@ -47,59 +37,24 @@ final class ConverterViewModel {
         sanitizer = AmountInputSanitizer(locale: locale)
         displayFormatter = AmountDisplayFormatter(locale: locale)
         self.locale = locale
-        self.now = now
-        self.sleep = sleep
     }
 
-    /// Loads rates now and then keeps them current: each refresh is scheduled
-    /// `refreshInterval` after the server issued the quotes. Runs until the calling task is
-    /// cancelled - `.task` does that when the screen goes away; in the background iOS
-    /// suspends the app, and an overdue refresh fires as soon as it's back.
+    /// Loads rates now, then again `refreshInterval` after each response, until the calling
+    /// task is cancelled (`.task` does that when the screen goes away). In the background iOS
+    /// suspends the app; a wait that ran out meanwhile ends on return, so an overdue refresh
+    /// happens right away.
     func keepRatesUpdated() async {
         while !Task.isCancelled {
             await loadRates()
-            do {
-                try await sleep(delayUntilNextRefresh())
-            } catch {
-                return
-            }
+            try? await Task.sleep(for: Self.refreshInterval)
         }
     }
 
-    /// Seconds until the rates on screen are due for a refresh, clamped to
-    /// `minimumRefreshDelay...refreshInterval` so neither clock skew nor a future server
-    /// time can make it tight-loop or stall. Stale or missing rates wait a full interval.
-    func delayUntilNextRefresh() -> TimeInterval {
-        guard case let .loaded(snapshot, isFresh: true) = ratesResult else { return Self.refreshInterval }
-        let due = (snapshot.quotedAt ?? snapshot.fetchedAt).addingTimeInterval(Self.refreshInterval)
-        return min(max(due.timeIntervalSince(now()), Self.minimumRefreshDelay), Self.refreshInterval)
-    }
-
-    /// Fetches rates for every catalog quote currency. If a load is already running, waits
-    /// for it instead of starting a second request.
+    /// Fetches rates for every catalog quote currency.
     func loadRates() async {
-        if let loadTask {
-            return await loadTask.value
-        }
-        let task = Task {
-            let result = await loadRatesUseCase.load()
-            ratesResult = merged(result, keeping: ratesResult)
-            recalculateDerivedAmount()
-        }
-        loadTask = task
-        await task.value
-        loadTask = nil
-    }
-
-    /// For returns to the foreground: fetches only when the rates on screen aren't fresh or
-    /// their refresh is already due, so quick app switching doesn't hit the API.
-    func refreshIfStale() async {
-        if case let .loaded(snapshot, isFresh: true) = ratesResult,
-           now() < (snapshot.quotedAt ?? snapshot.fetchedAt).addingTimeInterval(Self.refreshInterval)
-        {
-            return
-        }
-        await loadRates()
+        let result = await loadRatesUseCase.load()
+        ratesResult = merged(result, keeping: ratesResult)
+        recalculateDerivedAmount()
     }
 
     /// A failed load never takes away rates already on screen - they stay, marked stale.

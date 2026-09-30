@@ -10,7 +10,6 @@ struct ConverterView: View {
     /// `.focused(_:equals:)` claim represents on every swap doesn't reliably carry focus
     /// across the swap in practice.
     @FocusState private var focusedSlot: FocusSlot?
-    @Environment(\.scenePhase) private var scenePhase
 
     /// Screen-specific metrics from the Figma layout (not reusable design tokens).
     private enum Layout {
@@ -80,12 +79,6 @@ struct ConverterView: View {
                 .background(.bgSelected)
                 .task {
                     await viewModel.keepRatesUpdated()
-                }
-                .onChange(of: scenePhase) { _, newPhase in
-                    guard newPhase == .active else { return }
-                    Task {
-                        await viewModel.refreshIfStale()
-                    }
                 }
 
                 Spacer(minLength: 0)

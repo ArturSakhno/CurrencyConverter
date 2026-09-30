@@ -11,15 +11,22 @@ struct ConverterViewModelTests {
     )
 
     private func makeSUT(
-        result: RatesLoadResult,
+        results: [RatesLoadResult],
         locale: Locale = Locale(identifier: "en_US")
     ) -> ConverterViewModel {
         ConverterViewModel(
             convertUseCase: DefaultConvertCurrencyUseCase(),
-            loadRatesUseCase: StubLoadExchangeRatesUseCase(result: result),
+            loadRatesUseCase: StubLoadExchangeRatesUseCase(results: results),
             quoteCurrency: mxn,
             locale: locale
         )
+    }
+
+    private func makeSUT(
+        result: RatesLoadResult,
+        locale: Locale = Locale(identifier: "en_US")
+    ) -> ConverterViewModel {
+        makeSUT(results: [result], locale: locale)
     }
 
     @Test func activeRateValueUsesBidWhenBaseOnTop() async {
@@ -221,158 +228,13 @@ struct ConverterViewModelTests {
         #expect(sut.ratesAsOfText != nil)
     }
 
-    // MARK: - Refresh throttle
-
-    private func makeCountingSUT(
-        results: [RatesLoadResult],
-        now: @escaping () -> Date = { Date(timeIntervalSince1970: 10) }
-    ) -> (ConverterViewModel, CountingLoadExchangeRatesUseCase) {
-        let useCase = CountingLoadExchangeRatesUseCase(results: results)
-        let sut = ConverterViewModel(
-            convertUseCase: DefaultConvertCurrencyUseCase(),
-            loadRatesUseCase: useCase,
-            quoteCurrency: mxn,
-            locale: Locale(identifier: "en_US"),
-            now: now
-        )
-        return (sut, useCase)
-    }
-
-    @Test func refreshIfStaleSkipsWithinMinimumInterval() async {
-        // sampleSnapshot was fetched at t=0; "now" is 10 s later.
-        let (sut, useCase) = makeCountingSUT(results: [.loaded(sampleSnapshot, isFresh: true)])
-        await sut.loadRates()
-
-        await sut.refreshIfStale()
-
-        #expect(await useCase.callCount == 1)
-    }
-
-    @Test func refreshIfStaleFetchesAfterMinimumInterval() async {
-        let (sut, useCase) = makeCountingSUT(
-            results: [.loaded(sampleSnapshot, isFresh: true)],
-            now: { Date(timeIntervalSince1970: ConverterViewModel.refreshInterval + 1) }
-        )
-        await sut.loadRates()
-
-        await sut.refreshIfStale()
-
-        #expect(await useCase.callCount == 2)
-    }
-
-    @Test func refreshIfStaleAlwaysRetriesStaleRates() async {
-        let (sut, useCase) = makeCountingSUT(results: [.loaded(sampleSnapshot, isFresh: false)])
-        await sut.loadRates()
-
-        await sut.refreshIfStale()
-
-        #expect(await useCase.callCount == 2)
-    }
-
-    @Test func refreshIfStaleFetchesWhenNothingIsLoaded() async {
-        let (sut, useCase) = makeCountingSUT(results: [.unavailable])
-
-        await sut.refreshIfStale()
-
-        #expect(await useCase.callCount == 1)
-    }
-
-    @Test func overlappingLoadsShareOneRequest() async {
-        let (sut, useCase) = makeCountingSUT(results: [.loaded(sampleSnapshot, isFresh: true)])
-
-        async let first: Void = sut.loadRates()
-        async let second: Void = sut.loadRates()
-        _ = await (first, second)
-
-        #expect(await useCase.callCount == 1)
-        #expect(sut.ratesResult == .loaded(sampleSnapshot, isFresh: true))
-    }
-
     @Test func failedReloadKeepsRatesOnScreenMarkedStale() async {
-        let (sut, _) = makeCountingSUT(results: [.loaded(sampleSnapshot, isFresh: true), .unavailable])
+        let sut = makeSUT(results: [.loaded(sampleSnapshot, isFresh: true), .unavailable])
         await sut.loadRates()
 
         await sut.loadRates()
 
         #expect(sut.ratesResult == .loaded(sampleSnapshot, isFresh: false))
-    }
-
-    // MARK: - Refresh schedule
-
-    private func snapshot(fetchedAt: TimeInterval, quotedAt: TimeInterval?) -> ExchangeRatesSnapshot {
-        ExchangeRatesSnapshot(
-            rates: [ExchangeRate(
-                quoteCurrencyCode: "MXN",
-                ask: 18.42,
-                bid: 18.40,
-                quotedAt: quotedAt.map(Date.init(timeIntervalSince1970:))
-            )],
-            fetchedAt: Date(timeIntervalSince1970: fetchedAt)
-        )
-    }
-
-    @Test func nextRefreshIsDueThirtySecondsAfterQuoteTime() async {
-        // Quoted at t=95, fetched at t=100 (device clock ahead), now t=110 -> due at 125.
-        let (sut, _) = makeCountingSUT(
-            results: [.loaded(snapshot(fetchedAt: 100, quotedAt: 95), isFresh: true)],
-            now: { Date(timeIntervalSince1970: 110) }
-        )
-        await sut.loadRates()
-
-        #expect(sut.delayUntilNextRefresh() == 15)
-    }
-
-    @Test func nextRefreshFallsBackToFetchTimeWithoutQuoteTime() async {
-        let (sut, _) = makeCountingSUT(
-            results: [.loaded(snapshot(fetchedAt: 100, quotedAt: nil), isFresh: true)],
-            now: { Date(timeIntervalSince1970: 110) }
-        )
-        await sut.loadRates()
-
-        #expect(sut.delayUntilNextRefresh() == 20)
-    }
-
-    @Test func nextRefreshDelayIsClampedAgainstClockSkew() async {
-        let overdue = makeCountingSUT(
-            results: [.loaded(snapshot(fetchedAt: 0, quotedAt: 0), isFresh: true)],
-            now: { Date(timeIntervalSince1970: 500) }
-        ).0
-        let fromTheFuture = makeCountingSUT(
-            results: [.loaded(snapshot(fetchedAt: 0, quotedAt: 3600), isFresh: true)],
-            now: { Date(timeIntervalSince1970: 0) }
-        ).0
-        await overdue.loadRates()
-        await fromTheFuture.loadRates()
-
-        #expect(overdue.delayUntilNextRefresh() == ConverterViewModel.minimumRefreshDelay)
-        #expect(fromTheFuture.delayUntilNextRefresh() == ConverterViewModel.refreshInterval)
-    }
-
-    @Test func staleRatesRetryAfterAFullInterval() async {
-        let (sut, _) = makeCountingSUT(results: [.unavailable])
-        await sut.loadRates()
-
-        #expect(sut.delayUntilNextRefresh() == ConverterViewModel.refreshInterval)
-    }
-
-    @Test func keepRatesUpdatedReloadsAfterEachScheduledDelay() async {
-        let recorder = SleepRecorder(stopAfter: 3)
-        let useCase = CountingLoadExchangeRatesUseCase(
-            results: [.loaded(snapshot(fetchedAt: 100, quotedAt: 95), isFresh: true)]
-        )
-        let sut = ConverterViewModel(
-            convertUseCase: DefaultConvertCurrencyUseCase(),
-            loadRatesUseCase: useCase,
-            quoteCurrency: mxn,
-            locale: Locale(identifier: "en_US"),
-            now: { Date(timeIntervalSince1970: 110) },
-            sleep: { try await recorder.sleep($0) }
-        )
-
-        await sut.keepRatesUpdated()
-
-        #expect(await useCase.callCount == 3)
-        #expect(await recorder.delays == [15, 15, 15])
     }
 }
 
@@ -417,46 +279,15 @@ extension ConverterViewModelTests {
     }
 }
 
-/// Stands in for `Task.sleep`: records each requested delay and returns immediately, then
-/// throws `CancellationError` on the `stopAfter`-th call so the refresh loop ends.
-private actor SleepRecorder {
-    private let stopAfter: Int
-    private(set) var delays: [TimeInterval] = []
-
-    init(stopAfter: Int) {
-        self.stopAfter = stopAfter
-    }
-
-    func sleep(_ delay: TimeInterval) throws {
-        delays.append(delay)
-        if delays.count >= stopAfter {
-            throw CancellationError()
-        }
-    }
-}
-
-/// Returns `results` in order (repeating the last one) and counts calls. Sleeps briefly so
-/// overlapping `loadRates()` calls really are in flight at the same time.
-private actor CountingLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
-    private let results: [RatesLoadResult]
-    private(set) var callCount = 0
+/// Returns `results` in order, then keeps returning the last one.
+private actor StubLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
+    private var results: [RatesLoadResult]
 
     init(results: [RatesLoadResult]) {
         self.results = results
     }
 
     func load() async -> RatesLoadResult {
-        callCount += 1
-        let result = results[min(callCount, results.count) - 1]
-        try? await Task.sleep(for: .milliseconds(20))
-        return result
-    }
-}
-
-private struct StubLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
-    let result: RatesLoadResult
-
-    func load() async -> RatesLoadResult {
-        result
+        results.count > 1 ? results.removeFirst() : results[0]
     }
 }

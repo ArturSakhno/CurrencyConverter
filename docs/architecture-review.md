@@ -1,6 +1,6 @@
 # CurrencyConverter architecture review
 
-Reviewed 29 September 2026 against `main` at `d5e1b3e`. The checkout advanced during the review; this document includes the merged refresh implementation. Application code was not changed. Rates are no longer persisted (#13), so local storage is left out. Code links point to the reviewed commit; the Status column records what happened to each proposal since.
+Reviewed against `main` at `d5e1b3e`. The checkout advanced during the review; this document includes the merged refresh implementation. Application code was not changed. Rates are no longer persisted (#13), so local storage is left out. Code links point to the reviewed commit; the Status column records what happened to each proposal since.
 
 **Recommendation:** keep the feature-oriented Clean Architecture + MVVM structure. The most useful work is to strengthen data validation, make amount edits atomic, and complete screen-state handling. The existing app composition, repository seams, and DesignSystem package are appropriate for this project's size.
 
@@ -58,7 +58,7 @@ Scores use `(impact + risk) × (6 − effort)`, with each dimension rated 1–5.
 | 3 | Model initial loading, content, and unavailable screens | Unfinished requirement | 5 / 4 / 2 | 36 | 0.5–1 day | Open |
 | 4 | Add fixture composition and boundary/UI regressions | Testability refactor | 4 / 4 / 3 | 24 | 1–2 days | Open |
 | 5 | Reconcile project guidance and verification commands | Documentation | 2 / 2 / 1 | 20 | 0.25 day | Open; README started in #13 |
-| 6 | Consolidate refresh deadline rules | Small structural refactor | 3 / 3 / 3 | 18 | 0.5 day | Open |
+| 6 | Consolidate refresh deadline rules | Small structural refactor | 3 / 3 / 3 | 18 | 0.5 day | Superseded: plain 30 s loop |
 
 **1. Validate rates before use.**
 
@@ -114,7 +114,7 @@ The app scheme does not include DesignSystemTests, and the lint configuration om
 
 **6. Consolidate refresh deadline rules.**
 
-*Status: open.*
+*Status: superseded. The deadline logic was removed: rates now refresh 30 s after each response, and the API's quote time is ignored.*
 
 [ConverterViewModel.swift:72](https://github.com/ArturSakhno/CurrencyConverter/blob/d5e1b3ee75d25c6e65e363c1393b0500df2529a0/CurrencyConverter/Features/Converter/Presentation/ConverterViewModel.swift#L72) and [line 96](https://github.com/ArturSakhno/CurrencyConverter/blob/d5e1b3ee75d25c6e65e363c1393b0500df2529a0/CurrencyConverter/Features/Converter/Presentation/ConverterViewModel.swift#L96) separately calculate when a snapshot is due. Extract a small pure `RatesRefreshPolicy` for deadline, clamping, and foreground eligibility; keep observable state and orchestration in the model.
 
