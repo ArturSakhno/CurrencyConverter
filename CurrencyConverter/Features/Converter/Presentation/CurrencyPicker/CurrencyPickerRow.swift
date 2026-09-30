@@ -13,7 +13,7 @@ struct CurrencyPickerRow: View {
             HStack(spacing: DS.Spacing.s) {
                 flag
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: DS.Spacing.l) {
                     Text(verbatim: info.displayCode)
                         .textStyle(\.body)
                         .foregroundStyle(.textPrimary)
@@ -80,16 +80,6 @@ struct CurrencyPickerRow: View {
         onSelect: {}
     )
     .padding()
-}
-
-#Preview("Dark Mode") {
-    CurrencyPickerRow(
-        info: .info(for: Currency(code: "BRL")),
-        isSelected: true,
-        onSelect: {}
-    )
-    .padding()
-    .preferredColorScheme(.dark)
 }
 
 #Preview("Accessibility XXXL") {
