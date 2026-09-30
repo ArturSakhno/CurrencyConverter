@@ -85,7 +85,12 @@ struct ConverterView: View {
             }
         }
         .scrollBounceBehavior(.basedOnSize)
-        // Tapping anywhere outside the fields - including the empty area below - dismisses the keyboard.
+        .background(alignment: .top) {
+            Rectangle()
+                .fill(.bgSelected)
+                .ignoresSafeArea(edges: .top)
+                .frame(height: .zero)
+        }
         .contentShape(.rect)
         .onTapGesture {
             focusedSlot = nil
