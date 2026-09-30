@@ -9,18 +9,3 @@ nonisolated struct RemoteExchangeRateRepository: ExchangeRateRepository {
         return ExchangeRatesSnapshot(rates: rates, fetchedAt: Date())
     }
 }
-
-private extension TickerDTO {
-    nonisolated func toDomain() -> ExchangeRate? {
-        guard
-            let askDecimal = Decimal(string: ask),
-            let bidDecimal = Decimal(string: bid),
-            let quoteCode = book.split(separator: "_").last
-        else { return nil }
-        return ExchangeRate(
-            quoteCurrencyCode: quoteCode.uppercased(),
-            ask: askDecimal,
-            bid: bidDecimal
-        )
-    }
-}
