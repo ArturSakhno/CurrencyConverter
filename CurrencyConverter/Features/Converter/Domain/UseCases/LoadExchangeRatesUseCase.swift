@@ -1,8 +1,5 @@
-/// Rates aren't persisted: a converter's rates only mean something live. `isFresh: false`
-/// is never produced here; the view model uses it for rates it keeps on screen after a
-/// failed refresh.
 nonisolated enum RatesLoadResult: Equatable, Sendable {
-    case loaded(ExchangeRatesSnapshot, isFresh: Bool)
+    case loaded(ExchangeRatesSnapshot)
     case unavailable
 }
 
@@ -18,6 +15,6 @@ struct DefaultLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
         guard let snapshot = try? await repository.fetchLatestRates(for: quoteCurrencyCodes) else {
             return .unavailable
         }
-        return .loaded(snapshot, isFresh: true)
+        return .loaded(snapshot)
     }
 }

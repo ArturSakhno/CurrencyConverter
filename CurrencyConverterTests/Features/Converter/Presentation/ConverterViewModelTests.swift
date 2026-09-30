@@ -29,20 +29,6 @@ struct ConverterViewModelTests {
         makeSUT(results: [result], locale: locale)
     }
 
-    @Test func activeRateValueUsesBidWhenBaseOnTop() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
-        await sut.loadRates()
-
-        #expect(sut.activeRateValue(for: mxn, isBaseOnTop: true) == 18.40)
-    }
-
-    @Test func activeRateValueUsesAskWhenBaseOnBottom() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
-        await sut.loadRates()
-
-        #expect(sut.activeRateValue(for: mxn, isBaseOnTop: false) == 18.42)
-    }
-
     @Test func ratePillTextShowsUnavailableStringWhenUnavailable() async {
         let sut = makeSUT(result: .unavailable)
         await sut.loadRates()
@@ -56,7 +42,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func ratePillTextFormatsRateToFourDecimals() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
         await sut.loadRates()
 
         let text = sut.ratePillText(
@@ -67,85 +53,8 @@ struct ConverterViewModelTests {
         #expect(text == "1 USDc = 18.4000 MXN")
     }
 
-//    @Test func convertedAmountFromBaseMatchesUseCaseMath() async {
-//        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
-//        await sut.loadRates()
-//
-//        let result = sut.convertedAmount(
-//            sourceText: "100",
-//            sourceField: .base,
-//            quoteCurrency: mxn,
-//            isBaseOnTop: true
-//        )
-//
-//        #expect(result == "1,840.00")
-//    }
-
-//    @Test func convertedAmountFromQuoteMatchesUseCaseMath() async {
-//        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
-//        await sut.loadRates()
-//
-//        let result = sut.convertedAmount(
-//            sourceText: "1842",
-//            sourceField: .quote,
-//            quoteCurrency: mxn,
-//            isBaseOnTop: false
-//        )
-//
-//        #expect(result == "100.00")
-//    }
-
-//    @Test func convertedAmountKeepsEveryDigitBeyondEntryCap() async {
-//        let cop = Currency(code: "COP")
-//        let snapshot = ExchangeRatesSnapshot(
-//            rates: [ExchangeRate(quoteCurrencyCode: "COP", ask: 4000, bid: 4000)],
-//            fetchedAt: Date(timeIntervalSince1970: 0)
-//        )
-//        let sut = makeSUT(result: .loaded(snapshot, isFresh: true))
-//        await sut.loadRates()
-//
-//        let result = sut.convertedAmount(
-//            sourceText: "999999999999",
-//            sourceField: .base,
-//            quoteCurrency: cop,
-//            isBaseOnTop: true
-//        )
-//
-//        let parser = AmountInputSanitizer(locale: Locale(identifier: "en_US"))
-//        #expect(result.flatMap(parser.decimal(from:)) == Decimal(string: "3999999999996000"))
-//    }
-
-//    @Test func convertedAmountReturnsNilForUnparsableInput() async {
-//        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
-//        await sut.loadRates()
-//
-//        let result = sut.convertedAmount(
-//            sourceText: "",
-//            sourceField: .base,
-//            quoteCurrency: mxn,
-//            isBaseOnTop: true
-//        )
-//
-//        #expect(result == nil)
-//    }
-
-//    @Test func convertedAmountReturnsNilWhenNoRateForQuoteCurrency() async {
-//        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
-//        await sut.loadRates()
-//
-//        let unknownQuoteCurrency = Currency(code: "ARS")
-//        let result = sut.convertedAmount(
-//            sourceText: "100",
-//            sourceField: .base,
-//            quoteCurrency: unknownQuoteCurrency,
-//            isBaseOnTop: true
-//        )
-//
-//        #expect(result == nil)
-//    }
-
     @Test func typingBaseDerivesQuote() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
         await sut.loadRates()
 
         sut.setAmountText("100", for: .base)
@@ -154,7 +63,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func swapRecalculatesDerivedAmountWithAskAndKeepsTypedAmount() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
         await sut.loadRates()
         sut.setAmountText("100", for: .base)
 
@@ -165,7 +74,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func swapAfterTypingQuoteRecalculatesBase() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
         await sut.loadRates()
         sut.swap()
         sut.setAmountText("1,842", for: .quote)
@@ -185,7 +94,7 @@ struct ConverterViewModelTests {
             ],
             fetchedAt: Date(timeIntervalSince1970: 0)
         )
-        let sut = makeSUT(result: .loaded(snapshot, isFresh: true))
+        let sut = makeSUT(result: .loaded(snapshot))
         await sut.loadRates()
         sut.setAmountText("100", for: .base)
 
@@ -196,7 +105,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func loadingRatesRecalculatesDerivedAmount() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
         sut.setAmountText("100", for: .base)
         #expect(sut.quoteAmountText == "")
 
@@ -222,19 +131,19 @@ struct ConverterViewModelTests {
     }
 
     @Test func ratesAsOfTextReflectsFetchedAtWhenLoaded() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
         await sut.loadRates()
 
         #expect(sut.ratesAsOfText != nil)
     }
 
     @Test func failedReloadKeepsRatesOnScreenMarkedStale() async {
-        let sut = makeSUT(results: [.loaded(sampleSnapshot, isFresh: true), .unavailable])
+        let sut = makeSUT(results: [.loaded(sampleSnapshot), .unavailable])
         await sut.loadRates()
 
         await sut.loadRates()
 
-        #expect(sut.ratesResult == .loaded(sampleSnapshot, isFresh: false))
+        #expect(sut.ratesResult == .loaded(sampleSnapshot))
     }
 }
 
@@ -243,7 +152,7 @@ struct ConverterViewModelTests {
 @MainActor
 extension ConverterViewModelTests {
     @Test func typedAmountIsSanitizedBeforeItIsStored() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
         await sut.loadRates()
 
         sut.setAmountText("1234.567", for: .base)
@@ -253,7 +162,7 @@ extension ConverterViewModelTests {
     }
 
     @Test func rejectedEditInDerivedFieldKeepsTypedAmountAsSource() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true))
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
         await sut.loadRates()
         sut.setAmountText("100", for: .base)
 
@@ -269,7 +178,7 @@ extension ConverterViewModelTests {
     }
 
     @Test func editsUseTheInjectedLocale() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot, isFresh: true), locale: Locale(identifier: "es_ES"))
+        let sut = makeSUT(result: .loaded(sampleSnapshot), locale: Locale(identifier: "es_ES"))
         await sut.loadRates()
 
         sut.setAmountText("12345,5", for: .base)

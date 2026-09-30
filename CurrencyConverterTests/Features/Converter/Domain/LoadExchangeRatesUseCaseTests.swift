@@ -14,7 +14,7 @@ struct LoadExchangeRatesUseCaseTests {
 
         let result = await sut.load()
 
-        #expect(result == .loaded(sampleSnapshot, isFresh: true))
+        #expect(result == .loaded(sampleSnapshot))
     }
 
     @Test func loadReturnsUnavailableOnNetworkFailure() async {

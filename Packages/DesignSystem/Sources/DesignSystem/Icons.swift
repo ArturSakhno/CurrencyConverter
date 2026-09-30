@@ -3,13 +3,13 @@ import SwiftUI
 public extension DS {
     /// Icons shipped in this package's asset catalog, so features don't need their own copies.
     enum Icon {
-        public static var arrowDown: Image { image("ds.arrow.down") }
-        public static var checkmark: Image { image("ds.checkmark") }
-        public static var chevronDown: Image { image("ds.chevron.down") }
-        public static var cross: Image { image("ds.cross") }
+        public static var arrowDown: Image { image(.dsArrowDown) }
+        public static var checkmark: Image { image(.dsCheckmark) }
+        public static var chevronDown: Image { image(.dsChevronDown) }
+        public static var cross: Image { image(.dsCross) }
 
-        private static func image(_ name: String) -> Image {
-            Image(name, bundle: .module)
+        private static func image(_ resource: ImageResource) -> Image {
+            Image(resource)
         }
     }
 }

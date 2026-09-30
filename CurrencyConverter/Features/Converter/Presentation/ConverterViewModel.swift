@@ -59,8 +59,8 @@ final class ConverterViewModel {
 
     /// A failed load never takes away rates already on screen - they stay, marked stale.
     private func merged(_ result: RatesLoadResult, keeping current: RatesLoadResult) -> RatesLoadResult {
-        guard case .unavailable = result, case let .loaded(snapshot, _) = current else { return result }
-        return .loaded(snapshot, isFresh: false)
+        guard case .unavailable = result, case let .loaded(snapshot) = current else { return result }
+        return .loaded(snapshot)
     }
 
     // MARK: - Amounts
@@ -122,15 +122,6 @@ final class ConverterViewModel {
         }
     }
 
-    // MARK: - Rates
-
-    /// Bid when the base currency is on top (selling USDc), ask when it's on the
-    /// bottom (buying USDc) - driven purely by row position, never by focus.
-    func activeRateValue(for quoteCurrency: Currency, isBaseOnTop: Bool) -> Decimal? {
-        guard let rate = rate(for: quoteCurrency) else { return nil }
-        return isBaseOnTop ? rate.bid : rate.ask
-    }
-
     func ratePillText(baseDisplayCode: String, quoteDisplayCode: String) -> String {
         guard let value = activeRateValue(for: quoteCurrency, isBaseOnTop: isBaseOnTop) else {
             return String(localized: "Rate unavailable")
@@ -142,7 +133,7 @@ final class ConverterViewModel {
     /// Client-capture time of the loaded snapshot, per the locked "rates as of" decision.
     /// `nil` when unavailable, so the caption simply doesn't render.
     var ratesAsOfText: String? {
-        guard case let .loaded(snapshot, _) = ratesResult else { return nil }
+        guard case let .loaded(snapshot) = ratesResult else { return nil }
         return snapshot.fetchedAt.formatted(
             Date.FormatStyle(date: .omitted, time: .shortened).locale(locale)
         )
@@ -154,7 +145,7 @@ private extension ConverterViewModel {
     /// quote currency never triggers a re-fetch: the snapshot already holds every
     /// catalog currency's rate.
     func rate(for quoteCurrency: Currency) -> ExchangeRate? {
-        guard case let .loaded(snapshot, _) = ratesResult else { return nil }
+        guard case let .loaded(snapshot) = ratesResult else { return nil }
         return snapshot.rates.first { $0.quoteCurrencyCode == quoteCurrency.code }
     }
 
@@ -181,5 +172,12 @@ private extension ConverterViewModel {
             convertUseCase.baseAmount(fromQuote: sourceAmount, rate: rate)
         }
         return displayFormatter.string(from: result, fractionDigits: 2)
+    }
+
+    /// Bid when the base currency is on top (selling USDc), ask when it's on the
+    /// bottom (buying USDc) - driven purely by row position, never by focus.
+    func activeRateValue(for quoteCurrency: Currency, isBaseOnTop: Bool) -> Decimal? {
+        guard let rate = rate(for: quoteCurrency) else { return nil }
+        return isBaseOnTop ? rate.bid : rate.ask
     }
 }
