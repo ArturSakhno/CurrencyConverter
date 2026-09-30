@@ -3,7 +3,8 @@ import SwiftUI
 
 struct ConverterView: View {
     let viewModel: ConverterViewModel
-    let baseCurrency: Currency
+    let quoteCurrency: Currency
+    let isPlaceholder: Bool
     let onSelectCurrency: () -> Void
 
     @FocusState private var focusedSlot: FocusSlot?
@@ -18,17 +19,7 @@ struct ConverterView: View {
         static let incoming = "+"
     }
 
-    private var isBaseOnTop: Bool { viewModel.isBaseOnTop }
-    private var quoteCurrency: Currency { viewModel.quoteCurrency }
-    private var baseInfo: CurrencyDisplayInfo { .info(for: baseCurrency) }
-    private var quoteInfo: CurrencyDisplayInfo { .info(for: quoteCurrency) }
-
-    private var topCurrency: Currency { isBaseOnTop ? baseCurrency : quoteCurrency }
-    private var bottomCurrency: Currency { isBaseOnTop ? quoteCurrency : baseCurrency }
-    private var topInfo: CurrencyDisplayInfo { .info(for: topCurrency) }
-    private var bottomInfo: CurrencyDisplayInfo { .info(for: bottomCurrency) }
-    private var topField: AmountField { isBaseOnTop ? .base : .quote }
-    private var bottomField: AmountField { isBaseOnTop ? .quote : .base }
+    private static let placeholderAmount = "0.00"
 
     private func amountText(for field: AmountField) -> Binding<String> {
         Binding(
@@ -46,19 +37,21 @@ struct ConverterView: View {
                         .textStyle(\.h3)
                         .foregroundStyle(.textPrimary)
 
-                    if let ratesAsOfText = viewModel.ratesAsOfText {
-                        Text("Rates as of \(ratesAsOfText)")
-                            .padding(.horizontal, DS.Spacing.m)
-                            .textStyle(\.bodySmall)
-                            .foregroundStyle(.textSecondary)
-                    }
+                    Text("Rates as of \(viewModel.ratesAsOfText ?? "00:00")")
+                        .padding(.horizontal, DS.Spacing.m)
+                        .textStyle(\.bodySmall)
+                        .foregroundStyle(.textSecondary)
+                        .skeleton(isPlaceholder)
 
                     ZStack {
                         VStack {
-                            topView
+                            row(.top)
+                                .containerShape(.rect)
+                                .skeleton(isPlaceholder)
                                 .padding(.bottom, Layout.rowGap)
 
-                            bottomView
+                            row(.bottom)
+                                .skeleton(isPlaceholder)
                                 .padding(.top, Layout.rowGap)
                                 .background(.bgPrimary)
                         }
@@ -68,9 +61,6 @@ struct ConverterView: View {
                 }
                 .padding(.top, Layout.screenTop)
                 .background(.bgSelected)
-                .task {
-                    await viewModel.keepRatesUpdated()
-                }
 
                 Spacer(minLength: 0)
             }
@@ -88,41 +78,28 @@ struct ConverterView: View {
         }
     }
 
-    var topView: some View {
-        CurrencyInputField(
-            amountText: amountText(for: topField),
-            currencyCode: topInfo.displayCode,
-            sign: Sign.outgoing,
-            currencySymbol: topInfo.currencySymbol,
-            subtitle: topInfo.subtitle,
-            showsChevron: !isBaseOnTop,
-            imageName: topInfo.flagAssetName,
-            field: .top,
+    private func row(_ slot: FocusSlot) -> some View {
+        let isTop = slot == .top
+        let isBase = isTop == viewModel.isBaseOnTop
+        let currency = isPlaceholder || isBase ? viewModel.baseCurrency : quoteCurrency
+        let info = CurrencyDisplayInfo.info(for: currency)
+        return CurrencyInputField(
+            amountText: isPlaceholder ? .constant(Self.placeholderAmount) : amountText(for: isBase ? .base : .quote),
+            currencyCode: info.displayCode,
+            sign: isPlaceholder ? nil : (isTop ? Sign.outgoing : Sign.incoming),
+            currencySymbol: isPlaceholder ? nil : info.currencySymbol,
+            subtitle: info.subtitle,
+            showsChevron: !isPlaceholder && !isBase,
+            imageName: info.flagAssetName,
+            field: slot,
             focusedField: $focusedSlot,
-            onSelectCurrency: onSelectCurrency
+            onSelectCurrency: isPlaceholder ? {} : onSelectCurrency
         )
         .padding(.horizontal, DS.Spacing.m)
         .padding(.vertical, DS.Spacing.l)
     }
 
-    var bottomView: some View {
-        CurrencyInputField(
-            amountText: amountText(for: bottomField),
-            currencyCode: bottomInfo.displayCode,
-            sign: Sign.incoming,
-            currencySymbol: bottomInfo.currencySymbol,
-            subtitle: bottomInfo.subtitle,
-            showsChevron: isBaseOnTop,
-            imageName: bottomInfo.flagAssetName,
-            field: .bottom,
-            focusedField: $focusedSlot,
-            onSelectCurrency: onSelectCurrency
-        )
-        .padding(.horizontal, DS.Spacing.m)
-        .padding(.vertical, DS.Spacing.l)
-    }
-
-    var exchange: some View {
+    private var exchange: some View {
         ZStack(alignment: .leading) {
             SwapButton {
                 viewModel.swap()
@@ -130,16 +107,17 @@ struct ConverterView: View {
                     focusedSlot = focusedSlot == .top ? .bottom : .top
                 }
             }
-            .rotationEffect(isBaseOnTop ? .degrees(0) : .degrees(180))
-            .animation(.default, value: isBaseOnTop)
+            .rotationEffect(viewModel.isBaseOnTop ? .degrees(0) : .degrees(180))
+            .animation(.default, value: viewModel.isBaseOnTop)
             .padding(.leading, DS.Spacing.m)
 
             ExchangeRateView(
                 text: viewModel.ratePillText(
-                    baseDisplayCode: baseInfo.displayCode,
-                    quoteDisplayCode: quoteInfo.displayCode
+                    baseDisplayCode: CurrencyDisplayInfo.info(for: viewModel.baseCurrency).displayCode,
+                    quoteDisplayCode: CurrencyDisplayInfo.info(for: quoteCurrency).displayCode
                 )
             )
+            .skeleton(isPlaceholder)
             .frame(maxWidth: .infinity)
             .allowsHitTesting(false)
         }
@@ -149,7 +127,8 @@ struct ConverterView: View {
 #Preview {
     ConverterView(
         viewModel: DependencyContainer().makeConverterViewModel(),
-        baseCurrency: CurrencyCatalog.base,
+        quoteCurrency: Currency(code: "XXX"),
+        isPlaceholder: true,
         onSelectCurrency: {}
     )
 }

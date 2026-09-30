@@ -9,17 +9,15 @@ struct DependencyContainer {
 
         convertUseCase = DefaultConvertCurrencyUseCase()
         currencyCatalogUseCase = DefaultCurrencyCatalogUseCase(repository: currencyCatalogRepository)
-        loadRatesUseCase = DefaultLoadExchangeRatesUseCase(
-            repository: repository,
-            quoteCurrencyCodes: currencyCatalogUseCase.availableQuoteCurrencies().map(\.code)
-        )
+        loadRatesUseCase = DefaultLoadExchangeRatesUseCase(repository: repository)
     }
 
     func makeConverterViewModel() -> ConverterViewModel {
         ConverterViewModel(
             convertUseCase: convertUseCase,
             loadRatesUseCase: loadRatesUseCase,
-            quoteCurrency: currencyCatalogUseCase.defaultQuoteCurrency()
+            loadAvailableCurrenciesUseCase: currencyCatalogUseCase,
+            baseCurrency: CurrencyCatalog.base
         )
     }
 }

@@ -2,17 +2,31 @@ import Foundation
 
 @Observable
 final class ConverterViewModel {
-    private(set) var ratesResult: RatesLoadResult = .unavailable
+    enum State: Equatable {
+        case loading
+        case noConnection
+        case errorScreen
+        case converter(Content)
+    }
+
+    struct Content: Equatable {
+        var quoteCurrency: Currency
+        let availableCurrencies: [Currency]
+        var snapshot: ExchangeRatesSnapshot
+    }
+
+    let baseCurrency: Currency
+    private(set) var state: State = .loading
     private(set) var baseAmountText = ""
     private(set) var quoteAmountText = ""
     private(set) var isBaseOnTop = true
-    private(set) var quoteCurrency: Currency
     private var lastEditedField: AmountField = .base
 
     static let refreshInterval: Duration = .seconds(30)
 
     private let convertUseCase: ConvertCurrencyUseCase
     private let loadRatesUseCase: LoadExchangeRatesUseCase
+    private let loadAvailableCurrenciesUseCase: CurrencyCatalogUseCase
     private let sanitizer: AmountInputSanitizer
     private let displayFormatter: AmountDisplayFormatter
     private let locale: Locale
@@ -20,33 +34,59 @@ final class ConverterViewModel {
     init(
         convertUseCase: ConvertCurrencyUseCase,
         loadRatesUseCase: LoadExchangeRatesUseCase,
-        quoteCurrency: Currency,
+        loadAvailableCurrenciesUseCase: CurrencyCatalogUseCase,
+        baseCurrency: Currency,
         locale: Locale = .current
     ) {
-        self.quoteCurrency = quoteCurrency
         self.convertUseCase = convertUseCase
         self.loadRatesUseCase = loadRatesUseCase
+        self.loadAvailableCurrenciesUseCase = loadAvailableCurrenciesUseCase
+        self.baseCurrency = baseCurrency
+        self.locale = locale
         sanitizer = AmountInputSanitizer(locale: locale)
         displayFormatter = AmountDisplayFormatter(locale: locale)
-        self.locale = locale
     }
 
     func keepRatesUpdated() async {
         while !Task.isCancelled {
-            await loadRates()
+            await refresh()
             try? await Task.sleep(for: Self.refreshInterval)
         }
     }
 
-    func loadRates() async {
-        let result = await loadRatesUseCase.load()
-        ratesResult = merged(result, keeping: ratesResult)
+    func refresh() async {
+        guard let content else {
+            await loadConverter()
+            return
+        }
+        let result = await loadRatesUseCase(rates: content.availableCurrencies.map(\.code))
+        guard case let .loaded(snapshot) = result, var current = self.content else { return }
+        current.snapshot = snapshot
+        state = .converter(current)
         recalculateDerivedAmount()
     }
 
-    private func merged(_ result: RatesLoadResult, keeping current: RatesLoadResult) -> RatesLoadResult {
-        guard case .unavailable = result, case let .loaded(snapshot) = current else { return result }
-        return .loaded(snapshot)
+    func retry() async {
+        state = .loading
+        await loadConverter()
+    }
+
+    private func loadConverter() async {
+        let currencies = await loadAvailableCurrenciesUseCase()
+        guard let firstCurrency = currencies.first else {
+            state = .errorScreen
+            return
+        }
+        guard case let .loaded(snapshot) = await loadRatesUseCase(rates: currencies.map(\.code)) else {
+            state = .noConnection
+            return
+        }
+        state = .converter(Content(
+            quoteCurrency: firstCurrency,
+            availableCurrencies: currencies,
+            snapshot: snapshot
+        ))
+        recalculateDerivedAmount()
     }
 
     func amountText(for field: AmountField) -> String {
@@ -74,8 +114,9 @@ final class ConverterViewModel {
     }
 
     func selectQuoteCurrency(_ currency: Currency) {
-        guard currency != quoteCurrency else { return }
-        quoteCurrency = currency
+        guard var content, currency != content.quoteCurrency else { return }
+        content.quoteCurrency = currency
+        state = .converter(content)
         recalculateDerivedAmount()
     }
 
@@ -87,8 +128,8 @@ final class ConverterViewModel {
     }
 
     func ratePillText(baseDisplayCode: String, quoteDisplayCode: String) -> String {
-        guard let snapshot,
-              let value = convertUseCase.price(of: quoteCurrency, direction: direction, in: snapshot)
+        guard let content,
+              let value = convertUseCase.price(of: content.quoteCurrency, direction: direction, in: content.snapshot)
         else {
             return String(localized: "Rate unavailable")
         }
@@ -97,17 +138,16 @@ final class ConverterViewModel {
     }
 
     var ratesAsOfText: String? {
-        guard case let .loaded(snapshot) = ratesResult else { return nil }
-        return snapshot.fetchedAt.formatted(
+        content?.snapshot.fetchedAt.formatted(
             Date.FormatStyle(date: .omitted, time: .shortened).locale(locale)
         )
     }
 }
 
 private extension ConverterViewModel {
-    var snapshot: ExchangeRatesSnapshot? {
-        guard case let .loaded(snapshot) = ratesResult else { return nil }
-        return snapshot
+    var content: Content? {
+        guard case let .converter(content) = state else { return nil }
+        return content
     }
 
     var direction: TradeDirection {
@@ -115,14 +155,14 @@ private extension ConverterViewModel {
     }
 
     func convertedAmount(from text: String, side: CurrencySide) -> String? {
-        guard let snapshot,
+        guard let content,
               let amount = sanitizer.decimal(from: text),
               let result = convertUseCase.convert(
                   amount,
                   from: side,
-                  quote: quoteCurrency,
+                  quote: content.quoteCurrency,
                   direction: direction,
-                  in: snapshot
+                  in: content.snapshot
               )
         else {
             return nil

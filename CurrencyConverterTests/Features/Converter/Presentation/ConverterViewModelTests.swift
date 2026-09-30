@@ -5,6 +5,7 @@ import Testing
 @MainActor
 struct ConverterViewModelTests {
     private let mxn = Currency(code: "MXN")
+    private let cop = Currency(code: "COP")
     private let sampleSnapshot = ExchangeRatesSnapshot(
         rates: [ExchangeRate(quoteCurrencyCode: "MXN", ask: 18.42, bid: 18.40)],
         fetchedAt: Date(timeIntervalSince1970: 0)
@@ -12,12 +13,14 @@ struct ConverterViewModelTests {
 
     private func makeSUT(
         results: [RatesLoadResult],
+        loadedCurrencies: [Currency] = CurrencyCatalog.availableQuoteCurrencies,
         locale: Locale = Locale(identifier: "en_US")
     ) -> ConverterViewModel {
         ConverterViewModel(
             convertUseCase: DefaultConvertCurrencyUseCase(),
             loadRatesUseCase: StubLoadExchangeRatesUseCase(results: results),
-            quoteCurrency: mxn,
+            loadAvailableCurrenciesUseCase: StubCurrencyCatalogUseCase(currencies: loadedCurrencies),
+            baseCurrency: CurrencyCatalog.base,
             locale: locale
         )
     }
@@ -29,33 +32,33 @@ struct ConverterViewModelTests {
         makeSUT(results: [result], locale: locale)
     }
 
-    @Test func ratePillTextShowsUnavailableStringWhenUnavailable() async {
-        let sut = makeSUT(result: .unavailable)
-        await sut.loadRates()
-
-        let text = sut.ratePillText(
-            baseDisplayCode: "USDc",
-            quoteDisplayCode: "MXN"
-        )
-
-        #expect(text == "Rate unavailable")
+    private func content(_ sut: ConverterViewModel) -> ConverterViewModel.Content? {
+        guard case let .converter(content) = sut.state else { return nil }
+        return content
     }
 
     @Test func ratePillTextFormatsRateToFourDecimals() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot))
-        await sut.loadRates()
+        await sut.refresh()
 
-        let text = sut.ratePillText(
-            baseDisplayCode: "USDc",
-            quoteDisplayCode: "MXN"
-        )
+        let text = sut.ratePillText(baseDisplayCode: "USDc", quoteDisplayCode: "MXN")
 
         #expect(text == "1 USDc = 18.4000 MXN")
     }
 
+    @Test func ratePillTextShowsUnavailableWhenTheSelectedCurrencyHasNoRate() async {
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        await sut.refresh()
+        sut.selectQuoteCurrency(cop)
+
+        let text = sut.ratePillText(baseDisplayCode: "USDc", quoteDisplayCode: "COP")
+
+        #expect(text == "Rate unavailable")
+    }
+
     @Test func typingBaseDerivesQuote() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot))
-        await sut.loadRates()
+        await sut.refresh()
 
         sut.setAmountText("100", for: .base)
 
@@ -64,7 +67,7 @@ struct ConverterViewModelTests {
 
     @Test func swapRecalculatesDerivedAmountWithAskAndKeepsTypedAmount() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot))
-        await sut.loadRates()
+        await sut.refresh()
         sut.setAmountText("100", for: .base)
 
         sut.swap()
@@ -75,7 +78,7 @@ struct ConverterViewModelTests {
 
     @Test func swapAfterTypingQuoteRecalculatesBase() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot))
-        await sut.loadRates()
+        await sut.refresh()
         sut.swap()
         sut.setAmountText("1,842", for: .quote)
         #expect(sut.baseAmountText == "100.00")
@@ -95,63 +98,135 @@ struct ConverterViewModelTests {
             fetchedAt: Date(timeIntervalSince1970: 0)
         )
         let sut = makeSUT(result: .loaded(snapshot))
-        await sut.loadRates()
+        await sut.refresh()
         sut.setAmountText("100", for: .base)
 
-        sut.selectQuoteCurrency(Currency(code: "COP"))
+        sut.selectQuoteCurrency(cop)
 
-        #expect(sut.quoteCurrency == Currency(code: "COP"))
+        #expect(content(sut)?.quoteCurrency == cop)
         #expect(sut.quoteAmountText == "399,000.00")
     }
 
-    @Test func loadingRatesRecalculatesDerivedAmount() async {
+    @Test func typedAmountConvertsOnceRatesLoad() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot))
         sut.setAmountText("100", for: .base)
         #expect(sut.quoteAmountText == "")
 
-        await sut.loadRates()
+        await sut.refresh()
 
         #expect(sut.quoteAmountText == "1,840.00")
     }
 
-    @Test func derivedAmountClearsWhenRateIsMissing() async {
+    @Test func derivedAmountClearsWithoutRates() async {
         let sut = makeSUT(result: .unavailable)
-        await sut.loadRates()
+        await sut.refresh()
 
         sut.setAmountText("100", for: .base)
 
         #expect(sut.quoteAmountText == "")
     }
 
-    @Test func ratesAsOfTextIsNilWhenUnavailable() async {
+    @Test func ratesAsOfTextIsNilWithoutRates() async {
         let sut = makeSUT(result: .unavailable)
-        await sut.loadRates()
+        await sut.refresh()
 
         #expect(sut.ratesAsOfText == nil)
     }
 
     @Test func ratesAsOfTextReflectsFetchedAtWhenLoaded() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot))
-        await sut.loadRates()
+        await sut.refresh()
 
         #expect(sut.ratesAsOfText != nil)
-    }
-
-    @Test func failedReloadKeepsRatesOnScreenMarkedStale() async {
-        let sut = makeSUT(results: [.loaded(sampleSnapshot), .unavailable])
-        await sut.loadRates()
-
-        await sut.loadRates()
-
-        #expect(sut.ratesResult == .loaded(sampleSnapshot))
     }
 }
 
 @MainActor
 extension ConverterViewModelTests {
+    @Test func startsLoading() {
+        #expect(makeSUT(result: .loaded(sampleSnapshot)).state == .loading)
+    }
+
+    @Test func firstRefreshShowsTheConverterWithTheFirstCurrency() async {
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
+
+        await sut.refresh()
+
+        #expect(sut.state == .converter(.init(
+            quoteCurrency: mxn,
+            availableCurrencies: CurrencyCatalog.availableQuoteCurrencies,
+            snapshot: sampleSnapshot
+        )))
+    }
+
+    @Test func emptyCurrencyListShowsErrorScreen() async {
+        let sut = makeSUT(results: [.loaded(sampleSnapshot)], loadedCurrencies: [])
+
+        await sut.refresh()
+
+        #expect(sut.state == .errorScreen)
+    }
+
+    @Test func failedFirstRatesShowNoConnection() async {
+        let sut = makeSUT(result: .unavailable)
+
+        await sut.refresh()
+
+        #expect(sut.state == .noConnection)
+    }
+
+    @Test(arguments: [true, false])
+    func currenciesCanRecoverAfterErrorScreen(usingRetry: Bool) async {
+        let sut = ConverterViewModel(
+            convertUseCase: DefaultConvertCurrencyUseCase(),
+            loadRatesUseCase: StubLoadExchangeRatesUseCase(results: [.loaded(sampleSnapshot)]),
+            loadAvailableCurrenciesUseCase: RecoveringCurrencyCatalogUseCase(currencies: [mxn]),
+            baseCurrency: CurrencyCatalog.base
+        )
+        await sut.refresh()
+        #expect(sut.state == .errorScreen)
+
+        if usingRetry {
+            await sut.retry()
+        } else {
+            await sut.refresh()
+        }
+
+        #expect(content(sut)?.quoteCurrency == mxn)
+        #expect(content(sut)?.snapshot == sampleSnapshot)
+    }
+
+    @Test func retryAfterNoConnectionShowsTheConverter() async {
+        let sut = makeSUT(results: [.unavailable, .loaded(sampleSnapshot)])
+        await sut.refresh()
+
+        await sut.retry()
+
+        #expect(content(sut)?.snapshot == sampleSnapshot)
+    }
+
+    @Test func failedRefreshKeepsTheConverter() async {
+        let sut = makeSUT(results: [.loaded(sampleSnapshot), .unavailable])
+        await sut.refresh()
+
+        await sut.refresh()
+
+        #expect(content(sut)?.snapshot == sampleSnapshot)
+    }
+
+    @Test func refreshKeepsTheSelectedCurrency() async {
+        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        await sut.refresh()
+        sut.selectQuoteCurrency(cop)
+
+        await sut.refresh()
+
+        #expect(content(sut)?.quoteCurrency == cop)
+    }
+
     @Test func typedAmountIsSanitizedBeforeItIsStored() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot))
-        await sut.loadRates()
+        await sut.refresh()
 
         sut.setAmountText("1234.567", for: .base)
 
@@ -161,7 +236,7 @@ extension ConverterViewModelTests {
 
     @Test func rejectedEditInDerivedFieldKeepsTypedAmountAsSource() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot))
-        await sut.loadRates()
+        await sut.refresh()
         sut.setAmountText("100", for: .base)
 
         sut.setAmountText("1,840.005", for: .quote)
@@ -175,7 +250,7 @@ extension ConverterViewModelTests {
 
     @Test func editsUseTheInjectedLocale() async {
         let sut = makeSUT(result: .loaded(sampleSnapshot), locale: Locale(identifier: "es_ES"))
-        await sut.loadRates()
+        await sut.refresh()
 
         sut.setAmountText("12345,5", for: .base)
 
@@ -191,7 +266,29 @@ private actor StubLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
         self.results = results
     }
 
-    func load() async -> RatesLoadResult {
+    func callAsFunction(rates _: [String]) async -> RatesLoadResult {
         results.count > 1 ? results.removeFirst() : results[0]
+    }
+}
+
+private struct StubCurrencyCatalogUseCase: CurrencyCatalogUseCase {
+    let currencies: [Currency]
+
+    func callAsFunction() async -> [Currency] {
+        currencies
+    }
+}
+
+private actor RecoveringCurrencyCatalogUseCase: CurrencyCatalogUseCase {
+    private var isFirstCall = true
+    private let currencies: [Currency]
+
+    init(currencies: [Currency]) {
+        self.currencies = currencies
+    }
+
+    func callAsFunction() async -> [Currency] {
+        defer { isFirstCall = false }
+        return isFirstCall ? [] : currencies
     }
 }

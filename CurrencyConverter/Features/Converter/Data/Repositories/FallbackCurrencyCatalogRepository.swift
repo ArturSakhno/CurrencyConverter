@@ -1,13 +1,5 @@
 nonisolated struct FallbackCurrencyCatalogRepository: CurrencyCatalogRepository {
-    func availableQuoteCurrencies() -> [Currency] {
+    func availableQuoteCurrencies() async -> [Currency] {
         CurrencyCatalog.availableQuoteCurrencies
-    }
-
-    func baseCurrency() -> Currency {
-        CurrencyCatalog.base
-    }
-
-    func defaultQuoteCurrency() -> Currency {
-        CurrencyCatalog.defaultQuote
     }
 }

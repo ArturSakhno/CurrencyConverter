@@ -10,18 +10,18 @@ struct LoadExchangeRatesUseCaseTests {
 
     @Test func loadReturnsFreshSnapshotOnNetworkSuccess() async {
         let repository = StubExchangeRateRepository(fetchResult: .success(sampleSnapshot))
-        let sut = DefaultLoadExchangeRatesUseCase(repository: repository, quoteCurrencyCodes: ["MXN"])
+        let sut = DefaultLoadExchangeRatesUseCase(repository: repository)
 
-        let result = await sut.load()
+        let result = await sut(rates: ["MXN"])
 
         #expect(result == .loaded(sampleSnapshot))
     }
 
     @Test func loadReturnsUnavailableOnNetworkFailure() async {
         let repository = StubExchangeRateRepository(fetchResult: .failure(.networkError))
-        let sut = DefaultLoadExchangeRatesUseCase(repository: repository, quoteCurrencyCodes: ["MXN"])
+        let sut = DefaultLoadExchangeRatesUseCase(repository: repository)
 
-        let result = await sut.load()
+        let result = await sut(rates: ["MXN"])
 
         #expect(result == .unavailable)
     }
