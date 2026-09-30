@@ -14,12 +14,14 @@ struct ConverterViewModelTests {
     private func makeSUT(
         results: [Result<ExchangeRatesSnapshot, ExchangeRatesError>],
         loadedCurrencies: [Currency] = CurrencyCatalog.availableQuoteCurrencies,
+        networkMonitor: StubNetworkMonitor = StubNetworkMonitor(),
         locale: Locale = Locale(identifier: "en_US")
     ) -> ConverterViewModel {
         ConverterViewModel(
             convertUseCase: DefaultConvertCurrencyUseCase(),
             loadRatesUseCase: StubLoadExchangeRatesUseCase(results: results),
             loadAvailableCurrenciesUseCase: StubCurrencyCatalogUseCase(currencies: loadedCurrencies),
+            networkMonitor: networkMonitor,
             baseCurrency: CurrencyCatalog.base,
             locale: locale
         )
@@ -164,15 +166,48 @@ extension ConverterViewModelTests {
 
         await sut.refresh()
 
-        #expect(sut.state == .failed(.currenciesUnavailable))
+        #expect(sut.state == .failed(.unavailable))
     }
 
-    @Test func failedFirstRatesShowNoConnection() async {
-        let sut = makeSUT(result: .failure(.unavailable))
+    @Test func failedFirstRatesWhileOfflineShowNoConnection() async {
+        let sut = makeSUT(results: [.failure(.unavailable)], networkMonitor: StubNetworkMonitor(isConnected: false))
 
         await sut.refresh()
 
         #expect(sut.state == .failed(.noConnection))
+    }
+
+    @Test func failedFirstRatesWhileOnlineShowUnavailable() async {
+        let sut = makeSUT(results: [.failure(.unavailable)], networkMonitor: StubNetworkMonitor(isConnected: true))
+
+        await sut.refresh()
+
+        #expect(sut.state == .failed(.unavailable))
+    }
+
+    @Test func connectionComingBackRetriesAfterNoConnection() async {
+        let sut = makeSUT(
+            results: [.failure(.unavailable), .success(sampleSnapshot)],
+            networkMonitor: StubNetworkMonitor(isConnected: false, updates: [false, true])
+        )
+        await sut.refresh()
+        #expect(sut.state == .failed(.noConnection))
+
+        await sut.retryWhenBackOnline()
+
+        #expect(content(sut)?.snapshot == sampleSnapshot)
+    }
+
+    @Test func connectionUpdatesLeaveOtherFailuresToTheRefreshLoop() async {
+        let sut = makeSUT(
+            results: [.failure(.unavailable), .success(sampleSnapshot)],
+            networkMonitor: StubNetworkMonitor(isConnected: true, updates: [true])
+        )
+        await sut.refresh()
+
+        await sut.retryWhenBackOnline()
+
+        #expect(sut.state == .failed(.unavailable))
     }
 
     @Test(arguments: [true, false])
@@ -181,10 +216,11 @@ extension ConverterViewModelTests {
             convertUseCase: DefaultConvertCurrencyUseCase(),
             loadRatesUseCase: StubLoadExchangeRatesUseCase(results: [.success(sampleSnapshot)]),
             loadAvailableCurrenciesUseCase: RecoveringCurrencyCatalogUseCase(currencies: [mxn]),
+            networkMonitor: StubNetworkMonitor(),
             baseCurrency: CurrencyCatalog.base
         )
         await sut.refresh()
-        #expect(sut.state == .failed(.currenciesUnavailable))
+        #expect(sut.state == .failed(.unavailable))
 
         if usingRetry {
             await sut.retry()
@@ -197,7 +233,10 @@ extension ConverterViewModelTests {
     }
 
     @Test func retryAfterNoConnectionShowsTheConverter() async {
-        let sut = makeSUT(results: [.failure(.unavailable), .success(sampleSnapshot)])
+        let sut = makeSUT(
+            results: [.failure(.unavailable), .success(sampleSnapshot)],
+            networkMonitor: StubNetworkMonitor(isConnected: false)
+        )
         await sut.refresh()
 
         await sut.retry()
@@ -277,6 +316,20 @@ private struct StubCurrencyCatalogUseCase: CurrencyCatalogUseCase {
 
     func callAsFunction() async -> [Currency] {
         currencies
+    }
+}
+
+private struct StubNetworkMonitor: NetworkMonitor {
+    var isConnected = true
+    var updates: [Bool] = []
+
+    func connectivityUpdates() -> AsyncStream<Bool> {
+        AsyncStream { continuation in
+            for update in updates {
+                continuation.yield(update)
+            }
+            continuation.finish()
+        }
     }
 }
 

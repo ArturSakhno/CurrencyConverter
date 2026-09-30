@@ -36,12 +36,12 @@ nonisolated enum Localized {
 
         static let noConnectionTitle = LocalizedStringResource(
             "converter.noConnection.title",
-            comment: "Title when the first exchange rate request fails"
+            comment: "Title when the first exchange rate request fails while the device is offline"
         )
 
         static let noConnectionMessage = LocalizedStringResource(
             "converter.noConnection.message",
-            comment: "Instructions shown when the first exchange rate request fails"
+            comment: "Instructions shown when the first exchange rate request fails while the device is offline"
         )
 
         static let currencyLoadErrorTitle = LocalizedStringResource(

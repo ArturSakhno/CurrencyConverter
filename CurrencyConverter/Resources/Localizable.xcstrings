@@ -223,7 +223,7 @@
       }
     },
     "converter.noConnection.message" : {
-      "comment" : "Instructions shown when the first exchange rate request fails",
+      "comment" : "Instructions shown when the first exchange rate request fails while the device is offline",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -240,7 +240,7 @@
       }
     },
     "converter.noConnection.title" : {
-      "comment" : "Title when the first exchange rate request fails",
+      "comment" : "Title when the first exchange rate request fails while the device is offline",
       "localizations" : {
         "en" : {
           "stringUnit" : {

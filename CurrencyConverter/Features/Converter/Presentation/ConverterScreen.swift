@@ -25,13 +25,13 @@ struct ConverterScreen: View {
                     isPlaceholder: false,
                     onSelectCurrency: onSelectCurrency
                 )
-            case .failed(.currenciesUnavailable):
+            case .failed(.unavailable):
                 StatusScreenView(
                     systemImage: "exclamationmark.triangle",
                     title: Localized.Converter.currencyLoadErrorTitle,
                     message: Localized.Converter.currencyLoadErrorMessage
                 ) {
-                    Task { await viewModel.retry() }
+                    await viewModel.retry()
                 }
             case .failed(.noConnection):
                 StatusScreenView(
@@ -39,12 +39,15 @@ struct ConverterScreen: View {
                     title: Localized.Converter.noConnectionTitle,
                     message: Localized.Converter.noConnectionMessage
                 ) {
-                    Task { await viewModel.retry() }
+                    await viewModel.retry()
                 }
             }
         }
         .task {
             await viewModel.keepRatesUpdated()
+        }
+        .task {
+            await viewModel.retryWhenBackOnline()
         }
     }
 }

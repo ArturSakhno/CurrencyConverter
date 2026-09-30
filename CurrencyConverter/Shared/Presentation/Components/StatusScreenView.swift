@@ -6,7 +6,7 @@ struct StatusScreenView: View {
     let systemImage: String
     let title: LocalizedStringResource
     let message: LocalizedStringResource
-    let onRetry: () -> Void
+    let onRetry: () async -> Void
 
     var body: some View {
         VStack(spacing: DS.Spacing.m) {
@@ -23,7 +23,11 @@ struct StatusScreenView: View {
                 .textStyle(\.body)
                 .foregroundStyle(.textSecondary)
 
-            Button(action: onRetry) {
+            Button {
+                Task {
+                    await onRetry()
+                }
+            } label: {
                 Text(Localized.Common.retry)
                     .textStyle(\.body)
                     .foregroundStyle(.onInteractivePrimary)

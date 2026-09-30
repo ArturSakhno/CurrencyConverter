@@ -10,7 +10,7 @@ final class ConverterViewModel {
 
     enum LoadError: Error {
         case noConnection
-        case currenciesUnavailable
+        case unavailable
     }
 
     struct Content: Equatable {
@@ -31,6 +31,7 @@ final class ConverterViewModel {
     private let convertUseCase: ConvertCurrencyUseCase
     private let loadRatesUseCase: LoadExchangeRatesUseCase
     private let loadAvailableCurrenciesUseCase: CurrencyCatalogUseCase
+    private let networkMonitor: NetworkMonitor
     private let sanitizer: AmountInputSanitizer
     private let displayFormatter: AmountDisplayFormatter
     private let locale: Locale
@@ -39,12 +40,14 @@ final class ConverterViewModel {
         convertUseCase: ConvertCurrencyUseCase,
         loadRatesUseCase: LoadExchangeRatesUseCase,
         loadAvailableCurrenciesUseCase: CurrencyCatalogUseCase,
+        networkMonitor: NetworkMonitor,
         baseCurrency: Currency,
         locale: Locale = .current
     ) {
         self.convertUseCase = convertUseCase
         self.loadRatesUseCase = loadRatesUseCase
         self.loadAvailableCurrenciesUseCase = loadAvailableCurrenciesUseCase
+        self.networkMonitor = networkMonitor
         self.baseCurrency = baseCurrency
         self.locale = locale
         sanitizer = AmountInputSanitizer(locale: locale)
@@ -71,8 +74,13 @@ final class ConverterViewModel {
     }
 
     func retry() async {
-        state = .loading
         await loadConverter()
+    }
+
+    func retryWhenBackOnline() async {
+        for await isConnected in networkMonitor.connectivityUpdates() where isConnected && state == .failed(.noConnection) {
+            await retry()
+        }
     }
 
     private func loadConverter() async {
@@ -87,7 +95,7 @@ final class ConverterViewModel {
     private func loadContent() async throws(LoadError) -> Content {
         let currencies = await loadAvailableCurrenciesUseCase()
         guard let firstCurrency = currencies.first, let snapshot = try? await loadRatesUseCase(rates: currencies.map(\.code)) else {
-            throw .currenciesUnavailable
+            throw await networkMonitor.isConnected ? .unavailable : .noConnection
         }
 
         return Content(
