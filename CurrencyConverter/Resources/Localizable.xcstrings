@@ -171,40 +171,6 @@
         }
       }
     },
-    "converter.currencyLoadError.message" : {
-      "comment" : "Instructions when the currency list cannot be loaded",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please try again to load the available currencies."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inténtalo de nuevo para cargar las monedas disponibles."
-          }
-        }
-      }
-    },
-    "converter.currencyLoadError.title" : {
-      "comment" : "Title when the currency list cannot be loaded",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unable to load currencies"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se pudieron cargar las monedas"
-          }
-        }
-      }
-    },
     "converter.loadingRates" : {
       "comment" : "Accessibility label for the loading converter",
       "localizations" : {
@@ -320,6 +286,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Calculadora de cambio"
+          }
+        }
+      }
+    },
+    "converter.unavailable.message" : {
+      "comment" : "Generic instructions shown when the first load fails while the device is online",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please try again to load exchange rates."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inténtalo de nuevo para cargar las tasas de cambio."
+          }
+        }
+      }
+    },
+    "converter.unavailable.title" : {
+      "comment" : "Generic title when the first load fails while the device is online",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo salió mal"
           }
         }
       }

@@ -28,8 +28,8 @@ struct ConverterScreen: View {
             case .failed(.unavailable):
                 StatusScreenView(
                     systemImage: "exclamationmark.triangle",
-                    title: Localized.Converter.currencyLoadErrorTitle,
-                    message: Localized.Converter.currencyLoadErrorMessage
+                    title: Localized.Converter.unavailableTitle,
+                    message: Localized.Converter.unavailableMessage
                 ) {
                     await viewModel.retry()
                 }

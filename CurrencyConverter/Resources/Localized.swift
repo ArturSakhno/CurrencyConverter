@@ -44,14 +44,14 @@ nonisolated enum Localized {
             comment: "Instructions shown when the first exchange rate request fails while the device is offline"
         )
 
-        static let currencyLoadErrorTitle = LocalizedStringResource(
-            "converter.currencyLoadError.title",
-            comment: "Title when the currency list cannot be loaded"
+        static let unavailableTitle = LocalizedStringResource(
+            "converter.unavailable.title",
+            comment: "Generic title when the first load fails while the device is online"
         )
 
-        static let currencyLoadErrorMessage = LocalizedStringResource(
-            "converter.currencyLoadError.message",
-            comment: "Instructions when the currency list cannot be loaded"
+        static let unavailableMessage = LocalizedStringResource(
+            "converter.unavailable.message",
+            comment: "Generic instructions shown when the first load fails while the device is online"
         )
 
         static func ratesAsOf(_ time: String) -> LocalizedStringResource {
