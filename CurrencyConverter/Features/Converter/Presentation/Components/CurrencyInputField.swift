@@ -40,7 +40,7 @@ struct CurrencyInputField: View {
                     text: $amountText,
                     sign: sign,
                     currencySymbol: currencySymbol,
-                    accessibilityLabel: "Amount in \(currencyCode)",
+                    accessibilityLabel: Localized.Converter.amountIn(currencyCode),
                     field: field,
                     focusedField: focusedField
                 )

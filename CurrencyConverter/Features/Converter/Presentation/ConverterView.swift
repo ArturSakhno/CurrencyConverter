@@ -32,12 +32,12 @@ struct ConverterView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: .zero) {
                 VStack(alignment: .leading, spacing: .zero) {
-                    Text("Exchange calculator")
+                    Text(Localized.Converter.title)
                         .padding(.horizontal, DS.Spacing.m)
                         .textStyle(\.h3)
                         .foregroundStyle(.textPrimary)
 
-                    Text("Rates as of \(viewModel.ratesAsOfText ?? "00:00")")
+                    Text(Localized.Converter.ratesAsOf(viewModel.ratesAsOfText ?? "00:00"))
                         .padding(.horizontal, DS.Spacing.m)
                         .textStyle(\.bodySmall)
                         .foregroundStyle(.textSecondary)

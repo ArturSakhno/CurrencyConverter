@@ -131,10 +131,14 @@ final class ConverterViewModel {
         guard let content,
               let value = convertUseCase.price(of: content.quoteCurrency, direction: direction, in: content.snapshot)
         else {
-            return String(localized: "Rate unavailable")
+            return String(localized: Localized.Converter.rateUnavailable)
         }
         let formattedRate = displayFormatter.string(from: value, fractionDigits: 4)
-        return "1 \(baseDisplayCode) = \(formattedRate) \(quoteDisplayCode)"
+        return String(localized: Localized.Converter.rateQuote(
+            baseCode: baseDisplayCode,
+            rate: formattedRate,
+            quoteCode: quoteDisplayCode
+        ))
     }
 
     var ratesAsOfText: String? {

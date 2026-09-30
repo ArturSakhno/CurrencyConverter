@@ -17,7 +17,7 @@ struct AmountTextField: View {
     @Binding var text: String
     let sign: String?
     var currencySymbol: String?
-    let accessibilityLabel: LocalizedStringKey
+    let accessibilityLabel: LocalizedStringResource
     let field: FocusSlot
     var focusedField: FocusState<FocusSlot?>.Binding
 
@@ -92,7 +92,7 @@ struct AmountTextField: View {
         text: $text,
         sign: "−",
         currencySymbol: "$",
-        accessibilityLabel: "Amount in USDc",
+        accessibilityLabel: Localized.Converter.amountIn("USDc"),
         field: .top,
         focusedField: $focusedField
     )
@@ -106,7 +106,7 @@ struct AmountTextField: View {
         text: $text,
         sign: "+",
         currencySymbol: "$",
-        accessibilityLabel: "Amount in MXN",
+        accessibilityLabel: Localized.Converter.amountIn("MXN"),
         field: .bottom,
         focusedField: $focusedField
     )
@@ -120,7 +120,7 @@ struct AmountTextField: View {
         text: $text,
         sign: "−",
         currencySymbol: "$",
-        accessibilityLabel: "Amount in USDc",
+        accessibilityLabel: Localized.Converter.amountIn("USDc"),
         field: .top,
         focusedField: $focusedField
     )
@@ -135,7 +135,7 @@ struct AmountTextField: View {
         text: $text,
         sign: "+",
         currencySymbol: "$",
-        accessibilityLabel: "Amount in COP",
+        accessibilityLabel: Localized.Converter.amountIn("COP"),
         field: .bottom,
         focusedField: $focusedField
     )

@@ -23,7 +23,7 @@ struct CurrencyPickerView: View {
             .toolbarRole(.browser)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("Choose currency")
+                    Text(Localized.Converter.chooseCurrency)
                         .textStyle(\.h4)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -32,7 +32,7 @@ struct CurrencyPickerView: View {
                             .resizable()
                             .frame(width: DS.Size.closeButton, height: DS.Size.closeButton)
                     }
-                    .accessibilityLabel(Text("Close"))
+                    .accessibilityLabel(Text(Localized.Common.close))
                 }
             }
         }

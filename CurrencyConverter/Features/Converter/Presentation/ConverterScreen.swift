@@ -17,7 +17,7 @@ struct ConverterScreen: View {
                     onSelectCurrency: onSelectCurrency
                 )
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text("Loading rates"))
+                .accessibilityLabel(Text(Localized.Converter.loadingRates))
             case let .converter(content):
                 ConverterView(
                     viewModel: viewModel,
@@ -26,11 +26,19 @@ struct ConverterScreen: View {
                     onSelectCurrency: onSelectCurrency
                 )
             case .errorScreen:
-                ConverterErrorView {
+                StatusScreenView(
+                    systemImage: "exclamationmark.triangle",
+                    title: Localized.Converter.currencyLoadErrorTitle,
+                    message: Localized.Converter.currencyLoadErrorMessage
+                ) {
                     Task { await viewModel.retry() }
                 }
             case .noConnection:
-                NoConnectionView {
+                StatusScreenView(
+                    systemImage: "wifi.slash",
+                    title: Localized.Converter.noConnectionTitle,
+                    message: Localized.Converter.noConnectionMessage
+                ) {
                     Task { await viewModel.retry() }
                 }
             }

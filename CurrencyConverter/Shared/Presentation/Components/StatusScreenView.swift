@@ -1,27 +1,30 @@
 import DesignSystem
+import Foundation
 import SwiftUI
 
-struct NoConnectionView: View {
+struct StatusScreenView: View {
+    let systemImage: String
+    let title: LocalizedStringResource
+    let message: LocalizedStringResource
     let onRetry: () -> Void
 
     var body: some View {
         VStack(spacing: DS.Spacing.m) {
-            Image(systemName: "wifi.slash")
+            Image(systemName: systemImage)
                 .textStyle(\.h3)
                 .foregroundStyle(.iconSecondary)
                 .accessibilityHidden(true)
 
-            Text("No connection")
+            Text(title)
                 .textStyle(\.h4)
                 .foregroundStyle(.textPrimary)
 
-            Text("Connect to the internet to load exchange rates.")
+            Text(message)
                 .textStyle(\.body)
                 .foregroundStyle(.textSecondary)
-                .multilineTextAlignment(.center)
 
             Button(action: onRetry) {
-                Text("Retry")
+                Text(Localized.Common.retry)
                     .textStyle(\.body)
                     .foregroundStyle(.onInteractivePrimary)
                     .padding(.horizontal, DS.Spacing.l)
@@ -30,11 +33,17 @@ struct NoConnectionView: View {
             }
             .padding(.top, DS.Spacing.xs)
         }
+        .multilineTextAlignment(.center)
         .padding(DS.Spacing.l)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
 #Preview {
-    NoConnectionView {}
+    StatusScreenView(
+        systemImage: "wifi.slash",
+        title: Localized.Converter.noConnectionTitle,
+        message: Localized.Converter.noConnectionMessage,
+        onRetry: {}
+    )
 }

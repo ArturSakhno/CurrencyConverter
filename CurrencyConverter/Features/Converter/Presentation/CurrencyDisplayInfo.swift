@@ -18,37 +18,37 @@ nonisolated struct CurrencyDisplayInfo: Equatable, Sendable {
     private static let table: [String: CurrencyDisplayInfo] = [
         "USDC": CurrencyDisplayInfo(
             displayCode: "USDc",
-            subtitle: String(localized: "Digital dollars"),
+            subtitle: String(localized: Localized.Converter.CurrencyNames.digitalDollars),
             currencySymbol: "$",
             flagAssetName: "us"
         ),
         "MXN": CurrencyDisplayInfo(
             displayCode: "MXN",
-            subtitle: String(localized: "Mexican pesos"),
+            subtitle: String(localized: Localized.Converter.CurrencyNames.mexicanPesos),
             currencySymbol: "$",
             flagAssetName: "mxn"
         ),
         "EURC": CurrencyDisplayInfo(
             displayCode: "EURc",
-            subtitle: String(localized: "Digital euros"),
+            subtitle: String(localized: Localized.Converter.CurrencyNames.digitalEuros),
             currencySymbol: "€",
             flagAssetName: "eur"
         ),
         "ARS": CurrencyDisplayInfo(
             displayCode: "ARS",
-            subtitle: String(localized: "Argentine pesos"),
+            subtitle: String(localized: Localized.Converter.CurrencyNames.argentinePesos),
             currencySymbol: "$",
             flagAssetName: "ars"
         ),
         "COP": CurrencyDisplayInfo(
             displayCode: "COP",
-            subtitle: String(localized: "Colombian pesos"),
+            subtitle: String(localized: Localized.Converter.CurrencyNames.colombianPesos),
             currencySymbol: "$",
             flagAssetName: "cop"
         ),
         "BRL": CurrencyDisplayInfo(
             displayCode: "BRL",
-            subtitle: String(localized: "Brazilian reais"),
+            subtitle: String(localized: Localized.Converter.CurrencyNames.brazilianReais),
             currencySymbol: "R$",
             flagAssetName: "brl"
         ),
