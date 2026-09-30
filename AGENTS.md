@@ -21,7 +21,7 @@ xcodebuild test -scheme CurrencyConverter -destination 'platform=iOS Simulator,n
 xcodebuild test -scheme CurrencyConverter -destination 'platform=iOS Simulator,name=iPhone 17' \
   -only-testing:CurrencyConverterTests/ConvertCurrencyUseCaseTests
 xcodebuild test -scheme CurrencyConverter -destination 'platform=iOS Simulator,name=iPhone 17' \
-  -only-testing:'CurrencyConverterTests/ConvertCurrencyUseCaseTests/quoteAmountMultipliesBaseByRate()'
+  -only-testing:'CurrencyConverterTests/ConvertCurrencyUseCaseTests/quoteAmountConvertsToBaseByDividing()'
 ```
 
 SwiftLint is configured in `.swiftlint.yml`. SwiftFormat (`.swiftformat`) runs as a pre-commit hook from `.githooks/pre-commit`: it formats staged Swift files and re-stages them, and blocks a partially staged file that needs formatting. Enable it once per clone with `git config core.hooksPath .githooks`. Trust `xcodebuild` output over SourceKit's live diagnostics. Right after you create a file, "cannot find type" errors from SourceKit are usually a stale index.
@@ -32,7 +32,7 @@ New files under `CurrencyConverter/` and `CurrencyConverterTests/` are picked up
 
 The app uses Clean Architecture plus MVVM and a Coordinator, organized by feature. Each feature under `CurrencyConverter/Features/` is a vertical slice: `Presentation/` → `Domain/` (use cases, repository protocols, entities) → `Data/` (repository implementations → network or local storage). Dependencies point inward: Domain depends on nothing, and both Data and Presentation depend on Domain.
 
-- **Features/Converter/**: `ConverterView` and `ConverterViewModel` (`@Observable`) with `Components/`, plus `AmountInputSanitizer` and `AmountDisplayFormatter`. `ConvertCurrencyUseCase` does the math. `LoadExchangeRatesUseCase` returns `.loaded(snapshot)` or `.unavailable`. `TickersAPIClient` calls `GET https://api.dolarapp.dev/v1/tickers?currencies=…` and decodes into `TickerDTO`, which maps to the Domain entity. DTOs never leak into Domain. Rates aren't persisted. `ConverterViewModel.keepRatesUpdated()` runs the refresh loop from `.task`. A failed load keeps the rates already on screen.
+- **Features/Converter/**: `ConverterView` and `ConverterViewModel` (`@Observable`) with `Components/`, plus `AmountInputSanitizer` and `AmountDisplayFormatter`. `ConvertCurrencyUseCase` owns conversion: it looks up the quote's rate, picks the bid or ask for the `TradeDirection` and does the math. The view model only parses and formats. `LoadExchangeRatesUseCase` returns `.loaded(snapshot)` or `.unavailable`. `TickersAPIClient` calls `GET https://api.dolarapp.dev/v1/tickers?currencies=…` and decodes into `TickerDTO`, which maps to the Domain entity. DTOs never leak into Domain. Rates aren't persisted. `ConverterViewModel.keepRatesUpdated()` runs the refresh loop from `.task`. A failed load keeps the rates already on screen.
 - **Features/CurrencyPicker/**: `CurrencyPickerView` reports `onSelect`/`onClose` and knows nothing about navigation. `CurrencyCatalogUseCase` → `CurrencyCatalogRepository` → `FallbackCurrencyCatalogRepository`, which serves the hardcoded catalog because the currencies endpoint returns 403.
 - **Shared/**: code both features use. `Currency` and `CurrencyCatalog` live in `Domain/`, `CurrencyDisplayInfo` (code → label, subtitle, symbol, flag) in `Presentation/`, and small helpers in `Utils/`. Features must not import from each other; anything both need goes here.
 - **App/**: `CurrencyConverterApp`, `RootView` (hosts the `NavigationStack` and the sheet switch), `AppCoordinator` (`@Observable`, sheet routing only, no push destinations), and `DependencyContainer`, which is the only place that wires Data types to Domain protocols and builds view models.
@@ -52,7 +52,7 @@ Other project settings that matter:
 
 - **Base vs quote currency**: the base is `CurrencyCatalog.base` (`USDC`), and the user picks the quote from `CurrencyCatalog.availableQuoteCurrencies` (MXN, EURC, ARS, COP, BRL). No logic may branch on a currency code string outside `Currency.swift`. The app never calls the currencies-list endpoint (it always returns 403), so the catalog is hardcoded on purpose.
 - **Domain has no display strings.** The mappings from a code to its label ("EURC" → "EURc") and to its subtitle ("Colombian pesos") live in Presentation.
-- **Bid/ask comes from row position (`isBaseOnTop`, which only swap toggles), never from which field has focus.** When USDc is on top (selling), use `bid`; when it's on the bottom (buying), use `ask`. On swap, the amount and focus stay with USDc.
+- **Bid/ask comes from row position (`isBaseOnTop`, which only swap toggles), never from which field has focus.** When USDc is on top (selling), use `bid`; when it's on the bottom (buying), use `ask`. The view model maps row position to `TradeDirection`; the bid/ask choice itself is `ExchangeRate.price(for:)` in Domain. On swap, the amount and focus stay with USDc.
 - **Money is `Decimal`, never `Double`.** Conversion math keeps full precision. Formatting to a fixed 2 decimals, for every currency including COP, happens only at display time.
 - **Amount entry is a plain `TextField` with `.keyboardType(.decimalPad)`.** There is no custom keypad, which is a documented deviation from Figma.
 - **Offline behavior:**

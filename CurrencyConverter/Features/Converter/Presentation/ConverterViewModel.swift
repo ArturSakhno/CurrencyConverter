@@ -57,7 +57,7 @@ final class ConverterViewModel {
         recalculateDerivedAmount()
     }
 
-    /// A failed load never takes away rates already on screen - they stay, marked stale.
+    /// A failed load never takes away rates already on screen.
     private func merged(_ result: RatesLoadResult, keeping current: RatesLoadResult) -> RatesLoadResult {
         guard case .unavailable = result, case let .loaded(snapshot) = current else { return result }
         return .loaded(snapshot)
@@ -105,25 +105,15 @@ final class ConverterViewModel {
     /// rate, row order and quote currency. Clears it when there's nothing to convert.
     private func recalculateDerivedAmount() {
         switch lastEditedField {
-        case .base:
-            quoteAmountText = convertedAmount(
-                sourceText: baseAmountText,
-                sourceField: .base,
-                quoteCurrency: quoteCurrency,
-                isBaseOnTop: isBaseOnTop
-            ) ?? ""
-        case .quote:
-            baseAmountText = convertedAmount(
-                sourceText: quoteAmountText,
-                sourceField: .quote,
-                quoteCurrency: quoteCurrency,
-                isBaseOnTop: isBaseOnTop
-            ) ?? ""
+        case .base: quoteAmountText = convertedAmount(from: baseAmountText, side: .base) ?? ""
+        case .quote: baseAmountText = convertedAmount(from: quoteAmountText, side: .quote) ?? ""
         }
     }
 
     func ratePillText(baseDisplayCode: String, quoteDisplayCode: String) -> String {
-        guard let value = activeRateValue(for: quoteCurrency, isBaseOnTop: isBaseOnTop) else {
+        guard let snapshot,
+              let value = convertUseCase.price(of: quoteCurrency, direction: direction, in: snapshot)
+        else {
             return String(localized: "Rate unavailable")
         }
         let formattedRate = displayFormatter.string(from: value, fractionDigits: 4)
@@ -141,43 +131,35 @@ final class ConverterViewModel {
 }
 
 private extension ConverterViewModel {
-    /// Looks up `quoteCurrency`'s rate in the already-loaded snapshot. Switching the
-    /// quote currency never triggers a re-fetch: the snapshot already holds every
-    /// catalog currency's rate.
-    func rate(for quoteCurrency: Currency) -> ExchangeRate? {
+    /// The loaded rates. Switching the quote currency never re-fetches: the snapshot already
+    /// holds every catalog currency's rate.
+    var snapshot: ExchangeRatesSnapshot? {
         guard case let .loaded(snapshot) = ratesResult else { return nil }
-        return snapshot.rates.first { $0.quoteCurrencyCode == quoteCurrency.code }
+        return snapshot
     }
 
-    /// Converts `sourceText` (raw text from whichever field the user is typing in) to the
-    /// other currency, formatted to 2 decimals. Returns `nil` when there's no rate to convert
-    /// with or the text doesn't parse to a number - the caller clears the derived field in
-    /// that case rather than showing a stale value.
-    func convertedAmount(
-        sourceText: String,
-        sourceField: AmountField,
-        quoteCurrency: Currency,
-        isBaseOnTop: Bool
-    ) -> String? {
-        guard let rate = activeRateValue(for: quoteCurrency, isBaseOnTop: isBaseOnTop),
-              let sourceAmount = sanitizer.decimal(from: sourceText)
+    /// The top row is the one money leaves, so USDc on top means selling it. Driven purely
+    /// by row position, never by focus.
+    var direction: TradeDirection {
+        isBaseOnTop ? .sellingBase : .buyingBase
+    }
+
+    /// Converts `text` (from whichever field the user is typing in) to the other currency,
+    /// formatted to 2 decimals. `nil` when there's no rate or the text doesn't parse to a
+    /// number - the caller clears the derived field rather than showing a stale value.
+    func convertedAmount(from text: String, side: CurrencySide) -> String? {
+        guard let snapshot,
+              let amount = sanitizer.decimal(from: text),
+              let result = convertUseCase.convert(
+                  amount,
+                  from: side,
+                  quote: quoteCurrency,
+                  direction: direction,
+                  in: snapshot
+              )
         else {
             return nil
         }
-
-        let result: Decimal = switch sourceField {
-        case .base:
-            convertUseCase.quoteAmount(fromBase: sourceAmount, rate: rate)
-        case .quote:
-            convertUseCase.baseAmount(fromQuote: sourceAmount, rate: rate)
-        }
         return displayFormatter.string(from: result, fractionDigits: 2)
-    }
-
-    /// Bid when the base currency is on top (selling USDc), ask when it's on the
-    /// bottom (buying USDc) - driven purely by row position, never by focus.
-    func activeRateValue(for quoteCurrency: Currency, isBaseOnTop: Bool) -> Decimal? {
-        guard let rate = rate(for: quoteCurrency) else { return nil }
-        return isBaseOnTop ? rate.bid : rate.ask
     }
 }
