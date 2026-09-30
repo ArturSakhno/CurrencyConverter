@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		16EB2168306AF3BC00876834 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 16EB2167306AF3BC00876834 /* DesignSystem */; };
+		16EB2178306AF3BC00876834 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 16EB2177306AF3BC00876834 /* Networking */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				16EB2168306AF3BC00876834 /* DesignSystem in Frameworks */,
+				16EB2178306AF3BC00876834 /* Networking in Frameworks */,
 			);
 		};
 		16B6526F306938660064BB5B /* Frameworks */ = {
@@ -91,6 +93,7 @@
 			name = CurrencyConverter;
 			packageProductDependencies = (
 				16EB2167306AF3BC00876834 /* DesignSystem */,
+				16EB2177306AF3BC00876834 /* Networking */,
 			);
 			productName = CurrencyConverter;
 			productReference = 16B65265306938650064BB5B /* CurrencyConverter.app */;
@@ -148,6 +151,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				16EB2166306AF3BC00876834 /* XCLocalSwiftPackageReference "Packages/DesignSystem" */,
+				16EB2176306AF3BC00876834 /* XCLocalSwiftPackageReference "Packages/Networking" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 16B65266306938650064BB5B /* Products */;
@@ -499,12 +503,20 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/DesignSystem;
 		};
+		16EB2176306AF3BC00876834 /* XCLocalSwiftPackageReference "Packages/Networking" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Networking;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		16EB2167306AF3BC00876834 /* DesignSystem */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DesignSystem;
+		};
+		16EB2177306AF3BC00876834 /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Networking;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

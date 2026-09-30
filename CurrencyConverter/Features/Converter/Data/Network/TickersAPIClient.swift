@@ -1,42 +1,23 @@
 import Foundation
+import Networking
 
 nonisolated protocol TickersAPIClient: Sendable {
-    func fetchTickers(quoteCurrencyCodes: [String]) async throws -> [ExchangeRate]
+    func fetchTickers(quoteCurrencyCodes: [String]) async throws(NetworkError) -> [TickerDTO?]
 }
 
-struct URLSessionTickersAPIClient: TickersAPIClient {
-    private let session: URLSession
-    private static let endpoint = URL(string: "https://api.dolarapp.dev/v1/tickers")!
+nonisolated struct DefaultTickersAPIClient: TickersAPIClient {
+    private static let baseURL = URL(string: "https://api.dolarapp.dev")!
+    private let networkClient: NetworkClient
 
-    init(session: URLSession = .shared) {
-        self.session = session
+    nonisolated init(networkClient: NetworkClient) {
+        self.networkClient = networkClient
     }
 
-    func fetchTickers(quoteCurrencyCodes: [String]) async throws -> [ExchangeRate] {
-        var components = URLComponents(url: Self.endpoint, resolvingAgainstBaseURL: false)!
-        components.queryItems = [URLQueryItem(name: "currencies", value: quoteCurrencyCodes.joined(separator: ","))]
-
-        let data: Data
-        let response: URLResponse
-        do {
-            (data, response) = try await session.data(from: components.url!)
-        } catch {
-            throw APIError.transport("\(error)")
-        }
-
-        let correlationID = (response as? HTTPURLResponse)?.value(forHTTPHeaderField: "x-correlation-id")
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            let status = (response as? HTTPURLResponse)?.statusCode ?? -1
-            throw APIError.unexpectedStatus(status, correlationID: correlationID)
-        }
-
-        let dtos: [TickerDTO?]
-        do {
-            dtos = try JSONDecoder().decode([TickerDTO?].self, from: data)
-        } catch {
-            throw APIError.decoding("\(error)", correlationID: correlationID)
-        }
-
-        return dtos.compactMap { $0?.toDomain() }
+    nonisolated func fetchTickers(quoteCurrencyCodes: [String]) async throws(NetworkError) -> [TickerDTO?] {
+        let request = try RequestBuilder(baseURL: Self.baseURL)
+            .path("v1/tickers")
+            .query("currencies", quoteCurrencyCodes.joined(separator: ","))
+            .build()
+        return try await networkClient.send(request, decoding: [TickerDTO?].self)
     }
 }

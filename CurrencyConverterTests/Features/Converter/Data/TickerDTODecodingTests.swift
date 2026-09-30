@@ -3,9 +3,8 @@ import Foundation
 import Testing
 
 struct TickerDTODecodingTests {
-    private func decode(_ json: String) throws -> [ExchangeRate] {
-        let dtos = try JSONDecoder().decode([TickerDTO?].self, from: Data(json.utf8))
-        return dtos.compactMap { $0?.toDomain() }
+    private func decode(_ json: String) throws -> [TickerDTO?] {
+        try JSONDecoder().decode([TickerDTO?].self, from: Data(json.utf8))
     }
 
     @Test func decodesMultipleValidTickers() throws {
@@ -16,14 +15,16 @@ struct TickerDTODecodingTests {
         ]
         """
 
-        let rates = try decode(json)
+        let tickers = try decode(json)
 
-        #expect(rates.count == 2)
-        #expect(rates.contains { $0.quoteCurrencyCode == "MXN" && $0.ask == Decimal(string: "18.4105000000") })
-        #expect(rates.contains { $0.quoteCurrencyCode == "ARS" && $0.bid == Decimal(string: "1539.4290300000") })
+        #expect(tickers.count == 2)
+        #expect(tickers[0]?.book == "usdc_mxn")
+        #expect(tickers[0]?.ask == "18.4105000000")
+        #expect(tickers[1]?.book == "usdc_ars")
+        #expect(tickers[1]?.bid == "1539.4290300000")
     }
 
-    @Test func dropsNullElementWithoutMisassigningTheRest() throws {
+    @Test func preservesNullElementAndPositions() throws {
         let json = """
         [
             {"ask": "1551.0000000000", "bid": "1539.4290300000", "book": "usdc_ars", "date": "2025-10-21T09:44:18.512194175"},
@@ -32,14 +33,15 @@ struct TickerDTODecodingTests {
         ]
         """
 
-        let rates = try decode(json)
+        let tickers = try decode(json)
 
-        #expect(rates.count == 2)
-        #expect(rates.contains { $0.quoteCurrencyCode == "ARS" })
-        #expect(rates.contains { $0.quoteCurrencyCode == "MXN" })
+        #expect(tickers.count == 3)
+        #expect(tickers[0]?.book == "usdc_ars")
+        #expect(tickers[1]?.book == nil)
+        #expect(tickers[2]?.book == "usdc_mxn")
     }
 
-    @Test func dropsTickerWithNonNumericAskOrBidWithoutFailingTheBatch() throws {
+    @Test func decodesNonNumericPriceForRepositoryValidation() throws {
         let json = """
         [
             {"ask": "not-a-number", "bid": "18.4069700000", "book": "usdc_mxn", "date": "2025-10-20T20:14:57.361483956"},
@@ -47,9 +49,10 @@ struct TickerDTODecodingTests {
         ]
         """
 
-        let rates = try decode(json)
+        let tickers = try decode(json)
 
-        #expect(rates.count == 1)
-        #expect(rates.first?.quoteCurrencyCode == "ARS")
+        #expect(tickers.count == 2)
+        #expect(tickers[0]?.ask == "not-a-number")
+        #expect(tickers[1]?.book == "usdc_ars")
     }
 }
