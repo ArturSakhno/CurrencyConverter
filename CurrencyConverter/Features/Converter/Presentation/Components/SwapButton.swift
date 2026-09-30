@@ -30,13 +30,3 @@ struct SwapButton: View {
 #Preview {
     SwapButton {}
 }
-
-#Preview("Dark Mode") {
-    SwapButton {}
-        .preferredColorScheme(.dark)
-}
-
-#Preview("Sample theme") {
-    SwapButton {}
-        .theme(.sample)
-}

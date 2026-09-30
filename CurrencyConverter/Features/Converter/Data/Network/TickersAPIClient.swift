@@ -14,7 +14,6 @@ struct URLSessionTickersAPIClient: TickersAPIClient {
 
     func fetchTickers(quoteCurrencyCodes: [String]) async throws -> [ExchangeRate] {
         var components = URLComponents(url: Self.endpoint, resolvingAgainstBaseURL: false)!
-        // No space in the separator: a space in the currency list 500s the whole batch.
         components.queryItems = [URLQueryItem(name: "currencies", value: quoteCurrencyCodes.joined(separator: ","))]
 
         let data: Data

@@ -1,49 +1,29 @@
 import SwiftUI
 
-/// Semantic color tokens for one appearance. Names mirror the Figma variables
-/// (`text/primary` → `textPrimary`); variables that share a value and meaning are
-/// collapsed into one token. Views never use raw colors - see `ThemeColor`.
 struct ColorPalette: Sendable, Equatable {
-    /// text/primary, Labels/Primary
     let textPrimary: Color
-    /// text/secondary
     let textSecondary: Color
-    /// text/accent-blue-light
     let textAccent: Color
-    /// text/error
     let textError: Color
 
-    /// bg/primary
     let bgPrimary: Color
-    /// bg/selected
     let bgSelected: Color
-    /// bg/overlay
     let bgOverlay: Color
 
-    /// surface/default
     let surfaceDefault: Color
-    /// surface/overlay
     let surfaceOverlay: Color
-    /// border/default
     let borderDefault: Color
 
-    /// icon/primary
     let iconPrimary: Color
-    /// icon/secondary
     let iconSecondary: Color
 
-    /// interactive/primary, button/primary/default/bg, interactive/selector/selected/bg
     let interactivePrimary: Color
-    /// button/primary/default/icon, interactive/selector/selected/icon
     let onInteractivePrimary: Color
-    /// interactive/selector/unselected/bg
     let selectorUnselectedBg: Color
-    /// interactive/selector/unselected/border
     let selectorUnselectedBorder: Color
 }
 
 extension ColorPalette {
-    /// Figma values.
     static let standardLight = ColorPalette(
         textPrimary: Color(hex: "#000000"),
         textSecondary: Color(hex: "#A8A29F"),
@@ -63,8 +43,6 @@ extension ColorPalette {
         selectorUnselectedBorder: Color(hex: "#D6D3D1")
     )
 
-    /// Self-designed (Figma is light-only), on the same warm stone scale as the light greys.
-    /// The brand green is lifted so it stays visible on a near-black background.
     static let standardDark = ColorPalette(
         textPrimary: Color(hex: "#FFFFFF"),
         textSecondary: Color(hex: "#A8A29F"),

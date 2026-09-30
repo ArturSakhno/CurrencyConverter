@@ -53,7 +53,6 @@ struct AmountInputSanitizerTests {
     }
 
     @Test func editShrinkingValueAlreadyOverCapIsAccepted() {
-        // A converted amount the user focuses and deletes from.
         #expect(sut.sanitizeEdit(from: "3,999,999,999,996,000.00", to: "3,999,999,999,996,00.00")
             == "399,999,999,999,600.00")
     }

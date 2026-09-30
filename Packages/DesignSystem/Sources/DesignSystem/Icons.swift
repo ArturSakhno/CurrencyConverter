@@ -1,7 +1,6 @@
 import SwiftUI
 
 public extension DS {
-    /// Icons shipped in this package's asset catalog, so features don't need their own copies.
     enum Icon {
         public static var arrowDown: Image { image(.dsArrowDown) }
         public static var checkmark: Image { image(.dsCheckmark) }

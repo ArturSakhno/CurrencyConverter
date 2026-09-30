@@ -102,7 +102,7 @@ struct CurrencyInputField: View {
             currencySymbol: "$",
             subtitle: "Colombian pesos",
             showsChevron: true,
-            imageName: "co",
+            imageName: "cop",
             field: .bottom,
             focusedField: $focusedField,
             onSelectCurrency: {}

@@ -1,8 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-/// Knows nothing about navigation: it reports the pick or the close, and the caller
-/// decides what happens next (update state, dismiss the sheet).
 struct CurrencyPickerView: View {
     let currencies: [Currency]
     let selection: Currency

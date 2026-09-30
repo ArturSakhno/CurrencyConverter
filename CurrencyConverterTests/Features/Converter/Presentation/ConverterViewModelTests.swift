@@ -147,8 +147,6 @@ struct ConverterViewModelTests {
     }
 }
 
-// MARK: - Edits
-
 @MainActor
 extension ConverterViewModelTests {
     @Test func typedAmountIsSanitizedBeforeItIsStored() async {
@@ -166,12 +164,10 @@ extension ConverterViewModelTests {
         await sut.loadRates()
         sut.setAmountText("100", for: .base)
 
-        // A third decimal sanitizes back to the current text, so the edit is rejected.
         sut.setAmountText("1,840.005", for: .quote)
 
         #expect(sut.quoteAmountText == "1,840.00")
         #expect(sut.baseAmountText == "100")
-        // USDc is still the source: a swap keeps it and re-derives the quote with the ask.
         sut.swap()
         #expect(sut.baseAmountText == "100")
         #expect(sut.quoteAmountText == "1,842.00")
@@ -188,7 +184,6 @@ extension ConverterViewModelTests {
     }
 }
 
-/// Returns `results` in order, then keeps returning the last one.
 private actor StubLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
     private var results: [RatesLoadResult]
 

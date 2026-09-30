@@ -32,7 +32,6 @@ struct ThemeTests {
     }
 
     @Test func hexParsesLeadingAlphaForOverlay() {
-        // Figma's RGBA #00000080 is written ARGB (#80000000) for `Color(hex:)`.
         #expect(Color(hex: "#80000000") == Color(.sRGB, red: 0, green: 0, blue: 0, opacity: 128 / 255))
     }
 

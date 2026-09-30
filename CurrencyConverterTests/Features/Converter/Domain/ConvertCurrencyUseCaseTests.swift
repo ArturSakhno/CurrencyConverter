@@ -5,7 +5,6 @@ import Testing
 struct ConvertCurrencyUseCaseTests {
     private let sut = DefaultConvertCurrencyUseCase()
     private let mxn = Currency(code: "MXN")
-    // From strings: a float literal goes through Double, so 18.40 wouldn't be exact.
     private static let bid = Decimal(string: "18.40")!
     private static let ask = Decimal(string: "18.42")!
     private let snapshot = ExchangeRatesSnapshot(

@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// A color token resolved at render time against the environment's theme and color
-/// scheme, so views write `.foregroundStyle(.textPrimary)` and Light/Dark just works.
 public struct ThemeColor: ShapeStyle {
     let token: KeyPath<ColorPalette, Color> & Sendable
 

@@ -21,13 +21,3 @@ struct ExchangeRateView: View {
 #Preview {
     ExchangeRateView(text: "1 USDc = 18.4097 MXN")
 }
-
-#Preview("Dark Mode") {
-    ExchangeRateView(text: "1 USDc = 18.4097 MXN")
-        .preferredColorScheme(.dark)
-}
-
-#Preview("Sample theme") {
-    ExchangeRateView(text: "1 USDc = 18.4097 MXN")
-        .theme(.sample)
-}

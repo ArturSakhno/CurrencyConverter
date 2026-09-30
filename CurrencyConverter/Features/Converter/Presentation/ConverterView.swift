@@ -6,19 +6,13 @@ struct ConverterView: View {
     let baseCurrency: Currency
     let onSelectCurrency: () -> Void
 
-    /// Keyed by screen slot, not currency - reassigning which *currency* a slot's
-    /// `.focused(_:equals:)` claim represents on every swap doesn't reliably carry focus
-    /// across the swap in practice.
     @FocusState private var focusedSlot: FocusSlot?
 
-    /// Screen-specific metrics from the Figma layout (not reusable design tokens).
     private enum Layout {
         static let screenTop: CGFloat = 54
-        /// Half the swap button's height, so the button and rate pill straddle both rows.
         static let rowGap: CGFloat = 30
     }
 
-    /// Top row sells (money leaves), bottom row buys - see the bid/ask rule in the view model.
     private enum Sign {
         static let outgoing = "−"
         static let incoming = "+"
@@ -29,8 +23,6 @@ struct ConverterView: View {
     private var baseInfo: CurrencyDisplayInfo { .info(for: baseCurrency) }
     private var quoteInfo: CurrencyDisplayInfo { .info(for: quoteCurrency) }
 
-    // MARK: - Row identity follows currency, not screen slot
-
     private var topCurrency: Currency { isBaseOnTop ? baseCurrency : quoteCurrency }
     private var bottomCurrency: Currency { isBaseOnTop ? quoteCurrency : baseCurrency }
     private var topInfo: CurrencyDisplayInfo { .info(for: topCurrency) }
@@ -38,7 +30,6 @@ struct ConverterView: View {
     private var topField: AmountField { isBaseOnTop ? .base : .quote }
     private var bottomField: AmountField { isBaseOnTop ? .quote : .base }
 
-    /// Only the text field writes through this, so every `set` is a user edit.
     private func amountText(for field: AmountField) -> Binding<String> {
         Binding(
             get: { viewModel.amountText(for: field) },
@@ -135,8 +126,6 @@ struct ConverterView: View {
         ZStack(alignment: .leading) {
             SwapButton {
                 viewModel.swap()
-                // Keep the same *currency* focused (now in the other slot),
-                // not the same slot - only meaningful when something is focused.
                 if focusedSlot != nil {
                     focusedSlot = focusedSlot == .top ? .bottom : .top
                 }

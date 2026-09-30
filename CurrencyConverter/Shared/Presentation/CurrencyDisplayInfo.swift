@@ -1,11 +1,5 @@
 import Foundation
 
-/// Presentation-only mapping from a `Currency.code` to the strings and asset name
-/// shown on screen. Domain stays UI-agnostic; this is where "EURC" becomes "EURc"
-/// and picks up its subtitle/symbol/flag.
-///
-/// `nonisolated` even though it lives in Presentation: this lets non-`@MainActor`
-/// unit tests call `.info(for:)` synchronously, matching `AmountInputSanitizer`.
 nonisolated struct CurrencyDisplayInfo: Equatable, Sendable {
     let displayCode: String
     let subtitle: String
