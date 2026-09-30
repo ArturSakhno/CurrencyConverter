@@ -39,11 +39,11 @@ struct RemoteExchangeRateRepositoryTests {
         #expect(snapshot.rates[1].ask == Decimal(string: "18.4105000000"))
     }
 
-    @Test func failedFetchThrows() async {
+    @Test func failedFetchThrowsUnavailable() async {
         let apiClient = StubTickersAPIClient(result: .failure(.transport(URLError(.notConnectedToInternet))))
         let sut = RemoteExchangeRateRepository(apiClient: apiClient)
 
-        await #expect(throws: NetworkError.self) {
+        await #expect(throws: ExchangeRatesError.unavailable) {
             try await sut.fetchLatestRates(for: ["MXN"])
         }
     }

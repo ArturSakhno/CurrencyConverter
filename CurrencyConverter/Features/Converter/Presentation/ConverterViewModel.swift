@@ -4,9 +4,13 @@ import Foundation
 final class ConverterViewModel {
     enum State: Equatable {
         case loading
-        case noConnection
-        case errorScreen
+        case failed(LoadError)
         case converter(Content)
+    }
+
+    enum LoadError: Error {
+        case noConnection
+        case currenciesUnavailable
     }
 
     struct Content: Equatable {
@@ -59,8 +63,8 @@ final class ConverterViewModel {
             await loadConverter()
             return
         }
-        let result = await loadRatesUseCase(rates: content.availableCurrencies.map(\.code))
-        guard case let .loaded(snapshot) = result, var current = self.content else { return }
+        let snapshot = try? await loadRatesUseCase(rates: content.availableCurrencies.map(\.code))
+        guard let snapshot, var current = self.content else { return }
         current.snapshot = snapshot
         state = .converter(current)
         recalculateDerivedAmount()
@@ -72,21 +76,25 @@ final class ConverterViewModel {
     }
 
     private func loadConverter() async {
+        do {
+            state = try await .converter(loadContent())
+            recalculateDerivedAmount()
+        } catch {
+            state = .failed(error)
+        }
+    }
+
+    private func loadContent() async throws(LoadError) -> Content {
         let currencies = await loadAvailableCurrenciesUseCase()
-        guard let firstCurrency = currencies.first else {
-            state = .errorScreen
-            return
+        guard let firstCurrency = currencies.first, let snapshot = try? await loadRatesUseCase(rates: currencies.map(\.code)) else {
+            throw .currenciesUnavailable
         }
-        guard case let .loaded(snapshot) = await loadRatesUseCase(rates: currencies.map(\.code)) else {
-            state = .noConnection
-            return
-        }
-        state = .converter(Content(
+
+        return Content(
             quoteCurrency: firstCurrency,
             availableCurrencies: currencies,
             snapshot: snapshot
-        ))
-        recalculateDerivedAmount()
+        )
     }
 
     func amountText(for field: AmountField) -> String {

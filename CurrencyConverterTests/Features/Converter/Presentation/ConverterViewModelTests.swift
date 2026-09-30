@@ -12,7 +12,7 @@ struct ConverterViewModelTests {
     )
 
     private func makeSUT(
-        results: [RatesLoadResult],
+        results: [Result<ExchangeRatesSnapshot, ExchangeRatesError>],
         loadedCurrencies: [Currency] = CurrencyCatalog.availableQuoteCurrencies,
         locale: Locale = Locale(identifier: "en_US")
     ) -> ConverterViewModel {
@@ -26,7 +26,7 @@ struct ConverterViewModelTests {
     }
 
     private func makeSUT(
-        result: RatesLoadResult,
+        result: Result<ExchangeRatesSnapshot, ExchangeRatesError>,
         locale: Locale = Locale(identifier: "en_US")
     ) -> ConverterViewModel {
         makeSUT(results: [result], locale: locale)
@@ -38,7 +38,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func ratePillTextFormatsRateToFourDecimals() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
         await sut.refresh()
 
         let text = sut.ratePillText(baseDisplayCode: "USDc", quoteDisplayCode: "MXN")
@@ -47,7 +47,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func ratePillTextShowsUnavailableWhenTheSelectedCurrencyHasNoRate() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
         await sut.refresh()
         sut.selectQuoteCurrency(cop)
 
@@ -57,7 +57,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func typingBaseDerivesQuote() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
         await sut.refresh()
 
         sut.setAmountText("100", for: .base)
@@ -66,7 +66,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func swapRecalculatesDerivedAmountWithAskAndKeepsTypedAmount() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
         await sut.refresh()
         sut.setAmountText("100", for: .base)
 
@@ -77,7 +77,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func swapAfterTypingQuoteRecalculatesBase() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
         await sut.refresh()
         sut.swap()
         sut.setAmountText("1,842", for: .quote)
@@ -97,7 +97,7 @@ struct ConverterViewModelTests {
             ],
             fetchedAt: Date(timeIntervalSince1970: 0)
         )
-        let sut = makeSUT(result: .loaded(snapshot))
+        let sut = makeSUT(result: .success(snapshot))
         await sut.refresh()
         sut.setAmountText("100", for: .base)
 
@@ -108,7 +108,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func typedAmountConvertsOnceRatesLoad() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
         sut.setAmountText("100", for: .base)
         #expect(sut.quoteAmountText == "")
 
@@ -118,7 +118,7 @@ struct ConverterViewModelTests {
     }
 
     @Test func derivedAmountClearsWithoutRates() async {
-        let sut = makeSUT(result: .unavailable)
+        let sut = makeSUT(result: .failure(.unavailable))
         await sut.refresh()
 
         sut.setAmountText("100", for: .base)
@@ -127,14 +127,14 @@ struct ConverterViewModelTests {
     }
 
     @Test func ratesAsOfTextIsNilWithoutRates() async {
-        let sut = makeSUT(result: .unavailable)
+        let sut = makeSUT(result: .failure(.unavailable))
         await sut.refresh()
 
         #expect(sut.ratesAsOfText == nil)
     }
 
     @Test func ratesAsOfTextReflectsFetchedAtWhenLoaded() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
         await sut.refresh()
 
         #expect(sut.ratesAsOfText != nil)
@@ -144,11 +144,11 @@ struct ConverterViewModelTests {
 @MainActor
 extension ConverterViewModelTests {
     @Test func startsLoading() {
-        #expect(makeSUT(result: .loaded(sampleSnapshot)).state == .loading)
+        #expect(makeSUT(result: .success(sampleSnapshot)).state == .loading)
     }
 
     @Test func firstRefreshShowsTheConverterWithTheFirstCurrency() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
 
         await sut.refresh()
 
@@ -160,31 +160,31 @@ extension ConverterViewModelTests {
     }
 
     @Test func emptyCurrencyListShowsErrorScreen() async {
-        let sut = makeSUT(results: [.loaded(sampleSnapshot)], loadedCurrencies: [])
+        let sut = makeSUT(results: [.success(sampleSnapshot)], loadedCurrencies: [])
 
         await sut.refresh()
 
-        #expect(sut.state == .errorScreen)
+        #expect(sut.state == .failed(.currenciesUnavailable))
     }
 
     @Test func failedFirstRatesShowNoConnection() async {
-        let sut = makeSUT(result: .unavailable)
+        let sut = makeSUT(result: .failure(.unavailable))
 
         await sut.refresh()
 
-        #expect(sut.state == .noConnection)
+        #expect(sut.state == .failed(.noConnection))
     }
 
     @Test(arguments: [true, false])
     func currenciesCanRecoverAfterErrorScreen(usingRetry: Bool) async {
         let sut = ConverterViewModel(
             convertUseCase: DefaultConvertCurrencyUseCase(),
-            loadRatesUseCase: StubLoadExchangeRatesUseCase(results: [.loaded(sampleSnapshot)]),
+            loadRatesUseCase: StubLoadExchangeRatesUseCase(results: [.success(sampleSnapshot)]),
             loadAvailableCurrenciesUseCase: RecoveringCurrencyCatalogUseCase(currencies: [mxn]),
             baseCurrency: CurrencyCatalog.base
         )
         await sut.refresh()
-        #expect(sut.state == .errorScreen)
+        #expect(sut.state == .failed(.currenciesUnavailable))
 
         if usingRetry {
             await sut.retry()
@@ -197,7 +197,7 @@ extension ConverterViewModelTests {
     }
 
     @Test func retryAfterNoConnectionShowsTheConverter() async {
-        let sut = makeSUT(results: [.unavailable, .loaded(sampleSnapshot)])
+        let sut = makeSUT(results: [.failure(.unavailable), .success(sampleSnapshot)])
         await sut.refresh()
 
         await sut.retry()
@@ -206,7 +206,7 @@ extension ConverterViewModelTests {
     }
 
     @Test func failedRefreshKeepsTheConverter() async {
-        let sut = makeSUT(results: [.loaded(sampleSnapshot), .unavailable])
+        let sut = makeSUT(results: [.success(sampleSnapshot), .failure(.unavailable)])
         await sut.refresh()
 
         await sut.refresh()
@@ -215,7 +215,7 @@ extension ConverterViewModelTests {
     }
 
     @Test func refreshKeepsTheSelectedCurrency() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
         await sut.refresh()
         sut.selectQuoteCurrency(cop)
 
@@ -225,7 +225,7 @@ extension ConverterViewModelTests {
     }
 
     @Test func typedAmountIsSanitizedBeforeItIsStored() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
         await sut.refresh()
 
         sut.setAmountText("1234.567", for: .base)
@@ -235,7 +235,7 @@ extension ConverterViewModelTests {
     }
 
     @Test func rejectedEditInDerivedFieldKeepsTypedAmountAsSource() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot))
+        let sut = makeSUT(result: .success(sampleSnapshot))
         await sut.refresh()
         sut.setAmountText("100", for: .base)
 
@@ -249,7 +249,7 @@ extension ConverterViewModelTests {
     }
 
     @Test func editsUseTheInjectedLocale() async {
-        let sut = makeSUT(result: .loaded(sampleSnapshot), locale: Locale(identifier: "es_ES"))
+        let sut = makeSUT(result: .success(sampleSnapshot), locale: Locale(identifier: "es_ES"))
         await sut.refresh()
 
         sut.setAmountText("12345,5", for: .base)
@@ -260,14 +260,15 @@ extension ConverterViewModelTests {
 }
 
 private actor StubLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
-    private var results: [RatesLoadResult]
+    private var results: [Result<ExchangeRatesSnapshot, ExchangeRatesError>]
 
-    init(results: [RatesLoadResult]) {
+    init(results: [Result<ExchangeRatesSnapshot, ExchangeRatesError>]) {
         self.results = results
     }
 
-    func callAsFunction(rates _: [String]) async -> RatesLoadResult {
-        results.count > 1 ? results.removeFirst() : results[0]
+    func callAsFunction(rates _: [String]) async throws(ExchangeRatesError) -> ExchangeRatesSnapshot {
+        let result = results.count > 1 ? results.removeFirst() : results[0]
+        return try result.get()
     }
 }
 

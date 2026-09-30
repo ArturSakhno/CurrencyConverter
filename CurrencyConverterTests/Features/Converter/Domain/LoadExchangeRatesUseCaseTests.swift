@@ -8,31 +8,29 @@ struct LoadExchangeRatesUseCaseTests {
         fetchedAt: Date(timeIntervalSince1970: 0)
     )
 
-    @Test func loadReturnsFreshSnapshotOnNetworkSuccess() async {
+    @Test func loadReturnsFreshSnapshotOnNetworkSuccess() async throws {
         let repository = StubExchangeRateRepository(fetchResult: .success(sampleSnapshot))
         let sut = DefaultLoadExchangeRatesUseCase(repository: repository)
 
-        let result = await sut(rates: ["MXN"])
+        let snapshot = try await sut(rates: ["MXN"])
 
-        #expect(result == .loaded(sampleSnapshot))
+        #expect(snapshot == sampleSnapshot)
     }
 
-    @Test func loadReturnsUnavailableOnNetworkFailure() async {
-        let repository = StubExchangeRateRepository(fetchResult: .failure(.networkError))
+    @Test func loadThrowsUnavailableOnNetworkFailure() async {
+        let repository = StubExchangeRateRepository(fetchResult: .failure(.unavailable))
         let sut = DefaultLoadExchangeRatesUseCase(repository: repository)
 
-        let result = await sut(rates: ["MXN"])
-
-        #expect(result == .unavailable)
+        await #expect(throws: ExchangeRatesError.unavailable) {
+            try await sut(rates: ["MXN"])
+        }
     }
 }
 
 private struct StubExchangeRateRepository: ExchangeRateRepository {
-    enum StubError: Error, Sendable { case networkError }
+    let fetchResult: Result<ExchangeRatesSnapshot, ExchangeRatesError>
 
-    let fetchResult: Result<ExchangeRatesSnapshot, StubError>
-
-    func fetchLatestRates(for _: [String]) async throws -> ExchangeRatesSnapshot {
+    func fetchLatestRates(for _: [String]) async throws(ExchangeRatesError) -> ExchangeRatesSnapshot {
         try fetchResult.get()
     }
 }

@@ -25,7 +25,7 @@ struct ConverterScreen: View {
                     isPlaceholder: false,
                     onSelectCurrency: onSelectCurrency
                 )
-            case .errorScreen:
+            case .failed(.currenciesUnavailable):
                 StatusScreenView(
                     systemImage: "exclamationmark.triangle",
                     title: Localized.Converter.currencyLoadErrorTitle,
@@ -33,7 +33,7 @@ struct ConverterScreen: View {
                 ) {
                     Task { await viewModel.retry() }
                 }
-            case .noConnection:
+            case .failed(.noConnection):
                 StatusScreenView(
                     systemImage: "wifi.slash",
                     title: Localized.Converter.noConnectionTitle,
