@@ -22,23 +22,20 @@ struct AmountTextField: View {
 
     let sign: String?
     let currencySymbol: String?
-    let accessibilityLabel: LocalizedStringResource
     let field: FocusSlot
     let focusedField: FocusState<FocusSlot?>.Binding
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: DS.Spacing.xxs) {
             if let sign {
                 Text(sign)
                     .foregroundStyle(draft.isEmpty ? DS.Color.textSecondary : DS.Color.textPrimary)
-                    .accessibilityHidden(true)
             }
 
             HStack(spacing: .zero) {
                 if let currencySymbol {
                     Text(currencySymbol)
                         .foregroundStyle(draft.isEmpty ? DS.Color.textSecondary : DS.Color.textPrimary)
-                        .accessibilityHidden(true)
                 }
 
                 Text(draft.isEmpty ? "0" : draft)
@@ -47,15 +44,16 @@ struct AmountTextField: View {
                     .padding(.trailing, 2)
                     .hidden()
                     .overlay {
-                        TextField(text: $draft, prompt: Text(verbatim: "0").foregroundStyle(DS.Color.textSecondary)) {
-                            Text(accessibilityLabel)
-                        }
-                        .foregroundStyle(DS.Color.textPrimary)
-                        .keyboardType(.decimalPad)
-                        .multilineTextAlignment(.trailing)
-                        .lineLimit(2)
-                        .accessibilityLabel(accessibilityLabel)
-                        .focused(focusedField, equals: field)
+                        TextField(
+                            text: $draft,
+                            prompt: Text(verbatim: "0")
+                                .foregroundStyle(DS.Color.textSecondary)
+                        ) { EmptyView() }
+                            .foregroundStyle(DS.Color.textPrimary)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .lineLimit(2)
+                            .focused(focusedField, equals: field)
                     }
             }
         }
@@ -95,7 +93,6 @@ private extension AmountTextField {
         text: $text,
         sign: "−",
         currencySymbol: "$",
-        accessibilityLabel: Localized.Converter.amountIn("USDc"),
         field: .top,
         focusedField: $focusedField
     )
@@ -109,7 +106,6 @@ private extension AmountTextField {
         text: $text,
         sign: "+",
         currencySymbol: "$",
-        accessibilityLabel: Localized.Converter.amountIn("MXN"),
         field: .bottom,
         focusedField: $focusedField
     )
@@ -123,7 +119,6 @@ private extension AmountTextField {
         text: $text,
         sign: "−",
         currencySymbol: "$",
-        accessibilityLabel: Localized.Converter.amountIn("USDc"),
         field: .top,
         focusedField: $focusedField
     )
@@ -138,7 +133,6 @@ private extension AmountTextField {
         text: $text,
         sign: "+",
         currencySymbol: "$",
-        accessibilityLabel: Localized.Converter.amountIn("COP"),
         field: .bottom,
         focusedField: $focusedField
     )

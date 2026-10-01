@@ -14,7 +14,6 @@ struct StatusScreenView: View {
             Image(systemName: systemImage)
                 .textStyle(.h3)
                 .foregroundStyle(DS.Color.iconSecondary)
-                .accessibilityHidden(true)
 
             Text(title)
                 .textStyle(.h4)

@@ -30,7 +30,6 @@ struct CurrencyPickerRow: View {
                             DS.Icon.checkmark
                                 .resizable()
                                 .foregroundStyle(DS.Color.bgPrimary)
-                                .accessibilityHidden(true)
                         }
                     } else {
                         Circle()
@@ -44,7 +43,6 @@ struct CurrencyPickerRow: View {
             }
             .contentShape(Rectangle())
         }
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -59,7 +57,6 @@ private extension CurrencyPickerRow {
                     .scaledToFit()
                     .frame(width: flagSize, height: flagSize)
                     .clipShape(Circle())
-                    .accessibilityHidden(true)
             }
         }
         .frame(width: DS.Size.avatar, height: DS.Size.avatar)

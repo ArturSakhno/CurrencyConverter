@@ -32,7 +32,6 @@ struct CurrencyPickerView: View {
                             .resizable()
                             .frame(width: DS.Size.closeButton, height: DS.Size.closeButton)
                     }
-                    .accessibilityLabel(Text(Localized.Common.close))
                 }
             }
         }

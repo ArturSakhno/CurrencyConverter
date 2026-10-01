@@ -2,11 +2,6 @@ import Foundation
 
 nonisolated enum Localized {
     nonisolated enum Common {
-        static let close = LocalizedStringResource(
-            "common.close",
-            comment: "Accessibility label for a close button"
-        )
-
         static let retry = LocalizedStringResource(
             "common.retry",
             comment: "Button that tries a failed operation again"
@@ -26,11 +21,6 @@ nonisolated enum Localized {
         static let title = LocalizedStringResource(
             "converter.title",
             comment: "Main converter screen title"
-        )
-
-        static let loadingRates = LocalizedStringResource(
-            "converter.loadingRates",
-            comment: "Accessibility label for the loading converter"
         )
 
         static let chooseCurrency = LocalizedStringResource(
@@ -67,13 +57,6 @@ nonisolated enum Localized {
             LocalizedStringResource(
                 "converter.ratesAsOf \(time)",
                 comment: "Caption under the screen title; the value is the local time the rates were fetched"
-            )
-        }
-
-        static func amountIn(_ currencyCode: String) -> LocalizedStringResource {
-            LocalizedStringResource(
-                "converter.amountIn \(currencyCode)",
-                comment: "Accessibility label for an amount entry field; the value is the displayed currency code"
             )
         }
 

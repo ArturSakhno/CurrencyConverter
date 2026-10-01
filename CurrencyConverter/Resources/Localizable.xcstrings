@@ -1,23 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "common.close" : {
-      "comment" : "Accessibility label for a close button",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Close"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cerrar"
-          }
-        }
-      }
-    },
     "common.retry" : {
       "comment" : "Button that tries a failed operation again",
       "localizations" : {
@@ -31,23 +14,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reintentar"
-          }
-        }
-      }
-    },
-    "converter.amountIn %@" : {
-      "comment" : "Accessibility label for an amount entry field; the value is the displayed currency code",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Amount in %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monto en %@"
           }
         }
       }
@@ -167,23 +133,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pesos mexicanos"
-          }
-        }
-      }
-    },
-    "converter.loadingRates" : {
-      "comment" : "Accessibility label for the loading converter",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Loading rates"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cargando tasas"
           }
         }
       }

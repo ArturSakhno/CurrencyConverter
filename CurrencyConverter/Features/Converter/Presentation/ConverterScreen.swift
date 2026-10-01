@@ -16,8 +16,6 @@ struct ConverterScreen: View {
                     isPlaceholder: true,
                     onSelectCurrency: onSelectCurrency
                 )
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text(Localized.Converter.loadingRates))
             case let .converter(content):
                 ConverterView(
                     viewModel: viewModel,
