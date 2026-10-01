@@ -105,8 +105,14 @@ struct AmountFormatterTests {
         #expect(sut.string(from: 100, fractionDigits: 2) == "100.00")
     }
 
-    @Test func roundsToTwoDecimalPlaces() throws {
-        #expect(try sut.string(from: #require(Decimal(string: "18.415")), fractionDigits: 2) == "18.42")
+    @Test(arguments: [
+        ("18.415", "18.42"),
+        ("0.125", "0.13"),
+        ("1.005", "1.01"),
+        ("2.345", "2.35"),
+    ])
+    func roundsHalfUpToTwoDecimalPlaces(input: String, expected: String) throws {
+        #expect(try sut.string(from: #require(Decimal(string: input)), fractionDigits: 2) == expected)
     }
 
     @Test func formatsToFourDecimalPlaces() throws {

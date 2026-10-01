@@ -2,6 +2,10 @@
 
 A USDc ⇄ other-currency exchange calculator for the DolarApp iOS take-home: SwiftUI, iOS 17+, iPhone only, Swift 6.
 
+## Money
+
+Amounts and rates are `Decimal` from the API response to the screen, and the conversion keeps full precision. Values are rounded only for display, half-up: amounts to 2 decimals in every currency, including COP, and the rate to 4. For example, 0.125 shows as 0.13.
+
 ## Deliberate simplifications
 
 - **Rates aren't persisted.** A converter's rates only mean something live, so a cold start without a network connection shows the blocking "No connection" screen instead of rates saved earlier. If a refresh fails after rates have loaded, they stay on screen, and "Rates as of" shows when they were fetched. A production app could cache the last rates for display only, labelled with the date they were fetched.

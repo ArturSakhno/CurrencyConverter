@@ -32,6 +32,7 @@ nonisolated struct AmountFormatter: Sendable {
             .number
                 .locale(locale)
                 .precision(.fractionLength(fractionDigits))
+                .rounded(rule: .toNearestOrAwayFromZero)
                 .grouping(.automatic)
         )
     }
