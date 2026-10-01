@@ -24,12 +24,12 @@ struct CurrencyInputField: View {
                 } label: {
                     HStack(spacing: .zero) {
                         Text(currencyCode)
-                            .textStyle(\.h3)
-                            .foregroundStyle(.textPrimary)
+                            .textStyle(.h3)
+                            .foregroundStyle(DS.Color.textPrimary)
                         if showsChevron {
                             DS.Icon.chevronDown
                                 .resizable()
-                                .foregroundStyle(.iconPrimary)
+                                .foregroundStyle(DS.Color.iconPrimary)
                                 .frame(width: DS.Size.icon, height: DS.Size.icon)
                         }
                     }
@@ -54,8 +54,8 @@ struct CurrencyInputField: View {
                         .frame(width: DS.Size.flagSmall, height: DS.Size.flagSmall)
                 }
                 Text(subtitle)
-                    .textStyle(\.bodySmall)
-                    .foregroundStyle(.textSecondary)
+                    .textStyle(.bodySmall)
+                    .foregroundStyle(DS.Color.textSecondary)
             }
         }
         .padding(.vertical, verticalPadding)

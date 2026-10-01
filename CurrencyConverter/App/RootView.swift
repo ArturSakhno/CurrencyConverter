@@ -16,7 +16,7 @@ struct RootView: View {
                 onSelectCurrency: { coordinator.presentCurrencyPicker() }
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.bgPrimary)
+            .background(DS.Color.bgPrimary)
             .sheet(item: $coordinator.presentedSheet) { route in
                 switch route {
                 case .currencyPicker:
@@ -34,6 +34,5 @@ struct RootView: View {
                 }
             }
         }
-        .theme(.standard)
     }
 }

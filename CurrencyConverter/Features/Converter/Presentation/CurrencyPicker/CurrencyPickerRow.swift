@@ -15,8 +15,8 @@ struct CurrencyPickerRow: View {
 
                 VStack(alignment: .leading, spacing: DS.Spacing.l) {
                     Text(verbatim: info.displayCode)
-                        .textStyle(\.body)
-                        .foregroundStyle(.textPrimary)
+                        .textStyle(.body)
+                        .foregroundStyle(DS.Color.textPrimary)
                 }
 
                 Spacer()
@@ -25,17 +25,17 @@ struct CurrencyPickerRow: View {
                     if isSelected {
                         ZStack {
                             Circle()
-                                .fill(.interactivePrimary)
+                                .fill(DS.Color.interactivePrimary)
 
                             DS.Icon.checkmark
                                 .resizable()
-                                .foregroundStyle(.bgPrimary)
+                                .foregroundStyle(DS.Color.bgPrimary)
                                 .accessibilityHidden(true)
                         }
                     } else {
                         Circle()
                             .stroke(
-                                .selectorUnselectedBorder,
+                                DS.Color.selectorUnselectedBorder,
                                 lineWidth: 2
                             )
                     }
@@ -52,7 +52,7 @@ private extension CurrencyPickerRow {
     var flag: some View {
         ZStack {
             Circle()
-                .fill(.surfaceDefault)
+                .fill(DS.Color.surfaceDefault)
             if let flagAssetName = info.flagAssetName {
                 Image(flagAssetName)
                     .resizable()

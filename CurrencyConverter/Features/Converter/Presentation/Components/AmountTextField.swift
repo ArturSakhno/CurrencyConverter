@@ -30,14 +30,14 @@ struct AmountTextField: View {
         HStack(spacing: 4) {
             if let sign {
                 Text(sign)
-                    .foregroundStyle(draft.isEmpty ? .textSecondary : .textPrimary)
+                    .foregroundStyle(draft.isEmpty ? DS.Color.textSecondary : DS.Color.textPrimary)
                     .accessibilityHidden(true)
             }
 
             HStack(spacing: .zero) {
                 if let currencySymbol {
                     Text(currencySymbol)
-                        .foregroundStyle(draft.isEmpty ? .textSecondary : .textPrimary)
+                        .foregroundStyle(draft.isEmpty ? DS.Color.textSecondary : DS.Color.textPrimary)
                         .accessibilityHidden(true)
                 }
 
@@ -47,10 +47,10 @@ struct AmountTextField: View {
                     .padding(.trailing, 2)
                     .hidden()
                     .overlay {
-                        TextField(text: $draft, prompt: Text(verbatim: "0").foregroundStyle(.textSecondary)) {
+                        TextField(text: $draft, prompt: Text(verbatim: "0").foregroundStyle(DS.Color.textSecondary)) {
                             Text(accessibilityLabel)
                         }
-                        .foregroundStyle(.textPrimary)
+                        .foregroundStyle(DS.Color.textPrimary)
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .lineLimit(2)
@@ -59,7 +59,7 @@ struct AmountTextField: View {
                     }
             }
         }
-        .textStyle(\.amountInput)
+        .textStyle(.amountInput)
         .monospacedDigit()
         .fixedSize()
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in

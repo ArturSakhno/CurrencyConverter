@@ -27,13 +27,13 @@ struct ConverterView: View {
                 VStack(alignment: .leading, spacing: .zero) {
                     Text(Localized.Converter.title)
                         .padding(.horizontal, DS.Spacing.m)
-                        .textStyle(\.h3)
-                        .foregroundStyle(.textPrimary)
+                        .textStyle(.h3)
+                        .foregroundStyle(DS.Color.textPrimary)
 
                     Text(Localized.Converter.ratesAsOf(viewModel.ratesAsOfText ?? "00:00"))
                         .padding(.horizontal, DS.Spacing.m)
-                        .textStyle(\.bodySmall)
-                        .foregroundStyle(.textSecondary)
+                        .textStyle(.bodySmall)
+                        .foregroundStyle(DS.Color.textSecondary)
                         .skeleton(isPlaceholder)
 
                     ZStack {
@@ -46,14 +46,14 @@ struct ConverterView: View {
                             row(.bottom)
                                 .skeleton(isPlaceholder)
                                 .padding(.top, Layout.rowGap)
-                                .background(.bgPrimary)
+                                .background(DS.Color.bgPrimary)
                         }
 
                         exchange
                     }
                 }
                 .padding(.top, Layout.screenTop)
-                .background(.bgSelected)
+                .background(DS.Color.bgSelected)
 
                 Spacer(minLength: 0)
             }
@@ -61,7 +61,7 @@ struct ConverterView: View {
         .scrollBounceBehavior(.basedOnSize)
         .background(alignment: .top) {
             Rectangle()
-                .fill(.bgSelected)
+                .fill(DS.Color.bgSelected)
                 .ignoresSafeArea(edges: .top)
                 .frame(height: .zero)
         }

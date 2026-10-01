@@ -2,15 +2,9 @@ import SwiftUI
 
 public extension DS {
     enum Icon {
-        public static var arrowDown: Image { image(.dsArrowDown) }
-        public static var checkmark: Image { image(.dsCheckmark) }
-        public static var chevronDown: Image { image(.dsChevronDown) }
-        public static var cross: Image { image(.dsCross) }
-    }
-}
-
-private extension DS.Icon {
-    static func image(_ resource: ImageResource) -> Image {
-        Image(resource)
+        public static var arrowDown: Image { Image(.dsArrowDown) }
+        public static var checkmark: Image { Image(.dsCheckmark) }
+        public static var chevronDown: Image { Image(.dsChevronDown) }
+        public static var cross: Image { Image(.dsCross) }
     }
 }

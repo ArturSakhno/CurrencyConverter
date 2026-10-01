@@ -24,7 +24,7 @@ struct CurrencyPickerView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text(Localized.Converter.chooseCurrency)
-                        .textStyle(\.h4)
+                        .textStyle(.h4)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: onClose) {
@@ -39,7 +39,7 @@ struct CurrencyPickerView: View {
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .frame(maxHeight: .infinity)
-        .presentationBackground(.bgPrimary)
+        .presentationBackground(DS.Color.bgPrimary)
     }
 }
 

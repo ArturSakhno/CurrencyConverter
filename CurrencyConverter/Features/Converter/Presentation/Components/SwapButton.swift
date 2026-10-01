@@ -10,11 +10,11 @@ struct SwapButton: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(.interactivePrimary)
+                    .fill(DS.Color.interactivePrimary)
                 DS.Icon.arrowDown
                     .resizable()
                     .renderingMode(.template)
-                    .foregroundStyle(.onInteractivePrimary)
+                    .foregroundStyle(DS.Color.onInteractivePrimary)
                     .frame(
                         width: DS.Size.icon,
                         height: DS.Size.icon

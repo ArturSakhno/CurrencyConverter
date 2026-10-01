@@ -12,32 +12,32 @@ struct StatusScreenView: View {
     var body: some View {
         VStack(spacing: DS.Spacing.m) {
             Image(systemName: systemImage)
-                .textStyle(\.h3)
-                .foregroundStyle(.iconSecondary)
+                .textStyle(.h3)
+                .foregroundStyle(DS.Color.iconSecondary)
                 .accessibilityHidden(true)
 
             Text(title)
-                .textStyle(\.h4)
-                .foregroundStyle(.textPrimary)
+                .textStyle(.h4)
+                .foregroundStyle(DS.Color.textPrimary)
 
             Text(message)
-                .textStyle(\.body)
-                .foregroundStyle(.textSecondary)
+                .textStyle(.body)
+                .foregroundStyle(DS.Color.textSecondary)
 
             Button(action: onRetry) {
                 Text(Localized.Common.retry)
-                    .textStyle(\.body)
-                    .foregroundStyle(.onInteractivePrimary)
+                    .textStyle(.body)
+                    .foregroundStyle(DS.Color.onInteractivePrimary)
                     .opacity(isRetrying ? 0 : 1)
                     .overlay {
                         if isRetrying {
                             ProgressView()
-                                .tint(ThemeColor.onInteractivePrimary)
+                                .tint(DS.Color.onInteractivePrimary)
                         }
                     }
                     .padding(.horizontal, DS.Spacing.l)
                     .padding(.vertical, DS.Spacing.s)
-                    .background(.interactivePrimary, in: .capsule)
+                    .background(DS.Color.interactivePrimary, in: .capsule)
             }
             .padding(.top, DS.Spacing.xs)
         }

@@ -6,14 +6,14 @@ struct ExchangeRateView: View {
 
     var body: some View {
         Text(text)
-            .textStyle(\.body)
-            .foregroundStyle(.interactivePrimary)
+            .textStyle(.body)
+            .foregroundStyle(DS.Color.interactivePrimary)
             .padding(.horizontal, DS.Spacing.s)
             .padding(.vertical, 11)
-            .background(.surfaceOverlay, in: .rect(cornerRadius: DS.Radius.pill))
+            .background(DS.Color.surfaceOverlay, in: .rect(cornerRadius: DS.Radius.pill))
             .overlay(
                 RoundedRectangle(cornerRadius: DS.Radius.pill)
-                    .stroke(.borderDefault, lineWidth: DS.borderWidth)
+                    .stroke(DS.Color.borderDefault, lineWidth: DS.borderWidth)
             )
     }
 }
