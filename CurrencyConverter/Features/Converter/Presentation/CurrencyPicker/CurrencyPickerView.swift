@@ -24,6 +24,7 @@ struct CurrencyPickerView: View {
                     )
                 )
                 .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             }
             .navigationBarTitleDisplayMode(.inline)
             .listStyle(.plain)
