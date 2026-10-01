@@ -14,6 +14,9 @@
 --header strip
 --stripunusedargs closure-only
 
+# Match SwiftLint's modifier_order: `nonisolated final class`, not `final nonisolated class`.
+--modifier-order nonisolated,final
+
 # Keep short computed properties and functions on one line: `var id: String { code }`.
 --disable wrapPropertyBodies,wrapFunctionBodies
 

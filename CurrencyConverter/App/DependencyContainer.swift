@@ -1,29 +1,22 @@
 import Networking
 
 struct DependencyContainer {
-    let convertUseCase: ConvertCurrencyUseCase
-    let loadRatesUseCase: LoadExchangeRatesUseCase
-    let currencyCatalogUseCase: CurrencyCatalogUseCase
-    let networkMonitor: NetworkMonitor
+    let currencyCatalogRepository: CurrencyCatalogRepository
+    let exchangeRateRepository: ExchangeRateRepository
 
     init() {
-        let repository = RemoteExchangeRateRepository(
+        exchangeRateRepository = RemoteExchangeRateRepository(
             apiClient: DefaultTickersAPIClient(networkClient: URLSessionNetworkClient())
         )
-        let currencyCatalogRepository = FallbackCurrencyCatalogRepository()
-
-        convertUseCase = DefaultConvertCurrencyUseCase()
-        currencyCatalogUseCase = DefaultCurrencyCatalogUseCase(repository: currencyCatalogRepository)
-        loadRatesUseCase = DefaultLoadExchangeRatesUseCase(repository: repository)
-        networkMonitor = NWPathNetworkMonitor()
+        currencyCatalogRepository = FallbackCurrencyCatalogRepository()
     }
 
     func makeConverterViewModel() -> ConverterViewModel {
         ConverterViewModel(
-            convertUseCase: convertUseCase,
-            loadRatesUseCase: loadRatesUseCase,
-            loadAvailableCurrenciesUseCase: currencyCatalogUseCase,
-            networkMonitor: networkMonitor,
+            convertUseCase: DefaultConvertCurrencyUseCase(),
+            loadRatesUseCase: DefaultLoadExchangeRatesUseCase(repository: exchangeRateRepository),
+            loadAvailableCurrenciesUseCase: DefaultCurrencyCatalogUseCase(repository: currencyCatalogRepository),
+            networkMonitor: NWPathNetworkMonitor(),
             baseCurrency: CurrencyCatalog.base
         )
     }
