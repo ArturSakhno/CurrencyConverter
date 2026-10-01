@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct CurrencyPickerRow: View {
-    @ScaledMetric(relativeTo: .largeTitle) private var flagSize: CGFloat = 24
+    @ScaledMetric(relativeTo: .largeTitle) private var flagSize: CGFloat = 28
 
     let info: CurrencyDisplayInfo
     let isSelected: Bool
@@ -10,14 +10,12 @@ struct CurrencyPickerRow: View {
 
     var body: some View {
         Button(action: onSelect) {
-            HStack(spacing: DS.Spacing.s) {
+            HStack(spacing: DS.Spacing.xs) {
                 flag
 
-                VStack(alignment: .leading, spacing: DS.Spacing.l) {
-                    Text(verbatim: info.displayCode)
-                        .textStyle(.body)
-                        .foregroundStyle(DS.Color.textPrimary)
-                }
+                Text(verbatim: info.displayCode)
+                    .textStyle(.body)
+                    .foregroundStyle(DS.Color.textPrimary)
 
                 Spacer()
 
@@ -59,7 +57,7 @@ private extension CurrencyPickerRow {
                     .clipShape(Circle())
             }
         }
-        .frame(width: DS.Size.avatar, height: DS.Size.avatar)
+        .frame(width: DS.Size.flagLarge, height: DS.Size.flagLarge)
     }
 }
 

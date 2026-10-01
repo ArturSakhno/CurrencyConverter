@@ -27,7 +27,7 @@ public enum DS {
         /// 32
         public static let closeButton: CGFloat = 32
         /// 40
-        public static let avatar: CGFloat = 40
+        public static let flagLarge: CGFloat = 40
         /// 11
         public static let flagSmall: CGFloat = 11
     }

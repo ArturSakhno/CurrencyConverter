@@ -15,8 +15,15 @@ struct CurrencyPickerView: View {
                     isSelected: currency == selection,
                     onSelect: { onSelect(currency) }
                 )
+                .listRowInsets(
+                    .init(
+                        top: DS.Spacing.s,
+                        leading: DS.Spacing.m,
+                        bottom: DS.Spacing.s,
+                        trailing: DS.Spacing.m
+                    )
+                )
                 .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
             }
             .navigationBarTitleDisplayMode(.inline)
             .listStyle(.plain)
