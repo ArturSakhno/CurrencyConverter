@@ -24,7 +24,7 @@ xcodebuild test -scheme CurrencyConverter -destination 'platform=iOS Simulator,n
   -only-testing:'CurrencyConverterTests/ConvertCurrencyUseCaseTests/quoteAmountConvertsToBaseByDividing()'
 ```
 
-SwiftLint is configured in `.swiftlint.yml`. SwiftFormat (`.swiftformat`) runs as a pre-commit hook from `.githooks/pre-commit`: it formats staged Swift files and re-stages them, and blocks a partially staged file that needs formatting. Enable it once per clone with `git config core.hooksPath .githooks`. Trust `xcodebuild` output over SourceKit's live diagnostics. Right after you create a file, "cannot find type" errors from SourceKit are usually a stale index.
+SwiftLint (`.swiftlint.yml`) runs as an Xcode build phase over the app, the tests and `Packages/`. The pre-commit hook in `.githooks/pre-commit` formats staged Swift files with SwiftFormat (`.swiftformat`) and re-stages them, and blocks a partially staged file that needs formatting. It then runs `swiftlint lint --strict` on the staged files, so any SwiftLint warning blocks the commit. Enable it once per clone with `git config core.hooksPath .githooks`. Trust `xcodebuild` output over SourceKit's live diagnostics. Right after you create a file, "cannot find type" errors from SourceKit are usually a stale index.
 
 New files under `CurrencyConverter/` and `CurrencyConverterTests/` are picked up automatically (file-system-synchronized groups). Never edit `project.pbxproj` to add a file.
 
@@ -48,6 +48,12 @@ The app target sets `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, so everything i
 Other project settings that matter:
 - `SWIFT_APPROACHABLE_CONCURRENCY = YES`
 - `MemberImportVisibility` is enabled, so every file that uses `Decimal` or `Date` needs its own `import Foundation`. This applies to test files too; `@testable import` doesn't bring it in transitively.
+
+## Code organization
+
+SwiftFormat's `organizeDeclarations` orders every type and extension body: nested types, static properties, property wrappers, stored properties, computed properties, `init`, `body`, then methods, with public before private inside each group and no MARK comments. It keeps the relative order of the stored properties behind a struct's memberwise init, so call sites don't change. Within each access level, stored `let`s come before stored `var`s. SwiftFormat can't sort that, so SwiftLint's `let_before_var` rule checks it for top-level types; check nested types by hand. In a struct with a memberwise init, prefer `let` for an input that never changes over reordering its properties.
+
+Private methods and computed properties go in a `private extension` right after the type, never in its body; SwiftLint's `private_member_outside_private_extension` rule flags any that don't. Members of that extension drop the `private` keyword, and in an extension of a `nonisolated` type each one needs its own `nonisolated`.
 
 ## Locked decisions (don't re-derive)
 

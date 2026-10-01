@@ -16,3 +16,15 @@
 
 # Keep short computed properties and functions on one line: `var id: String { code }`.
 --disable wrapPropertyBodies,wrapFunctionBodies
+
+# Declaration order in every type and extension: nested types, static properties, property
+# wrappers, stored properties, computed properties, init, body, methods. Public before private
+# within each group. No MARK comments.
+--enable organizeDeclarations
+--organizationmode type
+--organizetypes class,actor,struct,enum,extension
+--markcategories false
+
+# Property attributes stay on the declaration's line: `@State private var draft = ""`.
+--storedvarattrs same-line
+--computedvarattrs same-line

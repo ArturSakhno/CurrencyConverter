@@ -1,11 +1,14 @@
 included:
   - CurrencyConverter
   - CurrencyConverterTests
+  - Packages
 
 excluded:
   - CurrencyConverter.xcodeproj
   - DerivedData
   - .build
+  - Packages/*/.build
+  - Packages/*/.swiftpm
 
 disabled_rules:
   - trailing_comma # trailing commas keep multi-line literal diffs to one line
@@ -97,5 +100,30 @@ custom_rules:
     regex: '\b(amount|rate|bid|ask|price)\w*\s*:\s*Double\b'
     message: "Money values must be Decimal, never Double."
     severity: error
+
+  private_member_outside_private_extension:
+    name: "Private Member Outside Private Extension"
+    regex: '\b(?:private|fileprivate)\s+(?:(?:static|class|nonisolated|override|final|mutating|nonmutating)\s+)*(?:func\b|var\s+\w+\s*:[^={\n]*\{(?!\s*(?:willSet|didSet)\b))'
+    message: "Move private methods and computed properties into a `private extension`."
+    severity: warning
+    excluded_match_kinds:
+      - comment
+      - comment.mark
+      - comment.url
+      - doccomment
+      - doccomment.field
+      - string
+
+  let_before_var:
+    name: "Let Before Var"
+    regex: '^( {4})((?:(?:private|fileprivate|internal|package|public|open) )?)(?:(?:private|fileprivate|internal|package)\(set\) )?(?:(?:nonisolated|weak|unowned|lazy|final) )*var \w+[^\n{]*\n(?:[ \t]*\n|\1\2(?:(?:private|fileprivate|internal|package)\(set\) )?(?:(?:nonisolated|weak|unowned|lazy|final) )*(?:let|var) \w+[^\n{]*\n)*\1\2(?:(?:nonisolated|final) )*let \w'
+    message: "Declare `let` properties before `var` properties of the same access level."
+    severity: warning
+    excluded_match_kinds:
+      - comment
+      - comment.mark
+      - comment.url
+      - doccomment
+      - doccomment.field
 
 reporter: xcode
