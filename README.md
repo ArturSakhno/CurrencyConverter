@@ -9,18 +9,9 @@ A USDc ⇄ other-currency exchange calculator for the DolarApp iOS take-home: Sw
 
 ## Running
 
-Requires Xcode 27 or later. Open `CurrencyConverter.xcodeproj`, pick the shared `CurrencyConverter` scheme and an iPhone simulator, and run. There are no third-party dependencies. The two local packages resolve automatically, and the SwiftLint build phase is skipped when SwiftLint isn't installed.
+Requires Xcode 26 or later. Open `CurrencyConverter.xcodeproj`, pick the shared `CurrencyConverter` scheme and an iPhone simulator, and run. There are no third-party dependencies. The two local packages resolve automatically, and the SwiftLint build phase is skipped when SwiftLint isn't installed.
 
-```sh
-# App and its unit tests
-xcodebuild test -scheme CurrencyConverter -destination 'platform=iOS Simulator,name=iPhone 17'
-
-# Networking package (from Packages/Networking)
-swift test
-
-# DesignSystem package (from Packages/DesignSystem)
-xcodebuild test -scheme DesignSystem -destination 'platform=iOS Simulator,name=iPhone 17'
-```
+The deployment target is iOS 17. The app was tested on iOS 26 and later, on an iPhone 17 Pro and an iPhone SE (2nd generation).
 
 ## Features
 
