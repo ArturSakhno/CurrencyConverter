@@ -15,6 +15,7 @@ struct ExchangeRateView: View {
                 RoundedRectangle(cornerRadius: DS.Radius.pill)
                     .stroke(DS.Color.borderDefault, lineWidth: DS.borderWidth)
             )
+            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
     }
 }
 

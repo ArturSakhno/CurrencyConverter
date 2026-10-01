@@ -126,6 +126,15 @@ private extension ConverterView {
     }
 }
 
+#Preview("Placeholder") {
+    ConverterView(
+        viewModel: DependencyContainer().makeConverterViewModel(),
+        quoteCurrency: Currency(code: "XXX"),
+        isPlaceholder: false,
+        onSelectCurrency: {}
+    )
+}
+
 #Preview {
     ConverterView(
         viewModel: DependencyContainer().makeConverterViewModel(),
