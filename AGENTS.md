@@ -55,6 +55,8 @@ SwiftFormat's `organizeDeclarations` orders every type and extension body: neste
 
 Private methods and computed properties go in a `private extension` right after the type, never in its body; SwiftLint's `private_member_outside_private_extension` rule flags any that don't. Members of that extension drop the `private` keyword, and in an extension of a `nonisolated` type each one needs its own `nonisolated`.
 
+Never force unwrap, not even `URL(string:)` with a literal: SwiftLint's `force_unwrapping` rule runs with no exceptions. In tests, unwrap with `try #require(…)` and set a suite's stored fixtures in a throwing `init()`.
+
 ## Locked decisions (don't re-derive)
 
 - **Base vs quote currency**: the base is `CurrencyCatalog.base` (`USDC`), and the user picks the quote from `CurrencyCatalog.availableQuoteCurrencies` (MXN, EURC, ARS, COP, BRL). No logic may branch on a currency code string outside `Currency.swift`. The app never calls the currencies-list endpoint (it always returns 403), so the catalog is hardcoded on purpose.

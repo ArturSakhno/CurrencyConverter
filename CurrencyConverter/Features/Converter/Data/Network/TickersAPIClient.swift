@@ -6,7 +6,7 @@ nonisolated protocol TickersAPIClient: Sendable {
 }
 
 nonisolated struct DefaultTickersAPIClient: TickersAPIClient {
-    private static let baseURL = URL(string: "https://api.dolarapp.dev")!
+    private static let baseURL = URL(string: "https://api.dolarapp.dev")
 
     private let networkClient: NetworkClient
 
@@ -15,7 +15,8 @@ nonisolated struct DefaultTickersAPIClient: TickersAPIClient {
     }
 
     nonisolated func fetchTickers(quoteCurrencyCodes: [String]) async throws(NetworkError) -> [TickerDTO?] {
-        let request = try RequestBuilder(baseURL: Self.baseURL)
+        guard let url = Self.baseURL else { throw .invalidURL }
+        let request = try RequestBuilder(baseURL: url)
             .path("v1/tickers")
             .query("currencies", quoteCurrencyCodes.joined(separator: ","))
             .build()

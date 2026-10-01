@@ -3,7 +3,11 @@ import Networking
 import Testing
 
 struct RequestBuilderTests {
-    private let baseURL = URL(string: "https://api.example.com")!
+    private let baseURL: URL
+
+    init() throws {
+        baseURL = try #require(URL(string: "https://api.example.com"))
+    }
 
     @Test func defaultsToGetWithoutQueryHeadersOrBody() throws {
         let request = try RequestBuilder(baseURL: baseURL).path("v1/items").build()

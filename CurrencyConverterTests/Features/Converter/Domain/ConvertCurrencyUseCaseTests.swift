@@ -3,19 +3,25 @@ import Foundation
 import Testing
 
 struct ConvertCurrencyUseCaseTests {
-    private static let bid = Decimal(string: "18.40")!
-    private static let ask = Decimal(string: "18.42")!
+    private static let bid = "18.40"
+    private static let ask = "18.42"
 
     private let sut = DefaultConvertCurrencyUseCase()
     private let mxn = Currency(code: "MXN")
-    private let snapshot = ExchangeRatesSnapshot(
-        rates: [ExchangeRate(quoteCurrencyCode: "MXN", ask: Self.ask, bid: Self.bid)],
-        fetchedAt: Date(timeIntervalSince1970: 0)
-    )
+    private let snapshot: ExchangeRatesSnapshot
+
+    init() throws {
+        let rate = try ExchangeRate(
+            quoteCurrencyCode: "MXN",
+            ask: #require(Decimal(string: Self.ask)),
+            bid: #require(Decimal(string: Self.bid))
+        )
+        snapshot = ExchangeRatesSnapshot(rates: [rate], fetchedAt: Date(timeIntervalSince1970: 0))
+    }
 
     @Test(arguments: [(TradeDirection.sellingBase, bid), (.buyingBase, ask)])
-    func priceIsTheBidWhenSellingBaseAndTheAskWhenBuying(direction: TradeDirection, expected: Decimal) {
-        #expect(sut.price(of: mxn, direction: direction, in: snapshot) == expected)
+    func priceIsTheBidWhenSellingBaseAndTheAskWhenBuying(direction: TradeDirection, expected: String) {
+        #expect(sut.price(of: mxn, direction: direction, in: snapshot) == Decimal(string: expected))
     }
 
     @Test func baseAmountConvertsToQuoteAtTheDirectionsPrice() {

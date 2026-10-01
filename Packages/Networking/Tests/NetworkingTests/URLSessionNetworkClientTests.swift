@@ -4,10 +4,11 @@ import Testing
 
 @Suite(.serialized)
 struct URLSessionNetworkClientTests {
-    private let request = URLRequest(url: URL(string: "https://api.example.com/v1/items")!)
+    private let request: URLRequest
     private let sut: URLSessionNetworkClient
 
-    init() {
+    init() throws {
+        request = try URLRequest(url: #require(URL(string: "https://api.example.com/v1/items")))
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [StubURLProtocol.self]
         sut = URLSessionNetworkClient(session: URLSession(configuration: configuration))
@@ -102,12 +103,12 @@ private final class StubURLProtocol: URLProtocol {
             client?.urlProtocol(self, didFailWithError: error)
             return
         }
-        let response = HTTPURLResponse(
-            url: request.url!,
-            statusCode: stub.statusCode,
-            httpVersion: nil,
-            headerFields: stub.headers
-        )!
+        guard let url = request.url,
+              let response = HTTPURLResponse(url: url, statusCode: stub.statusCode, httpVersion: nil, headerFields: stub.headers)
+        else {
+            client?.urlProtocol(self, didFailWithError: URLError(.badURL))
+            return
+        }
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: stub.body)
         client?.urlProtocolDidFinishLoading(self)

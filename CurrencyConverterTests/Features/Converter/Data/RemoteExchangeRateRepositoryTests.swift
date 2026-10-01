@@ -4,11 +4,15 @@ import Networking
 import Testing
 
 struct RemoteExchangeRateRepositoryTests {
-    private let mxnRate = ExchangeRate(
-        quoteCurrencyCode: "MXN",
-        ask: Decimal(string: "18.42")!,
-        bid: Decimal(string: "18.40")!
-    )
+    private let mxnRate: ExchangeRate
+
+    init() throws {
+        mxnRate = try ExchangeRate(
+            quoteCurrencyCode: "MXN",
+            ask: #require(Decimal(string: "18.42")),
+            bid: #require(Decimal(string: "18.40"))
+        )
+    }
 
     @Test func successfulFetchReturnsRatesStampedWithFetchTime() async throws {
         let ticker = TickerDTO(ask: "18.42", bid: "18.40", book: "usdc_mxn")

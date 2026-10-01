@@ -30,6 +30,7 @@ opt_in_rules:
   - fatal_error_message
   - first_where
   - flatmap_over_map_reduce
+  - force_unwrapping
   - identical_operands
   - implicit_return
   - joined_default_parameter
@@ -53,6 +54,9 @@ opt_in_rules:
 analyzer_rules:
   - unused_declaration
   - unused_import
+
+force_unwrapping:
+  ignored_literal_argument_functions: []
 
 line_length:
   warning: 140
