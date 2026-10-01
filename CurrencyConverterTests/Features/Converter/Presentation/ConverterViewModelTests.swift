@@ -6,10 +6,16 @@ import Testing
 struct ConverterViewModelTests {
     private let mxn = Currency(code: "MXN")
     private let cop = Currency(code: "COP")
-    private let sampleSnapshot = ExchangeRatesSnapshot(
-        rates: [ExchangeRate(quoteCurrencyCode: "MXN", ask: 18.42, bid: 18.40)],
-        fetchedAt: Date(timeIntervalSince1970: 0)
-    )
+    private let sampleSnapshot: ExchangeRatesSnapshot
+
+    init() throws {
+        let mxnRate = try ExchangeRate(
+            quoteCurrencyCode: "MXN",
+            ask: #require(Decimal(string: "18.42")),
+            bid: #require(Decimal(string: "18.40"))
+        )
+        sampleSnapshot = ExchangeRatesSnapshot(rates: [mxnRate], fetchedAt: Date(timeIntervalSince1970: 0))
+    }
 
     @Test func ratePillTextFormatsRateToFourDecimals() async {
         let sut = makeSUT(result: .success(sampleSnapshot))
@@ -65,11 +71,8 @@ struct ConverterViewModelTests {
 
     @Test func selectingQuoteCurrencyRecalculatesDerivedAmount() async {
         let snapshot = ExchangeRatesSnapshot(
-            rates: [
-                ExchangeRate(quoteCurrencyCode: "MXN", ask: 18.42, bid: 18.40),
-                ExchangeRate(quoteCurrencyCode: "COP", ask: 4000, bid: 3990),
-            ],
-            fetchedAt: Date(timeIntervalSince1970: 0)
+            rates: sampleSnapshot.rates + [ExchangeRate(quoteCurrencyCode: "COP", ask: 4000, bid: 3990)],
+            fetchedAt: sampleSnapshot.fetchedAt
         )
         let sut = makeSUT(result: .success(snapshot))
         await sut.refresh()

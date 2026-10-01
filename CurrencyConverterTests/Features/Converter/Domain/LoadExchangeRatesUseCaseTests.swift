@@ -3,10 +3,16 @@ import Foundation
 import Testing
 
 struct LoadExchangeRatesUseCaseTests {
-    private let sampleSnapshot = ExchangeRatesSnapshot(
-        rates: [ExchangeRate(quoteCurrencyCode: "MXN", ask: 18.41, bid: 18.40)],
-        fetchedAt: Date(timeIntervalSince1970: 0)
-    )
+    private let sampleSnapshot: ExchangeRatesSnapshot
+
+    init() throws {
+        let mxnRate = try ExchangeRate(
+            quoteCurrencyCode: "MXN",
+            ask: #require(Decimal(string: "18.41")),
+            bid: #require(Decimal(string: "18.40"))
+        )
+        sampleSnapshot = ExchangeRatesSnapshot(rates: [mxnRate], fetchedAt: Date(timeIntervalSince1970: 0))
+    }
 
     @Test func loadReturnsFreshSnapshotOnNetworkSuccess() async throws {
         let repository = StubExchangeRateRepository(fetchResult: .success(sampleSnapshot))
