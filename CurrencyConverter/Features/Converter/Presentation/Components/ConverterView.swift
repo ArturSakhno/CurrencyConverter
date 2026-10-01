@@ -126,7 +126,7 @@ private extension ConverterView {
     }
 }
 
-#Preview("Placeholder") {
+#Preview {
     ConverterView(
         viewModel: DependencyContainer().makeConverterViewModel(),
         quoteCurrency: Currency(code: "XXX"),
@@ -135,7 +135,7 @@ private extension ConverterView {
     )
 }
 
-#Preview {
+#Preview("Placeholder") {
     ConverterView(
         viewModel: DependencyContainer().makeConverterViewModel(),
         quoteCurrency: Currency(code: "XXX"),
