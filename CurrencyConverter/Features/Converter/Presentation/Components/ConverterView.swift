@@ -2,13 +2,6 @@ import DesignSystem
 import SwiftUI
 
 struct ConverterView: View {
-    let viewModel: ConverterViewModel
-    let quoteCurrency: Currency
-    let isPlaceholder: Bool
-    let onSelectCurrency: () -> Void
-
-    @FocusState private var focusedSlot: FocusSlot?
-
     private enum Layout {
         static let screenTop: CGFloat = 54
         static let rowGap: CGFloat = 30
@@ -21,12 +14,12 @@ struct ConverterView: View {
 
     private static let placeholderAmount = "0.00"
 
-    private func amountText(for field: AmountField) -> Binding<String> {
-        Binding(
-            get: { viewModel.amountText(for: field) },
-            set: { viewModel.setAmountText($0, for: field) }
-        )
-    }
+    @FocusState private var focusedSlot: FocusSlot?
+
+    let viewModel: ConverterViewModel
+    let quoteCurrency: Currency
+    let isPlaceholder: Bool
+    let onSelectCurrency: () -> Void
 
     var body: some View {
         ScrollView {
@@ -77,29 +70,10 @@ struct ConverterView: View {
             focusedSlot = nil
         }
     }
+}
 
-    private func row(_ slot: FocusSlot) -> some View {
-        let isTop = slot == .top
-        let isBase = isTop == viewModel.isBaseOnTop
-        let currency = isPlaceholder || isBase ? viewModel.baseCurrency : quoteCurrency
-        let info = CurrencyDisplayInfo.info(for: currency)
-        return CurrencyInputField(
-            amountText: isPlaceholder ? .constant(Self.placeholderAmount) : amountText(for: isBase ? .base : .quote),
-            currencyCode: info.displayCode,
-            sign: isPlaceholder ? nil : (isTop ? Sign.outgoing : Sign.incoming),
-            currencySymbol: isPlaceholder ? nil : info.currencySymbol,
-            subtitle: info.subtitle,
-            showsChevron: !isPlaceholder && !isBase,
-            imageName: info.flagAssetName,
-            field: slot,
-            focusedField: $focusedSlot,
-            onSelectCurrency: isPlaceholder ? {} : onSelectCurrency
-        )
-        .padding(.horizontal, DS.Spacing.m)
-        .padding(.vertical, DS.Spacing.l)
-    }
-
-    private var exchange: some View {
+private extension ConverterView {
+    var exchange: some View {
         ZStack(alignment: .leading) {
             SwapButton {
                 viewModel.swap()
@@ -121,6 +95,34 @@ struct ConverterView: View {
             .frame(maxWidth: .infinity)
             .allowsHitTesting(false)
         }
+    }
+
+    func row(_ slot: FocusSlot) -> some View {
+        let isTop = slot == .top
+        let isBase = isTop == viewModel.isBaseOnTop
+        let currency = isPlaceholder || isBase ? viewModel.baseCurrency : quoteCurrency
+        let info = CurrencyDisplayInfo.info(for: currency)
+        return CurrencyInputField(
+            amountText: isPlaceholder ? .constant(Self.placeholderAmount) : amountText(for: isBase ? .base : .quote),
+            currencyCode: info.displayCode,
+            sign: isPlaceholder ? nil : (isTop ? Sign.outgoing : Sign.incoming),
+            currencySymbol: isPlaceholder ? nil : info.currencySymbol,
+            subtitle: info.subtitle,
+            showsChevron: !isPlaceholder && !isBase,
+            imageName: info.flagAssetName,
+            field: slot,
+            focusedField: $focusedSlot,
+            onSelectCurrency: isPlaceholder ? {} : onSelectCurrency
+        )
+        .padding(.horizontal, DS.Spacing.m)
+        .padding(.vertical, DS.Spacing.l)
+    }
+
+    func amountText(for field: AmountField) -> Binding<String> {
+        Binding(
+            get: { viewModel.amountText(for: field) },
+            set: { viewModel.setAmountText($0, for: field) }
+        )
     }
 }
 

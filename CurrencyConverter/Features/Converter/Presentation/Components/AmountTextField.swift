@@ -15,20 +15,16 @@ struct AmountTextField: View {
     static let minimumScale: CGFloat = 0.1
 
     @Binding var text: String
-    let sign: String?
-    var currencySymbol: String?
-    let accessibilityLabel: LocalizedStringResource
-    let field: FocusSlot
-    var focusedField: FocusState<FocusSlot?>.Binding
 
     @State private var draft = ""
     @State private var availableWidth: CGFloat?
     @State private var naturalWidth: CGFloat = 0
 
-    private var scale: CGFloat {
-        guard let availableWidth, naturalWidth > 0 else { return 1 }
-        return min(1, max(Self.minimumScale, availableWidth / naturalWidth))
-    }
+    let sign: String?
+    let currencySymbol: String?
+    let accessibilityLabel: LocalizedStringResource
+    let field: FocusSlot
+    let focusedField: FocusState<FocusSlot?>.Binding
 
     var body: some View {
         HStack(spacing: 4) {
@@ -82,6 +78,13 @@ struct AmountTextField: View {
             text = draft
             draft = text
         }
+    }
+}
+
+private extension AmountTextField {
+    var scale: CGFloat {
+        guard let availableWidth, naturalWidth > 0 else { return 1 }
+        return min(1, max(Self.minimumScale, availableWidth / naturalWidth))
     }
 }
 

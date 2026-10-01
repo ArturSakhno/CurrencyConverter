@@ -11,34 +11,6 @@ struct ConverterViewModelTests {
         fetchedAt: Date(timeIntervalSince1970: 0)
     )
 
-    private func makeSUT(
-        results: [Result<ExchangeRatesSnapshot, ExchangeRatesError>],
-        loadedCurrencies: [Currency] = CurrencyCatalog.availableQuoteCurrencies,
-        networkMonitor: StubNetworkMonitor = StubNetworkMonitor(),
-        locale: Locale = Locale(identifier: "en_US")
-    ) -> ConverterViewModel {
-        ConverterViewModel(
-            convertUseCase: DefaultConvertCurrencyUseCase(),
-            loadRatesUseCase: StubLoadExchangeRatesUseCase(results: results),
-            loadAvailableCurrenciesUseCase: StubCurrencyCatalogUseCase(currencies: loadedCurrencies),
-            networkMonitor: networkMonitor,
-            baseCurrency: CurrencyCatalog.base,
-            locale: locale
-        )
-    }
-
-    private func makeSUT(
-        result: Result<ExchangeRatesSnapshot, ExchangeRatesError>,
-        locale: Locale = Locale(identifier: "en_US")
-    ) -> ConverterViewModel {
-        makeSUT(results: [result], locale: locale)
-    }
-
-    private func content(_ sut: ConverterViewModel) -> ConverterViewModel.Content? {
-        guard case let .converter(content) = sut.state else { return nil }
-        return content
-    }
-
     @Test func ratePillTextFormatsRateToFourDecimals() async {
         let sut = makeSUT(result: .success(sampleSnapshot))
         await sut.refresh()
@@ -155,8 +127,8 @@ extension ConverterViewModelTests {
         await sut.refresh()
 
         #expect(sut.state == .converter(.init(
-            quoteCurrency: mxn,
             availableCurrencies: CurrencyCatalog.availableQuoteCurrencies,
+            quoteCurrency: mxn,
             snapshot: sampleSnapshot
         )))
     }
@@ -298,6 +270,36 @@ extension ConverterViewModelTests {
     }
 }
 
+private extension ConverterViewModelTests {
+    func makeSUT(
+        results: [Result<ExchangeRatesSnapshot, ExchangeRatesError>],
+        loadedCurrencies: [Currency] = CurrencyCatalog.availableQuoteCurrencies,
+        networkMonitor: StubNetworkMonitor = StubNetworkMonitor(),
+        locale: Locale = Locale(identifier: "en_US")
+    ) -> ConverterViewModel {
+        ConverterViewModel(
+            convertUseCase: DefaultConvertCurrencyUseCase(),
+            loadRatesUseCase: StubLoadExchangeRatesUseCase(results: results),
+            loadAvailableCurrenciesUseCase: StubCurrencyCatalogUseCase(currencies: loadedCurrencies),
+            networkMonitor: networkMonitor,
+            baseCurrency: CurrencyCatalog.base,
+            locale: locale
+        )
+    }
+
+    func makeSUT(
+        result: Result<ExchangeRatesSnapshot, ExchangeRatesError>,
+        locale: Locale = Locale(identifier: "en_US")
+    ) -> ConverterViewModel {
+        makeSUT(results: [result], locale: locale)
+    }
+
+    func content(_ sut: ConverterViewModel) -> ConverterViewModel.Content? {
+        guard case let .converter(content) = sut.state else { return nil }
+        return content
+    }
+}
+
 private actor StubLoadExchangeRatesUseCase: LoadExchangeRatesUseCase {
     private var results: [Result<ExchangeRatesSnapshot, ExchangeRatesError>]
 
@@ -334,8 +336,8 @@ private struct StubNetworkMonitor: NetworkMonitor {
 }
 
 private actor RecoveringCurrencyCatalogUseCase: CurrencyCatalogUseCase {
-    private var isFirstCall = true
     private let currencies: [Currency]
+    private var isFirstCall = true
 
     init(currencies: [Currency]) {
         self.currencies = currencies

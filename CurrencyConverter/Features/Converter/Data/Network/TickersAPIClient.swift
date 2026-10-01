@@ -7,6 +7,7 @@ nonisolated protocol TickersAPIClient: Sendable {
 
 nonisolated struct DefaultTickersAPIClient: TickersAPIClient {
     private static let baseURL = URL(string: "https://api.dolarapp.dev")!
+
     private let networkClient: NetworkClient
 
     nonisolated init(networkClient: NetworkClient) {

@@ -3,10 +3,6 @@ import Foundation
 import Testing
 
 struct TickerDTODecodingTests {
-    private func decode(_ json: String) throws -> [TickerDTO?] {
-        try JSONDecoder().decode([TickerDTO?].self, from: Data(json.utf8))
-    }
-
     @Test func decodesMultipleValidTickers() throws {
         let json = """
         [
@@ -54,5 +50,11 @@ struct TickerDTODecodingTests {
         #expect(tickers.count == 2)
         #expect(tickers[0]?.ask == "not-a-number")
         #expect(tickers[1]?.book == "usdc_ars")
+    }
+}
+
+private extension TickerDTODecodingTests {
+    func decode(_ json: String) throws -> [TickerDTO?] {
+        try JSONDecoder().decode([TickerDTO?].self, from: Data(json.utf8))
     }
 }

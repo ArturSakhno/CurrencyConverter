@@ -7,8 +7,9 @@ public extension View {
 }
 
 private struct SkeletonModifier: ViewModifier {
-    let isActive: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    let isActive: Bool
 
     func body(content: Content) -> some View {
         if isActive {

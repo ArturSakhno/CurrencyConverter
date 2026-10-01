@@ -49,8 +49,10 @@ public struct RequestBuilder: Sendable {
         request.httpBody = body
         return request
     }
+}
 
-    private func with(_ update: (inout RequestBuilder) -> Void) -> RequestBuilder {
+private extension RequestBuilder {
+    func with(_ update: (inout RequestBuilder) -> Void) -> RequestBuilder {
         var copy = self
         update(&copy)
         return copy

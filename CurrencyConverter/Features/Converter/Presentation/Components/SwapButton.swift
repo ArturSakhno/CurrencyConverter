@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SwapButton: View {
     let action: () -> Void
+
     var body: some View {
         Button {
             action()

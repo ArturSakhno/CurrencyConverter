@@ -6,7 +6,7 @@ struct StatusScreenView: View {
     let systemImage: String
     let title: LocalizedStringResource
     let message: LocalizedStringResource
-    var isRetrying: Bool = false
+    let isRetrying: Bool
     let onRetry: () -> Void
 
     var body: some View {
@@ -53,6 +53,7 @@ struct StatusScreenView: View {
         systemImage: "wifi.slash",
         title: Localized.Converter.noConnectionTitle,
         message: Localized.Converter.noConnectionMessage,
+        isRetrying: false,
         onRetry: {}
     )
 }

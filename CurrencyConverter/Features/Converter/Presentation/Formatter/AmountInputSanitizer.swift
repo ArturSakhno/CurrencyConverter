@@ -5,17 +5,35 @@ nonisolated struct AmountInputSanitizer: Sendable {
     var maxFractionDigits = 2
     var maxIntegerDigits = 12
 
-    private var decimalSeparator: Character {
-        locale.decimalSeparator?.first ?? "."
-    }
-
     func sanitize(_ raw: String) -> String {
         let plain = ungroupedSanitize(raw)
         let integerDigits = plain.prefix { $0 != decimalSeparator }
         return grouped(String(integerDigits)) + plain.dropFirst(integerDigits.count)
     }
 
-    private func ungroupedSanitize(_ raw: String) -> String {
+    func sanitizeEdit(from previous: String, to raw: String) -> String {
+        let digitCount = integerDigitCount(of: ungroupedSanitize(raw))
+        guard digitCount > maxIntegerDigits,
+              digitCount > integerDigitCount(of: ungroupedSanitize(previous))
+        else {
+            return sanitize(raw)
+        }
+        return sanitize(previous)
+    }
+
+    func decimal(from text: String) -> Decimal? {
+        let sanitized = ungroupedSanitize(text)
+        guard !sanitized.isEmpty else { return nil }
+        return Decimal(string: sanitized, locale: locale)
+    }
+}
+
+private extension AmountInputSanitizer {
+    nonisolated var decimalSeparator: Character {
+        locale.decimalSeparator?.first ?? "."
+    }
+
+    nonisolated func ungroupedSanitize(_ raw: String) -> String {
         var integerPart = ""
         var fractionPart = ""
         var hasSeparator = false
@@ -43,27 +61,11 @@ nonisolated struct AmountInputSanitizer: Sendable {
         return integerPart + String(decimalSeparator) + String(fractionPart.prefix(maxFractionDigits))
     }
 
-    func sanitizeEdit(from previous: String, to raw: String) -> String {
-        let digitCount = integerDigitCount(of: ungroupedSanitize(raw))
-        guard digitCount > maxIntegerDigits,
-              digitCount > integerDigitCount(of: ungroupedSanitize(previous))
-        else {
-            return sanitize(raw)
-        }
-        return sanitize(previous)
-    }
-
-    func decimal(from text: String) -> Decimal? {
-        let sanitized = ungroupedSanitize(text)
-        guard !sanitized.isEmpty else { return nil }
-        return Decimal(string: sanitized, locale: locale)
-    }
-
-    private func integerDigitCount(of ungrouped: String) -> Int {
+    nonisolated func integerDigitCount(of ungrouped: String) -> Int {
         ungrouped.prefix { $0 != decimalSeparator }.count
     }
 
-    private func grouped(_ integerDigits: String) -> String {
+    nonisolated func grouped(_ integerDigits: String) -> String {
         guard integerDigits.count > 3, let value = Decimal(string: integerDigits) else {
             return integerDigits
         }

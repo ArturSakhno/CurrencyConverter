@@ -2,11 +2,11 @@ import DesignSystem
 import SwiftUI
 
 struct CurrencyPickerRow: View {
+    @ScaledMetric(relativeTo: .largeTitle) private var flagSize: CGFloat = 24
+
     let info: CurrencyDisplayInfo
     let isSelected: Bool
     let onSelect: () -> Void
-
-    @ScaledMetric(relativeTo: .largeTitle) private var flagSize: CGFloat = 24
 
     var body: some View {
         Button(action: onSelect) {
@@ -46,8 +46,10 @@ struct CurrencyPickerRow: View {
         }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
+}
 
-    private var flag: some View {
+private extension CurrencyPickerRow {
+    var flag: some View {
         ZStack {
             Circle()
                 .fill(.surfaceDefault)

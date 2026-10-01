@@ -6,9 +6,11 @@ public extension DS {
         public static var checkmark: Image { image(.dsCheckmark) }
         public static var chevronDown: Image { image(.dsChevronDown) }
         public static var cross: Image { image(.dsCross) }
+    }
+}
 
-        private static func image(_ resource: ImageResource) -> Image {
-            Image(resource)
-        }
+private extension DS.Icon {
+    static func image(_ resource: ImageResource) -> Image {
+        Image(resource)
     }
 }

@@ -14,10 +14,12 @@ final class ConverterViewModel {
     }
 
     struct Content: Equatable {
-        var quoteCurrency: Currency
         let availableCurrencies: [Currency]
+        var quoteCurrency: Currency
         var snapshot: ExchangeRatesSnapshot
     }
+
+    static let refreshInterval: Duration = .seconds(30)
 
     let baseCurrency: Currency
     private(set) var state: State = .loading
@@ -25,9 +27,6 @@ final class ConverterViewModel {
     private(set) var quoteAmountText = ""
     private(set) var isBaseOnTop = true
     private(set) var isRetrying = false
-    private var lastEditedField: AmountField = .base
-
-    static let refreshInterval: Duration = .seconds(30)
 
     private let convertUseCase: ConvertCurrencyUseCase
     private let loadRatesUseCase: LoadExchangeRatesUseCase
@@ -36,6 +35,15 @@ final class ConverterViewModel {
     private let sanitizer: AmountInputSanitizer
     private let displayFormatter: AmountDisplayFormatter
     private let locale: Locale
+    private let minimumRetryDuration: Duration = .seconds(1)
+
+    private var lastEditedField: AmountField = .base
+
+    var ratesAsOfText: String? {
+        content?.snapshot.fetchedAt.formatted(
+            Date.FormatStyle(date: .omitted, time: .shortened).locale(locale)
+        )
+    }
 
     init(
         convertUseCase: ConvertCurrencyUseCase,
@@ -79,8 +87,6 @@ final class ConverterViewModel {
             await self?.retry()
         }
     }
-
-    private let minimumRetryDuration: Duration = .seconds(1)
 
     func retry() async {
         guard !isRetrying else { return }
@@ -149,12 +155,6 @@ final class ConverterViewModel {
             quoteCode: quoteDisplayCode
         ))
     }
-
-    var ratesAsOfText: String? {
-        content?.snapshot.fetchedAt.formatted(
-            Date.FormatStyle(date: .omitted, time: .shortened).locale(locale)
-        )
-    }
 }
 
 private extension ConverterViewModel {
@@ -206,8 +206,8 @@ private extension ConverterViewModel {
         }
 
         return Content(
-            quoteCurrency: firstCurrency,
             availableCurrencies: currencies,
+            quoteCurrency: firstCurrency,
             snapshot: snapshot
         )
     }

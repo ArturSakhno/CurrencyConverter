@@ -14,6 +14,15 @@ nonisolated enum Localized {
     }
 
     nonisolated enum Converter {
+        nonisolated enum CurrencyNames {
+            static let digitalDollars = LocalizedStringResource("converter.currency.digitalDollars")
+            static let digitalEuros = LocalizedStringResource("converter.currency.digitalEuros")
+            static let mexicanPesos = LocalizedStringResource("converter.currency.mexicanPesos")
+            static let argentinePesos = LocalizedStringResource("converter.currency.argentinePesos")
+            static let colombianPesos = LocalizedStringResource("converter.currency.colombianPesos")
+            static let brazilianReais = LocalizedStringResource("converter.currency.brazilianReais")
+        }
+
         static let title = LocalizedStringResource(
             "converter.title",
             comment: "Main converter screen title"
@@ -73,15 +82,6 @@ nonisolated enum Localized {
                 "converter.rateQuote \(baseCode) \(rate) \(quoteCode)",
                 comment: "Exchange rate; values are the base currency code, rate, and quote currency code"
             )
-        }
-
-        nonisolated enum CurrencyNames {
-            static let digitalDollars = LocalizedStringResource("converter.currency.digitalDollars")
-            static let digitalEuros = LocalizedStringResource("converter.currency.digitalEuros")
-            static let mexicanPesos = LocalizedStringResource("converter.currency.mexicanPesos")
-            static let argentinePesos = LocalizedStringResource("converter.currency.argentinePesos")
-            static let colombianPesos = LocalizedStringResource("converter.currency.colombianPesos")
-            static let brazilianReais = LocalizedStringResource("converter.currency.brazilianReais")
         }
     }
 }

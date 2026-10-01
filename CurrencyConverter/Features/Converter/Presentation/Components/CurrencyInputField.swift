@@ -3,6 +3,7 @@ import SwiftUI
 
 struct CurrencyInputField: View {
     @Binding var amountText: String
+
     let currencyCode: String
     let sign: String?
     let currencySymbol: String?
@@ -10,7 +11,7 @@ struct CurrencyInputField: View {
     let showsChevron: Bool
     let imageName: String?
     let field: FocusSlot
-    var focusedField: FocusState<FocusSlot?>.Binding
+    let focusedField: FocusState<FocusSlot?>.Binding
     let onSelectCurrency: () -> Void
 
     private let verticalPadding: CGFloat = 9.5

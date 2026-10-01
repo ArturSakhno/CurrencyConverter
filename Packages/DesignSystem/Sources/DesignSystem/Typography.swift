@@ -30,20 +30,13 @@ extension Typography {
 }
 
 private struct TextStyleModifier: ViewModifier {
-    let style: TextStyle
     @ScaledMetric private var size: CGFloat
+
+    let style: TextStyle
 
     init(style: TextStyle) {
         self.style = style
         _size = ScaledMetric(wrappedValue: style.size, relativeTo: style.relativeTo)
-    }
-
-    private var scale: CGFloat { size / style.size }
-
-    private var lineSpacing: CGFloat {
-        guard let lineHeight = style.lineHeight else { return 0 }
-        let natural = UIFont.systemFont(ofSize: size, weight: style.weight.uiFontWeight).lineHeight
-        return max(0, lineHeight * scale - natural)
     }
 
     func body(content: Content) -> some View {
@@ -54,9 +47,20 @@ private struct TextStyleModifier: ViewModifier {
     }
 }
 
+private extension TextStyleModifier {
+    var scale: CGFloat { size / style.size }
+
+    var lineSpacing: CGFloat {
+        guard let lineHeight = style.lineHeight else { return 0 }
+        let natural = UIFont.systemFont(ofSize: size, weight: style.weight.uiFontWeight).lineHeight
+        return max(0, lineHeight * scale - natural)
+    }
+}
+
 private struct ThemedTextStyleModifier: ViewModifier {
-    let keyPath: KeyPath<Typography, TextStyle>
     @Environment(\.theme) private var theme
+
+    let keyPath: KeyPath<Typography, TextStyle>
 
     func body(content: Content) -> some View {
         content.modifier(TextStyleModifier(style: theme.typography[keyPath: keyPath]))

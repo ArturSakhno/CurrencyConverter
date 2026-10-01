@@ -3,10 +3,11 @@ import Foundation
 import Testing
 
 struct ConvertCurrencyUseCaseTests {
-    private let sut = DefaultConvertCurrencyUseCase()
-    private let mxn = Currency(code: "MXN")
     private static let bid = Decimal(string: "18.40")!
     private static let ask = Decimal(string: "18.42")!
+
+    private let sut = DefaultConvertCurrencyUseCase()
+    private let mxn = Currency(code: "MXN")
     private let snapshot = ExchangeRatesSnapshot(
         rates: [ExchangeRate(quoteCurrencyCode: "MXN", ask: Self.ask, bid: Self.bid)],
         fetchedAt: Date(timeIntervalSince1970: 0)

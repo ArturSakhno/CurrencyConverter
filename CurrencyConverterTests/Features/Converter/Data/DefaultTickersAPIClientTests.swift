@@ -33,8 +33,9 @@ struct DefaultTickersAPIClientTests {
 }
 
 private actor RecordingNetworkClient: NetworkClient {
-    private let response: Data
     private(set) var lastRequest: URLRequest?
+
+    private let response: Data
 
     init(response: Data) {
         self.response = response

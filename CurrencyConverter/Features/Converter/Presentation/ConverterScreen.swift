@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct ConverterScreen: View {
+    private static let placeholderQuoteCurrency = Currency(code: "XXX")
+
     let viewModel: ConverterViewModel
     let onSelectCurrency: () -> Void
-
-    private static let placeholderQuoteCurrency = Currency(code: "XXX")
 
     var body: some View {
         ZStack {

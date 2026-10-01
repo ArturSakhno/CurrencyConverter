@@ -4,6 +4,7 @@ import Observation
 final class AppCoordinator {
     enum SheetRoute: Identifiable {
         case currencyPicker
+
         var id: Self { self }
     }
 

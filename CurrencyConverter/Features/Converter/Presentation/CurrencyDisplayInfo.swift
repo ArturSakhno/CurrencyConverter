@@ -1,20 +1,6 @@
 import Foundation
 
 nonisolated struct CurrencyDisplayInfo: Equatable, Sendable {
-    let displayCode: String
-    let subtitle: String
-    let currencySymbol: String?
-    let flagAssetName: String?
-
-    nonisolated static func info(for currency: Currency) -> CurrencyDisplayInfo {
-        table[currency.code] ?? CurrencyDisplayInfo(
-            displayCode: currency.code,
-            subtitle: "",
-            currencySymbol: nil,
-            flagAssetName: nil
-        )
-    }
-
     private static let table: [String: CurrencyDisplayInfo] = [
         "USDC": CurrencyDisplayInfo(
             displayCode: "USDc",
@@ -53,4 +39,18 @@ nonisolated struct CurrencyDisplayInfo: Equatable, Sendable {
             flagAssetName: "brl"
         ),
     ]
+
+    let displayCode: String
+    let subtitle: String
+    let currencySymbol: String?
+    let flagAssetName: String?
+
+    nonisolated static func info(for currency: Currency) -> CurrencyDisplayInfo {
+        table[currency.code] ?? CurrencyDisplayInfo(
+            displayCode: currency.code,
+            subtitle: "",
+            currencySymbol: nil,
+            flagAssetName: nil
+        )
+    }
 }
