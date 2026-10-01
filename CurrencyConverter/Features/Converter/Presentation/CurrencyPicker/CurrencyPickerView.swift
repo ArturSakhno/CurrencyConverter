@@ -51,7 +51,7 @@ struct CurrencyPickerView: View {
 }
 
 #Preview {
-    @Previewable @State var selection = CurrencyCatalog.defaultQuote
+    @Previewable @State var selection = CurrencyCatalog.availableQuoteCurrencies[0]
     Color.clear
         .sheet(isPresented: .constant(true)) {
             CurrencyPickerView(

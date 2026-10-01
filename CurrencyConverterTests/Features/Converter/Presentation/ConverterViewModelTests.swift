@@ -301,16 +301,6 @@ private struct StubCurrencyCatalogUseCase: CurrencyCatalogUseCase {
 
 private struct StubNetworkMonitor: NetworkMonitor {
     var isConnected = true
-    var updates: [Bool] = []
-
-    func connectivityUpdates() -> AsyncStream<Bool> {
-        AsyncStream { continuation in
-            for update in updates {
-                continuation.yield(update)
-            }
-            continuation.finish()
-        }
-    }
 }
 
 private actor RecoveringCurrencyCatalogUseCase: CurrencyCatalogUseCase {
