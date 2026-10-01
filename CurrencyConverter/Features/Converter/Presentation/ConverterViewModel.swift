@@ -190,9 +190,12 @@ private extension ConverterViewModel {
 
     func loadConverter() async {
         do {
-            state = try await .converter(loadContent())
+            let loadedContent = try await loadContent()
+            guard content == nil else { return }
+            state = .converter(loadedContent)
             recalculateDerivedAmount()
         } catch {
+            guard content == nil else { return }
             state = .failed(error)
         }
     }
