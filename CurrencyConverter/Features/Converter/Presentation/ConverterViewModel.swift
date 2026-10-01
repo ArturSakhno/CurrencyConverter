@@ -32,8 +32,7 @@ final class ConverterViewModel {
     private let loadRatesUseCase: LoadExchangeRatesUseCase
     private let loadAvailableCurrenciesUseCase: CurrencyCatalogUseCase
     private let networkMonitor: NetworkMonitor
-    private let sanitizer: AmountInputSanitizer
-    private let displayFormatter: AmountDisplayFormatter
+    private let amountFormatter: AmountFormatter
     private let locale: Locale
     private let minimumRetryDuration: Duration = .seconds(1)
 
@@ -59,8 +58,7 @@ final class ConverterViewModel {
         self.networkMonitor = networkMonitor
         self.baseCurrency = baseCurrency
         self.locale = locale
-        sanitizer = AmountInputSanitizer(locale: locale)
-        displayFormatter = AmountDisplayFormatter(locale: locale)
+        amountFormatter = AmountFormatter(locale: locale)
     }
 
     func keepRatesUpdated() async {
@@ -113,7 +111,7 @@ final class ConverterViewModel {
 
     func setAmountText(_ text: String, for field: AmountField) {
         let current = amountText(for: field)
-        let accepted = sanitizer.sanitizeEdit(from: current, to: text)
+        let accepted = amountFormatter.sanitizeEdit(from: current, to: text)
         guard accepted != current else { return }
         switch field {
         case .base: baseAmountText = accepted
@@ -148,7 +146,7 @@ final class ConverterViewModel {
         else {
             return String(localized: Localized.Converter.rateUnavailable)
         }
-        let formattedRate = displayFormatter.string(from: value, fractionDigits: 4)
+        let formattedRate = amountFormatter.string(from: value, fractionDigits: 4)
         return String(localized: Localized.Converter.rateQuote(
             baseCode: baseDisplayCode,
             rate: formattedRate,
@@ -169,7 +167,7 @@ private extension ConverterViewModel {
 
     func convertedAmount(from text: String, side: CurrencySide) -> String? {
         guard let content,
-              let amount = sanitizer.decimal(from: text),
+              let amount = amountFormatter.decimal(from: text),
               let result = convertUseCase.convert(
                   amount,
                   from: side,
@@ -180,7 +178,7 @@ private extension ConverterViewModel {
         else {
             return nil
         }
-        return displayFormatter.string(from: result, fractionDigits: 2)
+        return amountFormatter.string(from: result, fractionDigits: 2)
     }
 
     func recalculateDerivedAmount() {

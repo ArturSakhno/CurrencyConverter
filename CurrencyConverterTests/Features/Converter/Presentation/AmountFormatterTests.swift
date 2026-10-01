@@ -2,8 +2,8 @@
 import Foundation
 import Testing
 
-struct AmountInputSanitizerTests {
-    private let sut = AmountInputSanitizer(locale: Locale(identifier: "en_US"))
+struct AmountFormatterTests {
+    private let sut = AmountFormatter(locale: Locale(identifier: "en_US"))
 
     @Test(arguments: [
         ("12a3", "123"),
@@ -78,13 +78,13 @@ struct AmountInputSanitizerTests {
     }
 
     @Test func groupsWithLocaleSeparators() {
-        let spanish = AmountInputSanitizer(locale: Locale(identifier: "es_ES"))
+        let spanish = AmountFormatter(locale: Locale(identifier: "es_ES"))
         #expect(spanish.sanitize("1234567,5") == "1.234.567,5")
         #expect(spanish.decimal(from: "1.234.567,5") == Decimal(string: "1234567.5"))
     }
 
     @Test func usesLocaleDecimalSeparator() {
-        let spanish = AmountInputSanitizer(locale: Locale(identifier: "es_ES"))
+        let spanish = AmountFormatter(locale: Locale(identifier: "es_ES"))
         #expect(spanish.sanitize("12,5") == "12,5")
         #expect(spanish.decimal(from: "12,5") == Decimal(string: "12.5"))
     }
@@ -99,5 +99,26 @@ struct AmountInputSanitizerTests {
 
     @Test func parsesGroupedIntegerToCorrectDecimal() {
         #expect(sut.decimal(from: "10,000") == Decimal(string: "10000"))
+    }
+
+    @Test func formatsToTwoDecimalPlaces() {
+        #expect(sut.string(from: 100, fractionDigits: 2) == "100.00")
+    }
+
+    @Test func roundsToTwoDecimalPlaces() throws {
+        #expect(try sut.string(from: #require(Decimal(string: "18.415")), fractionDigits: 2) == "18.42")
+    }
+
+    @Test func formatsToFourDecimalPlaces() throws {
+        #expect(try sut.string(from: #require(Decimal(string: "18.4")), fractionDigits: 4) == "18.4000")
+    }
+
+    @Test func groupsThousands() {
+        #expect(sut.string(from: 338_724, fractionDigits: 2) == "338,724.00")
+    }
+
+    @Test func formatsWithLocaleDecimalSeparator() throws {
+        let spanish = AmountFormatter(locale: Locale(identifier: "es_ES"))
+        #expect(try spanish.string(from: #require(Decimal(string: "18.4")), fractionDigits: 2) == "18,40")
     }
 }

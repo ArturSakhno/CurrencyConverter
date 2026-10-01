@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct AmountInputSanitizer: Sendable {
+nonisolated struct AmountFormatter: Sendable {
     let locale: Locale
     var maxFractionDigits = 2
     var maxIntegerDigits = 12
@@ -26,9 +26,18 @@ nonisolated struct AmountInputSanitizer: Sendable {
         guard !sanitized.isEmpty else { return nil }
         return Decimal(string: sanitized, locale: locale)
     }
+
+    func string(from value: Decimal, fractionDigits: Int) -> String {
+        value.formatted(
+            .number
+                .locale(locale)
+                .precision(.fractionLength(fractionDigits))
+                .grouping(.automatic)
+        )
+    }
 }
 
-private extension AmountInputSanitizer {
+private extension AmountFormatter {
     nonisolated var decimalSeparator: Character {
         locale.decimalSeparator?.first ?? "."
     }
@@ -69,11 +78,6 @@ private extension AmountInputSanitizer {
         guard integerDigits.count > 3, let value = Decimal(string: integerDigits) else {
             return integerDigits
         }
-        return value.formatted(
-            .number
-                .locale(locale)
-                .precision(.fractionLength(0))
-                .grouping(.automatic)
-        )
+        return string(from: value, fractionDigits: 0)
     }
 }
