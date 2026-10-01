@@ -96,12 +96,6 @@ final class ConverterViewModel {
         try? await Task.sleep(until: deadline, clock: .continuous)
     }
 
-    func retryWhenBackOnline() async {
-        for await isConnected in networkMonitor.connectivityUpdates() where isConnected && state == .failed(.noConnection) {
-            await retry()
-        }
-    }
-
     func amountText(for field: AmountField) -> String {
         switch field {
         case .base: baseAmountText
@@ -119,13 +113,6 @@ final class ConverterViewModel {
         }
         lastEditedField = field
         recalculateDerivedAmount()
-    }
-
-    func onAppear() async {
-        async let keepUpdated = keepRatesUpdated()
-        async let retry = retryWhenBackOnline()
-
-        _ = await (keepUpdated, retry)
     }
 
     func swap() {

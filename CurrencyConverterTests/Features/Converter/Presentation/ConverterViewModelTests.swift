@@ -160,31 +160,6 @@ extension ConverterViewModelTests {
         #expect(sut.state == .failed(.unavailable))
     }
 
-    @Test func connectionComingBackRetriesAfterNoConnection() async {
-        let sut = makeSUT(
-            results: [.failure(.unavailable), .success(sampleSnapshot)],
-            networkMonitor: StubNetworkMonitor(isConnected: false, updates: [false, true])
-        )
-        await sut.refresh()
-        #expect(sut.state == .failed(.noConnection))
-
-        await sut.retryWhenBackOnline()
-
-        #expect(content(sut)?.snapshot == sampleSnapshot)
-    }
-
-    @Test func connectionUpdatesLeaveOtherFailuresToTheRefreshLoop() async {
-        let sut = makeSUT(
-            results: [.failure(.unavailable), .success(sampleSnapshot)],
-            networkMonitor: StubNetworkMonitor(isConnected: true, updates: [true])
-        )
-        await sut.refresh()
-
-        await sut.retryWhenBackOnline()
-
-        #expect(sut.state == .failed(.unavailable))
-    }
-
     @Test(arguments: [true, false])
     func currenciesCanRecoverAfterErrorScreen(usingRetry: Bool) async {
         let sut = ConverterViewModel(

@@ -46,7 +46,7 @@ struct ConverterScreen: View {
             }
         }
         .task {
-            await viewModel.onAppear()
+            await viewModel.keepRatesUpdated()
         }
     }
 }
