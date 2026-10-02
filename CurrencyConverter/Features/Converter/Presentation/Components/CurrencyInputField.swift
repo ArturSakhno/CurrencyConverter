@@ -3,6 +3,7 @@ import SwiftUI
 
 struct CurrencyInputField: View {
     @Binding var amountText: String
+    @ScaledMetric(relativeTo: .caption2) private var flagSize: CGFloat = DS.Size.flagSmall
 
     let currencyCode: String
     let sign: String?
@@ -13,8 +14,6 @@ struct CurrencyInputField: View {
     let field: FocusSlot
     let focusedField: FocusState<FocusSlot?>.Binding
     let onSelectCurrency: () -> Void
-
-    private let verticalPadding: CGFloat = 9.5
 
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
@@ -50,14 +49,16 @@ struct CurrencyInputField: View {
                 if let imageName {
                     Image(imageName)
                         .resizable()
-                        .frame(width: DS.Size.flagSmall, height: DS.Size.flagSmall)
+                        .scaledToFit()
+                        .frame(width: flagSize,
+                               height: flagSize)
                 }
                 Text(subtitle)
                     .textStyle(.bodySmall)
                     .foregroundStyle(DS.Color.textSecondary)
             }
         }
-        .padding(.vertical, verticalPadding)
+        .padding(.vertical, DS.Spacing.inputFieldVertical)
     }
 }
 
@@ -108,6 +109,6 @@ struct CurrencyInputField: View {
             onSelectCurrency: {}
         )
     }
-    .padding(.horizontal, 16)
+    .padding(.horizontal, DS.Spacing.m)
     .frame(width: 320)
 }

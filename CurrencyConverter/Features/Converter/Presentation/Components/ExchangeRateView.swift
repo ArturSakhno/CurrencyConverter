@@ -9,11 +9,11 @@ struct ExchangeRateView: View {
             .textStyle(.body)
             .foregroundStyle(DS.Color.interactivePrimary)
             .padding(.horizontal, DS.Spacing.s)
-            .padding(.vertical, 11)
+            .padding(.vertical, DS.Spacing.pillVertical)
             .background(DS.Color.surfaceOverlay, in: .rect(cornerRadius: DS.Radius.pill))
             .overlay(
                 RoundedRectangle(cornerRadius: DS.Radius.pill)
-                    .stroke(DS.Color.borderDefault, lineWidth: DS.borderWidth)
+                    .stroke(DS.Color.borderDefault, lineWidth: DS.BorderWidth.default)
             )
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
     }

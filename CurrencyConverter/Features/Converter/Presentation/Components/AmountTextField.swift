@@ -12,8 +12,6 @@ nonisolated enum FocusSlot: Hashable {
 }
 
 struct AmountTextField: View {
-    static let minimumScale: CGFloat = 0.1
-
     @Binding var text: String
 
     @State private var draft = ""
@@ -41,7 +39,7 @@ struct AmountTextField: View {
                 Text(draft.isEmpty ? "0" : draft)
                     .lineLimit(1)
                     .fixedSize()
-                    .padding(.trailing, 2)
+                    .padding(.trailing, DS.Spacing.xxxs)
                     .hidden()
                     .overlay {
                         TextField(
@@ -82,7 +80,7 @@ struct AmountTextField: View {
 private extension AmountTextField {
     var scale: CGFloat {
         guard let availableWidth, naturalWidth > 0 else { return 1 }
-        return min(1, max(Self.minimumScale, availableWidth / naturalWidth))
+        return min(1, max(DS.minimumAmountScale, availableWidth / naturalWidth))
     }
 }
 

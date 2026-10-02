@@ -2,11 +2,6 @@ import DesignSystem
 import SwiftUI
 
 struct ConverterView: View {
-    private enum Layout {
-        static let screenTop: CGFloat = 54
-        static let rowGap: CGFloat = 30
-    }
-
     private enum Sign {
         static let outgoing = "−"
         static let incoming = "+"
@@ -41,18 +36,18 @@ struct ConverterView: View {
                             row(.top)
                                 .containerShape(.rect)
                                 .skeleton(isPlaceholder)
-                                .padding(.bottom, Layout.rowGap)
+                                .padding(.bottom, DS.Spacing.converterRowGap)
 
                             row(.bottom)
                                 .skeleton(isPlaceholder)
-                                .padding(.top, Layout.rowGap)
+                                .padding(.top, DS.Spacing.converterRowGap)
                                 .background(DS.Color.bgPrimary)
                         }
 
                         exchange
                     }
                 }
-                .padding(.top, Layout.screenTop)
+                .padding(.top, DS.Spacing.screenTop)
                 .background(DS.Color.bgSelected)
 
                 Spacer(minLength: 0)

@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct CurrencyPickerRow: View {
-    @ScaledMetric(relativeTo: .largeTitle) private var flagSize: CGFloat = 28
+    @ScaledMetric(relativeTo: .largeTitle) private var flagSize: CGFloat = DS.Size.flagMedium
 
     let info: CurrencyDisplayInfo
     let isSelected: Bool
@@ -33,7 +33,7 @@ struct CurrencyPickerRow: View {
                         Circle()
                             .stroke(
                                 DS.Color.selectorUnselectedBorder,
-                                lineWidth: 2
+                                lineWidth: DS.BorderWidth.selector
                             )
                     }
                 }
