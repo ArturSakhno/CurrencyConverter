@@ -1,11 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-nonisolated enum AmountField: Hashable {
-    case base
-    case quote
-}
-
 nonisolated enum FocusSlot: Hashable {
     case top
     case bottom
@@ -15,8 +10,6 @@ struct AmountTextField: View {
     @Binding var text: String
 
     @State private var draft = ""
-    @State private var availableWidth: CGFloat?
-    @State private var naturalWidth: CGFloat = 0
 
     let sign: String?
     let currencySymbol: String?
@@ -27,45 +20,21 @@ struct AmountTextField: View {
         HStack(spacing: DS.Spacing.xxs) {
             if let sign {
                 Text(sign)
-                    .foregroundStyle(draft.isEmpty ? DS.Color.textSecondary : DS.Color.textPrimary)
+                    .foregroundStyle(prefixColor)
             }
 
             HStack(spacing: .zero) {
                 if let currencySymbol {
                     Text(currencySymbol)
-                        .foregroundStyle(draft.isEmpty ? DS.Color.textSecondary : DS.Color.textPrimary)
+                        .foregroundStyle(prefixColor)
                 }
 
-                Text(draft.isEmpty ? "0" : draft)
-                    .lineLimit(1)
-                    .fixedSize()
-                    .padding(.trailing, DS.Spacing.xxxs)
-                    .hidden()
-                    .overlay {
-                        TextField(
-                            text: $draft,
-                            prompt: Text(verbatim: "0")
-                                .foregroundStyle(DS.Color.textSecondary)
-                        ) { EmptyView() }
-                            .foregroundStyle(DS.Color.textPrimary)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .lineLimit(2)
-                            .focused(focusedField, equals: field)
-                    }
+                input
             }
         }
         .textStyle(.amountInput)
         .monospacedDigit()
-        .fixedSize()
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
-            naturalWidth = width
-        }
-        .scaleEffect(scale, anchor: .trailing)
-        .frame(minWidth: 0, maxWidth: .infinity, alignment: .trailing)
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
-            availableWidth = width
-        }
+        .shrinkToFit(minimumScale: DS.minimumAmountScale)
         .onChange(of: text, initial: true) {
             draft = text
         }
@@ -78,9 +47,28 @@ struct AmountTextField: View {
 }
 
 private extension AmountTextField {
-    var scale: CGFloat {
-        guard let availableWidth, naturalWidth > 0 else { return 1 }
-        return min(1, max(DS.minimumAmountScale, availableWidth / naturalWidth))
+    var prefixColor: Color {
+        draft.isEmpty ? DS.Color.textSecondary : DS.Color.textPrimary
+    }
+
+    var input: some View {
+        Text(draft.isEmpty ? "0" : draft)
+            .lineLimit(1)
+            .fixedSize()
+            .padding(.trailing, DS.Spacing.xxxs)
+            .hidden()
+            .overlay {
+                TextField(
+                    text: $draft,
+                    prompt: Text(verbatim: "0")
+                        .foregroundStyle(DS.Color.textSecondary)
+                ) { EmptyView() }
+                    .foregroundStyle(DS.Color.textPrimary)
+                    .keyboardType(.decimalPad)
+                    .multilineTextAlignment(.trailing)
+                    .lineLimit(2)
+                    .focused(focusedField, equals: field)
+            }
     }
 }
 
@@ -94,7 +82,7 @@ private extension AmountTextField {
         field: .top,
         focusedField: $focusedField
     )
-    .padding()
+    .padding(DS.Spacing.m)
 }
 
 #Preview("Filled") {
@@ -107,7 +95,7 @@ private extension AmountTextField {
         field: .bottom,
         focusedField: $focusedField
     )
-    .padding()
+    .padding(DS.Spacing.m)
 }
 
 #Preview("Dark Mode") {
@@ -120,7 +108,7 @@ private extension AmountTextField {
         field: .top,
         focusedField: $focusedField
     )
-    .padding()
+    .padding(DS.Spacing.m)
     .preferredColorScheme(.dark)
 }
 
@@ -134,6 +122,6 @@ private extension AmountTextField {
         field: .bottom,
         focusedField: $focusedField
     )
-    .padding()
+    .padding(DS.Spacing.m)
     .environment(\.dynamicTypeSize, .accessibility5)
 }

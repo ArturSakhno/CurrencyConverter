@@ -3,7 +3,6 @@ import SwiftUI
 
 struct CurrencyInputField: View {
     @Binding var amountText: String
-    @ScaledMetric(relativeTo: .caption2) private var flagSize: CGFloat = DS.Size.flagSmall
 
     let currencyCode: String
     let sign: String?
@@ -18,23 +17,11 @@ struct CurrencyInputField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
             HStack(spacing: DS.Spacing.xxs) {
-                Button {
-                    onSelectCurrency()
-                } label: {
-                    HStack(spacing: .zero) {
-                        Text(currencyCode)
-                            .textStyle(.h3)
-                            .foregroundStyle(DS.Color.textPrimary)
-                        if showsChevron {
-                            DS.Icon.chevronDown
-                                .resizable()
-                                .foregroundStyle(DS.Color.iconPrimary)
-                                .frame(width: DS.Size.icon, height: DS.Size.icon)
-                        }
-                    }
-                    .fixedSize()
-                }
-                .disabled(!showsChevron)
+                CurrencyCodeButton(
+                    code: currencyCode,
+                    showsChevron: showsChevron,
+                    action: onSelectCurrency
+                )
 
                 AmountTextField(
                     text: $amountText,
@@ -45,18 +32,7 @@ struct CurrencyInputField: View {
                 )
             }
 
-            HStack(spacing: DS.Spacing.xxs) {
-                if let imageName {
-                    Image(imageName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: flagSize,
-                               height: flagSize)
-                }
-                Text(subtitle)
-                    .textStyle(.bodySmall)
-                    .foregroundStyle(DS.Color.textSecondary)
-            }
+            CurrencySubtitle(imageName: imageName, text: subtitle)
         }
         .padding(.vertical, DS.Spacing.inputFieldVertical)
     }

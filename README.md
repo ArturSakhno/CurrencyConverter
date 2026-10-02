@@ -60,7 +60,7 @@ Packages/
 
 - `DS.Color`: each token is a plain `Color` with a light and a dark hex that follows the system appearance.
 - `TextStyle`, applied with `.textStyle(.h3)`: scales with Dynamic Type through `@ScaledMetric`, relative to a system text style.
-- `DS.Spacing`, `DS.Radius` and `DS.Size`, the icons in `DS.Icon`, and the `.skeleton(_:)` loading modifier.
+- `DS.Spacing`, `DS.Radius` and `DS.Size`, the icons in `DS.Icon`, the `.skeleton(_:)` loading modifier, and `.shrinkToFit(minimumScale:)`, which scales a long amount down to fit its row.
 
 Views never use raw colors or `.system(size:)`.
 

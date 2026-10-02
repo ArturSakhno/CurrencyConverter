@@ -18,20 +18,27 @@ struct RootView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(DS.Color.bgPrimary)
             .sheet(item: $coordinator.presentedSheet) { route in
-                switch route {
-                case .currencyPicker:
-                    if case let .converter(content) = converterViewModel.state {
-                        CurrencyPickerView(
-                            currencies: content.availableCurrencies,
-                            selection: content.quoteCurrency,
-                            onSelect: { currency in
-                                converterViewModel.selectQuoteCurrency(currency)
-                                coordinator.dismissSheet()
-                            },
-                            onClose: { coordinator.dismissSheet() }
-                        )
-                    }
-                }
+                sheetContent(for: route)
+            }
+        }
+    }
+}
+
+private extension RootView {
+    @ViewBuilder
+    func sheetContent(for route: AppCoordinator.SheetRoute) -> some View {
+        switch route {
+        case .currencyPicker:
+            if case let .converter(content) = converterViewModel.state {
+                CurrencyPickerView(
+                    currencies: content.availableCurrencies,
+                    selection: content.quoteCurrency,
+                    onSelect: { currency in
+                        converterViewModel.selectQuoteCurrency(currency)
+                        coordinator.dismissSheet()
+                    },
+                    onClose: { coordinator.dismissSheet() }
+                )
             }
         }
     }

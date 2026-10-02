@@ -1,5 +1,10 @@
 import Foundation
 
+nonisolated enum AmountField: Hashable {
+    case base
+    case quote
+}
+
 @Observable
 final class ConverterViewModel {
     enum State: Equatable {

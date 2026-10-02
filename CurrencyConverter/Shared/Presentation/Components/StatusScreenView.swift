@@ -23,22 +23,8 @@ struct StatusScreenView: View {
                 .textStyle(.body)
                 .foregroundStyle(DS.Color.textSecondary)
 
-            Button(action: onRetry) {
-                Text(Localized.Common.retry)
-                    .textStyle(.body)
-                    .foregroundStyle(DS.Color.onInteractivePrimary)
-                    .opacity(isRetrying ? 0 : 1)
-                    .overlay {
-                        if isRetrying {
-                            ProgressView()
-                                .tint(DS.Color.onInteractivePrimary)
-                        }
-                    }
-                    .padding(.horizontal, DS.Spacing.l)
-                    .padding(.vertical, DS.Spacing.s)
-                    .background(DS.Color.interactivePrimary, in: .capsule)
-            }
-            .padding(.top, DS.Spacing.xs)
+            RetryButton(isRetrying: isRetrying, action: onRetry)
+                .padding(.top, DS.Spacing.xs)
         }
         .multilineTextAlignment(.center)
         .padding(DS.Spacing.l)

@@ -20,30 +20,13 @@ struct ConverterView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: .zero) {
                 VStack(alignment: .leading, spacing: .zero) {
-                    Text(Localized.Converter.title)
-                        .padding(.horizontal, DS.Spacing.m)
-                        .textStyle(.h3)
-                        .foregroundStyle(DS.Color.textPrimary)
-
-                    Text(Localized.Converter.ratesAsOf(viewModel.ratesAsOfText ?? "00:00"))
-                        .padding(.horizontal, DS.Spacing.m)
-                        .textStyle(.bodySmall)
-                        .foregroundStyle(DS.Color.textSecondary)
-                        .skeleton(isPlaceholder)
+                    ConverterHeader(
+                        ratesAsOfText: viewModel.ratesAsOfText,
+                        isPlaceholder: isPlaceholder
+                    )
 
                     ZStack {
-                        VStack {
-                            row(.top)
-                                .containerShape(.rect)
-                                .skeleton(isPlaceholder)
-                                .padding(.bottom, DS.Spacing.converterRowGap)
-
-                            row(.bottom)
-                                .skeleton(isPlaceholder)
-                                .padding(.top, DS.Spacing.converterRowGap)
-                                .background(DS.Color.bgPrimary)
-                        }
-
+                        rows
                         exchange
                     }
                 }
@@ -55,10 +38,7 @@ struct ConverterView: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .background(alignment: .top) {
-            Rectangle()
-                .fill(DS.Color.bgSelected)
-                .ignoresSafeArea(edges: .top)
-                .frame(height: .zero)
+            statusBarBackground
         }
         .contentShape(.rect)
         .onTapGesture {
@@ -68,42 +48,61 @@ struct ConverterView: View {
 }
 
 private extension ConverterView {
+    var rateText: String {
+        viewModel.ratePillText(
+            baseDisplayCode: CurrencyDisplayInfo.info(for: viewModel.baseCurrency).displayCode,
+            quoteDisplayCode: CurrencyDisplayInfo.info(for: quoteCurrency).displayCode
+        )
+    }
+
+    var statusBarBackground: some View {
+        Rectangle()
+            .fill(DS.Color.bgSelected)
+            .ignoresSafeArea(edges: .top)
+            .frame(height: .zero)
+    }
+
+    var rows: some View {
+        VStack(spacing: DS.Spacing.xs) {
+            row(.top)
+                .containerShape(.rect)
+                .skeleton(isPlaceholder)
+                .padding(.bottom, DS.Spacing.converterRowGap)
+
+            row(.bottom)
+                .skeleton(isPlaceholder)
+                .padding(.top, DS.Spacing.converterRowGap)
+                .background(DS.Color.bgPrimary)
+        }
+    }
+
     var exchange: some View {
         ZStack(alignment: .leading) {
             SwapButton {
-                viewModel.swap()
-                if focusedSlot != nil {
-                    focusedSlot = focusedSlot == .top ? .bottom : .top
-                }
+                swapRows()
             }
             .rotationEffect(viewModel.isBaseOnTop ? .degrees(0) : .degrees(180))
             .animation(.default, value: viewModel.isBaseOnTop)
             .padding(.leading, DS.Spacing.m)
 
-            ExchangeRateView(
-                text: viewModel.ratePillText(
-                    baseDisplayCode: CurrencyDisplayInfo.info(for: viewModel.baseCurrency).displayCode,
-                    quoteDisplayCode: CurrencyDisplayInfo.info(for: quoteCurrency).displayCode
-                )
-            )
-            .skeleton(isPlaceholder)
-            .frame(maxWidth: .infinity)
-            .allowsHitTesting(false)
+            ExchangeRateView(text: rateText)
+                .skeleton(isPlaceholder)
+                .frame(maxWidth: .infinity)
+                .allowsHitTesting(false)
         }
     }
 
     func row(_ slot: FocusSlot) -> some View {
-        let isTop = slot == .top
-        let isBase = isTop == viewModel.isBaseOnTop
-        let currency = isPlaceholder || isBase ? viewModel.baseCurrency : quoteCurrency
+        let field = amountField(in: slot)
+        let currency = isPlaceholder || field == .base ? viewModel.baseCurrency : quoteCurrency
         let info = CurrencyDisplayInfo.info(for: currency)
         return CurrencyInputField(
-            amountText: isPlaceholder ? .constant(Self.placeholderAmount) : amountText(for: isBase ? .base : .quote),
+            amountText: amountText(for: field),
             currencyCode: info.displayCode,
-            sign: isPlaceholder ? nil : (isTop ? Sign.outgoing : Sign.incoming),
+            sign: isPlaceholder ? nil : sign(for: slot),
             currencySymbol: isPlaceholder ? nil : info.currencySymbol,
             subtitle: info.subtitle,
-            showsChevron: !isPlaceholder && !isBase,
+            showsChevron: !isPlaceholder && field == .quote,
             imageName: info.flagAssetName,
             field: slot,
             focusedField: $focusedSlot,
@@ -113,11 +112,27 @@ private extension ConverterView {
         .padding(.vertical, DS.Spacing.l)
     }
 
+    func amountField(in slot: FocusSlot) -> AmountField {
+        (slot == .top) == viewModel.isBaseOnTop ? .base : .quote
+    }
+
+    func sign(for slot: FocusSlot) -> String {
+        slot == .top ? Sign.outgoing : Sign.incoming
+    }
+
     func amountText(for field: AmountField) -> Binding<String> {
-        Binding(
+        guard !isPlaceholder else { return .constant(Self.placeholderAmount) }
+        return Binding(
             get: { viewModel.amountText(for: field) },
             set: { viewModel.setAmountText($0, for: field) }
         )
+    }
+
+    func swapRows() {
+        viewModel.swap()
+        if focusedSlot != nil {
+            focusedSlot = focusedSlot == .top ? .bottom : .top
+        }
     }
 }
 

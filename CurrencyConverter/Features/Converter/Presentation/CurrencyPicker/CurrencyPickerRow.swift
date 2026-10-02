@@ -17,27 +17,9 @@ struct CurrencyPickerRow: View {
                     .textStyle(.body)
                     .foregroundStyle(DS.Color.textPrimary)
 
-                Spacer()
+                Spacer(minLength: DS.Spacing.xs)
 
-                Group {
-                    if isSelected {
-                        ZStack {
-                            Circle()
-                                .fill(DS.Color.interactivePrimary)
-
-                            DS.Icon.checkmark
-                                .resizable()
-                                .foregroundStyle(DS.Color.bgPrimary)
-                        }
-                    } else {
-                        Circle()
-                            .stroke(
-                                DS.Color.selectorUnselectedBorder,
-                                lineWidth: DS.BorderWidth.selector
-                            )
-                    }
-                }
-                .frame(width: DS.Size.icon, height: DS.Size.icon)
+                SelectionIndicator(isSelected: isSelected)
             }
             .contentShape(Rectangle())
         }
@@ -67,7 +49,7 @@ private extension CurrencyPickerRow {
         isSelected: true,
         onSelect: {}
     )
-    .padding()
+    .padding(DS.Spacing.m)
 }
 
 #Preview("Unselected") {
@@ -76,7 +58,7 @@ private extension CurrencyPickerRow {
         isSelected: false,
         onSelect: {}
     )
-    .padding()
+    .padding(DS.Spacing.m)
 }
 
 #Preview("Accessibility XXXL") {
@@ -85,6 +67,6 @@ private extension CurrencyPickerRow {
         isSelected: false,
         onSelect: {}
     )
-    .padding()
+    .padding(DS.Spacing.m)
     .environment(\.dynamicTypeSize, .accessibility5)
 }
