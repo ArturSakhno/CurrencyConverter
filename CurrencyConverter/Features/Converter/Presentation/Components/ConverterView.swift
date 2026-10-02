@@ -110,6 +110,10 @@ private extension ConverterView {
         )
         .padding(.horizontal, DS.Spacing.m)
         .padding(.vertical, DS.Spacing.l)
+        .contentShape(.rect)
+        .onTapGesture {
+            focusedSlot = slot
+        }
     }
 
     func amountField(in slot: FocusSlot) -> AmountField {
