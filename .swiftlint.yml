@@ -1,0 +1,139 @@
+included:
+  - CurrencyConverter
+  - CurrencyConverterTests
+  - Packages
+
+excluded:
+  - CurrencyConverter.xcodeproj
+  - DerivedData
+  - .build
+  - Packages/*/.build
+  - Packages/*/.swiftpm
+
+disabled_rules:
+  - trailing_comma # trailing commas keep multi-line literal diffs to one line
+  - todo
+
+opt_in_rules:
+  - array_init
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - contains_over_first_not_nil
+  - contains_over_range_nil_comparison
+  - discouraged_optional_boolean
+  - empty_collection_literal
+  - empty_count
+  - explicit_init
+  - fatal_error_message
+  - first_where
+  - flatmap_over_map_reduce
+  - force_unwrapping
+  - identical_operands
+  - implicit_return
+  - joined_default_parameter
+  - last_where
+  - literal_expression_end_indentation
+  - modifier_order
+  - multiline_arguments
+  - multiline_parameters
+  - operator_usage_whitespace
+  - overridden_super_call
+  - prefer_self_type_over_type_of_self
+  - private_swiftui_state
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - sorted_first_last
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_parameter_alignment_on_call
+  - yoda_condition
+
+analyzer_rules:
+  - unused_declaration
+  - unused_import
+
+force_unwrapping:
+  ignored_literal_argument_functions: []
+
+line_length:
+  warning: 140
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+  ignores_interpolated_strings: true
+
+identifier_name:
+  min_length: 2
+  excluded:
+    - a
+    - b
+    - g
+    - r
+    - x
+    - y
+    - s
+    - m
+    - l
+
+type_name:
+  max_length: 50
+  excluded:
+    - DS
+
+function_body_length:
+  warning: 60
+  error: 100
+
+file_length:
+  warning: 400
+  error: 600
+
+type_body_length:
+  warning: 300
+  error: 450
+
+nesting:
+  type_level: 2
+
+custom_rules:
+  no_double_money:
+    name: "Money is Decimal"
+    regex: '\b(amount|rate|bid|ask|price)\w*\s*:\s*Double\b'
+    message: "Money values must be Decimal, never Double."
+    severity: error
+
+  private_method_outside_private_extension:
+    name: "Private Method Outside Private Extension"
+    regex: '\b(?:private|fileprivate)\s+(?:(?:static|class|nonisolated|override|final|mutating|nonmutating)\s+)*func\b'
+    message: "Move private methods into a `private extension`."
+    severity: warning
+    excluded_match_kinds:
+      - comment
+      - comment.mark
+      - comment.url
+      - doccomment
+      - doccomment.field
+      - string
+
+  computed_property_in_extension:
+    name: "Computed Property In Extension"
+    regex: '^(?:(?:public|package|internal|fileprivate|private|nonisolated|final|indirect) )*(?:struct|class|enum|actor) (\w+)\b.*?^(?:(?:public|package|internal|fileprivate|private|nonisolated) )*extension \1(?=[\s:{<])[^\n]*\{\n(?:(?!\}\n)[^\n]*\n)*? {4}(?:@\w+(?:\([^)\n]*\))? )*(?:(?:public|package|internal|fileprivate|private|static|nonisolated|override) )*var \w+\s*:[^={\n]*\{(?!\s*(?:willSet|didSet)\b)'
+    message: "Declare computed properties in the type body, after init: internal ones first, then private."
+    severity: warning
+
+  let_before_var:
+    name: "Let Before Var"
+    regex: '^( {4})((?:(?:private|fileprivate|internal|package|public|open) )?)(?:(?:private|fileprivate|internal|package)\(set\) )?(?:(?:nonisolated|weak|unowned|lazy|final) )*var \w+[^\n{]*\n(?:[ \t]*\n|\1\2(?:(?:private|fileprivate|internal|package)\(set\) )?(?:(?:nonisolated|weak|unowned|lazy|final) )*(?:let|var) \w+[^\n{]*\n)*\1\2(?:(?:nonisolated|final) )*let \w'
+    message: "Declare `let` properties before `var` properties of the same access level."
+    severity: warning
+    excluded_match_kinds:
+      - comment
+      - comment.mark
+      - comment.url
+      - doccomment
+      - doccomment.field
+
+reporter: xcode

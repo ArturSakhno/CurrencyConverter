@@ -1,0 +1,281 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "common.retry" : {
+      "comment" : "Button that tries a failed operation again",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar"
+          }
+        }
+      }
+    },
+    "converter.chooseCurrency" : {
+      "comment" : "Navigation title for the currency picker sheet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose currency"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir moneda"
+          }
+        }
+      }
+    },
+    "converter.currency.argentinePesos" : {
+      "comment" : "Subtitle for ARS",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Argentine pesos"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesos argentinos"
+          }
+        }
+      }
+    },
+    "converter.currency.brazilianReais" : {
+      "comment" : "Subtitle for BRL",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brazilian reais"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reales brasileños"
+          }
+        }
+      }
+    },
+    "converter.currency.colombianPesos" : {
+      "comment" : "Subtitle for COP",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colombian pesos"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesos colombianos"
+          }
+        }
+      }
+    },
+    "converter.currency.digitalDollars" : {
+      "comment" : "Subtitle for USDC",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digital dollars"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dólares digitales"
+          }
+        }
+      }
+    },
+    "converter.currency.digitalEuros" : {
+      "comment" : "Subtitle for EURC",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digital euros"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Euros digitales"
+          }
+        }
+      }
+    },
+    "converter.currency.mexicanPesos" : {
+      "comment" : "Subtitle for MXN",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mexican pesos"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesos mexicanos"
+          }
+        }
+      }
+    },
+    "converter.noConnection.message" : {
+      "comment" : "Instructions shown when the first exchange rate request fails while the device is offline",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect to the internet to load exchange rates."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conéctate a internet para cargar las tasas de cambio."
+          }
+        }
+      }
+    },
+    "converter.noConnection.title" : {
+      "comment" : "Title when the first exchange rate request fails while the device is offline",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No connection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión"
+          }
+        }
+      }
+    },
+    "converter.rateQuote %@ %@ %@" : {
+      "comment" : "Exchange rate; values are the base currency code, rate, and quote currency code",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 %@ = %@ %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 %@ = %@ %@"
+          }
+        }
+      }
+    },
+    "converter.ratesAsOf %@" : {
+      "comment" : "Caption under the screen title; the value is the local time the rates were fetched",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rates as of %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasas actualizadas: %@"
+          }
+        }
+      }
+    },
+    "converter.rateUnavailable" : {
+      "comment" : "Shown when the selected currency has no exchange rate",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rate unavailable"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasa no disponible"
+          }
+        }
+      }
+    },
+    "converter.title" : {
+      "comment" : "Main converter screen title",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exchange calculator"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculadora de cambio"
+          }
+        }
+      }
+    },
+    "converter.unavailable.message" : {
+      "comment" : "Generic instructions shown when the first load fails while the device is online",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please try again to load exchange rates."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inténtalo de nuevo para cargar las tasas de cambio."
+          }
+        }
+      }
+    },
+    "converter.unavailable.title" : {
+      "comment" : "Generic title when the first load fails while the device is online",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo salió mal"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

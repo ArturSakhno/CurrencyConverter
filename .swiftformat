@@ -1,0 +1,39 @@
+# SwiftFormat config - applied to staged Swift files by .githooks/pre-commit.
+# Kept in step with .swiftlint.yml (140-column lines, trailing commas allowed).
+
+--swiftversion 6.0
+--exclude .build,DerivedData,**/.swiftpm,*.xcodeproj
+
+--indent 4
+--maxwidth 140
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--closingparen balanced
+--commas always
+--header strip
+--stripunusedargs closure-only
+
+# Code inside `#if DEBUG` stays at file level: previews sit flush-left, not indented.
+--ifdef no-indent
+
+# Match SwiftLint's modifier_order: `nonisolated final class` and
+# `nonisolated private var`, not `final nonisolated class` or `private nonisolated var`.
+--modifier-order nonisolated,open,public,package,internal,fileprivate,private,final
+
+# Keep short computed properties and functions on one line: `var id: String { code }`.
+--disable wrapPropertyBodies,wrapFunctionBodies
+
+# Declaration order in every type and extension: nested types, static properties, property
+# wrappers, stored properties, init, body, computed properties, methods. Public before private
+# within each group, so internal computed properties sit right under init and private ones after
+# them. No MARK comments.
+--enable organizeDeclarations
+--organizationmode type
+--typeorder beforeMarks,nestedType,staticProperty,staticPropertyWithBody,classPropertyWithBody,overriddenProperty,swiftUIPropertyWrapper,instanceProperty,instanceLifecycle,swiftUIProperty,swiftUIMethod,computedProperty,overriddenMethod,staticMethod,classMethod,instanceMethod
+--organizetypes class,actor,struct,enum,extension
+--markcategories false
+
+# Property attributes stay on the declaration's line: `@State private var draft = ""`.
+--storedvarattrs same-line
+--computedvarattrs same-line

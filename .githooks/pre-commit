@@ -1,0 +1,40 @@
+#!/bin/sh
+# Formats staged Swift files with SwiftFormat (config: .swiftformat) and re-stages them, then
+# lints them with SwiftLint (config: .swiftlint.yml). Any SwiftLint warning blocks the commit.
+# Enable once per clone:  git config core.hooksPath .githooks
+# Skip for one commit:     git commit --no-verify
+
+# Xcode-launched git doesn't inherit the shell PATH; Homebrew on Apple silicon lives here.
+PATH="$PATH:/opt/homebrew/bin:/usr/local/bin"
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR -- '*.swift')
+[ -z "$staged" ] && exit 0
+
+status=0
+
+if command -v swiftformat >/dev/null 2>&1; then
+    echo "$staged" | while IFS= read -r file; do
+        # A file with unstaged edits too can't be re-staged safely - that would sneak the
+        # unstaged part into the commit. Lint it instead and let the author fix it.
+        if ! git diff --quiet -- "$file"; then
+            if ! swiftformat --lint --quiet "$file"; then
+                echo "pre-commit: $file needs formatting but is partially staged." >&2
+                echo "            Run 'swiftformat $file', review, and stage it again." >&2
+                exit 1
+            fi
+            continue
+        fi
+        swiftformat --quiet "$file" && git add -- "$file"
+    done || status=1
+else
+    echo "pre-commit: swiftformat not found (brew install swiftformat) - skipping formatting." >&2
+fi
+
+if command -v swiftlint >/dev/null 2>&1; then
+    # SwiftLint reads the working tree, so a partially staged file is checked with its unstaged edits.
+    echo "$staged" | tr '\n' '\0' | xargs -0 swiftlint lint --strict --quiet --force-exclude || status=1
+else
+    echo "pre-commit: swiftlint not found (brew install swiftlint) - skipping lint." >&2
+fi
+
+exit $status
