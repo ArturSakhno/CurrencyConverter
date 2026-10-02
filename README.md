@@ -15,7 +15,7 @@ The deployment target is iOS 17. The app was tested on iOS 26 and later, on an i
 
 ## Features
 
-- **Two amount fields.** Edit either one and the other recalculates.
+- **Two amount fields.** Edit either one and the other recalculates. Tapping anywhere on a row focuses its amount field.
 - **Currency picker.** Tapping the non-USDc currency opens the "Choose currency" sheet with MXN, EURc, ARS, COP and BRL.
 - **Swap.** The arrow button moves USDc between the top and bottom rows. The last edited amount stays and the other one is recalculated for the new direction. A focused field keeps focus on its currency in the new row.
 - **Direction-aware rate.** With USDc on top you sell USDc, so the app uses the `bid`. With USDc on the bottom you buy USDc, so it uses the `ask`. The `-` and `+` signs on the rows match the Figma.
@@ -44,7 +44,7 @@ CurrencyConverter/
   Shared/                 NetworkMonitor port, NWPathNetworkMonitor, StatusScreenView
   Resources/              Localizable.xcstrings, Localized.swift
 Packages/
-  DesignSystem/           Tokens, icons, skeleton modifier
+  DesignSystem/           Tokens, icons, skeleton and shrink-to-fit modifiers
   Networking/             RequestBuilder, NetworkClient, NetworkError
 ```
 
@@ -60,7 +60,7 @@ Packages/
 
 - `DS.Color`: each token is a plain `Color` with a light and a dark hex that follows the system appearance.
 - `TextStyle`, applied with `.textStyle(.h3)`: scales with Dynamic Type through `@ScaledMetric`, relative to a system text style.
-- `DS.Spacing`, `DS.Radius` and `DS.Size`, the icons in `DS.Icon`, the `.skeleton(_:)` loading modifier, and `.shrinkToFit(minimumScale:)`, which scales a long amount down to fit its row.
+- `DS.Spacing`, `DS.Radius`, `DS.Size` and `DS.BorderWidth`, the icons in `DS.Icon`, the `.skeleton(_:)` loading modifier, and `.shrinkToFit(minimumScale:)`, which scales a long amount down to fit its row.
 
 Views never use raw colors or `.system(size:)`.
 
@@ -94,7 +94,7 @@ The first load fetches the currency list, then the rates for those codes. If eit
 Unit tests use Swift Testing and mirror the app's folder layout:
 
 - **Domain:** `ConvertCurrencyUseCase`, `LoadExchangeRatesUseCase`, `CurrencyCatalogUseCase`.
-- **Data:** `TickerDTO` decoding, `DefaultTickersAPIClient`, `RemoteExchangeRateRepository`, `NWPathNetworkMonitor`.
+- **Data:** `TickerDTO` decoding, `DefaultTickersAPIClient`, `RemoteExchangeRateRepository`.
 - **Presentation:** `ConverterViewModel`, `AmountFormatter`, `CurrencyDisplayInfo`.
 - **Packages:** `RequestBuilder`, `URLSessionNetworkClient`, DesignSystem colors.
 
@@ -102,11 +102,11 @@ Coverage:
 
 | Area | Lines covered |
 |---|---|
-| Domain and Data | 100% |
+| Converter Domain and Data | 100% |
 | `ConverterViewModel` | 94% |
 | `AmountFormatter` | 99% |
 | Networking package | 96% |
-| App target overall | 71% |
+| App target overall | 69% |
 
 The app target's overall number is lower because the SwiftUI views and their previews aren't unit-tested.
 
